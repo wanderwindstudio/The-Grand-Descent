@@ -68,6 +68,29 @@ public class TuningConfig : ScriptableObject
     public float goblinWidth = 0.8f;
     public float enemyHitFlashTime = 0.08f;
 
+    [Header("Goblin sprite (billboard visuals)")]
+    [Tooltip("Off = the old green capsules. Also switchable in the F1 panel.")]
+    public bool useSpriteEnemies = true;
+    [Tooltip("How tall the drawn goblin is in the world, in metres.")]
+    public float goblinSpriteHeight = 1.2f;
+    [Tooltip("Fraction of the image height the goblin fills (1 = top to bottom; the art spec targets 0.85).")]
+    [Range(0.1f, 1f)] public float goblinSpriteFillFraction = 1f;
+    [Tooltip("Hop height while walking, in metres.")]
+    public float spriteBobHeight = 0.06f;
+    [Tooltip("Steps per second while walking.")]
+    public float spriteBobSpeed = 3f;
+    [Tooltip("Side-to-side lean while walking, in degrees.")]
+    public float spriteSwayDegrees = 4f;
+    [Tooltip("How much the sprite stretches up during the attack wind-up (0.15 = 15%).")]
+    public float spriteWindUpStretch = 0.15f;
+    [Tooltip("How far the sprite lunges toward you at the end of the wind-up, in metres.")]
+    public float spriteLungeDistance = 0.35f;
+    [Tooltip("Red glow on the sprite during the wind-up, for readability. 0 = off.")]
+    public float spriteWindUpGlow = 0.25f;
+    public float spriteHitFlashStrength = 1.5f;
+    public float corpseDuration = 0.7f;
+    public float corpseTipDegrees = 85f;
+
     [Header("Behind-you warning (goblin winding up off-screen)")]
     public bool behindCueEnabled = true;
     public float behindCueVolume = 0.8f;

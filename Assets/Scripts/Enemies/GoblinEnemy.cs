@@ -15,6 +15,7 @@ public class GoblinEnemy : MonoBehaviour
     public bool IsDead { get; private set; }
     public bool IsWindingUp => state == State.WindUp;
     // 0 at the start of the wind-up, 1 when the hit lands.
+    public bool IsHitFlashing => hitFlashTimer > 0f;
     public float WindUp01 => IsWindingUp ? 1f - stateTimer / Game.Tuning.goblinWindUpTime : 0f;
 
     NavMeshAgent agent;

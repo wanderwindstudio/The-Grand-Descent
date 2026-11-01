@@ -60,6 +60,18 @@ public class DebugPanel : MonoBehaviour
         t.missileRadius = Slider("Hit radius", t.missileRadius, 0.05f, 1f);
         t.missilePierce = IntSlider("Pierce", t.missilePierce, 0, 5);
 
+        GUILayout.Label("Goblin visuals");
+        if (!Art.HasGoblinSprite) GUILayout.Label("(sprite or material missing - run Grand Descent > Create Prototype Scene)");
+        if (GUILayout.Button(t.useSpriteEnemies ? "Showing: SPRITE  (click for capsule)" : "Showing: CAPSULE  (click for sprite)"))
+            t.useSpriteEnemies = !t.useSpriteEnemies;
+        t.goblinSpriteHeight = Slider("Sprite height (m)", t.goblinSpriteHeight, 0.5f, 3f);
+        t.spriteBobHeight = Slider("Walk hop height", t.spriteBobHeight, 0f, 0.3f);
+        t.spriteBobSpeed = Slider("Walk steps/s", t.spriteBobSpeed, 0.5f, 8f);
+        t.spriteSwayDegrees = Slider("Walk lean", t.spriteSwayDegrees, 0f, 15f);
+        t.spriteWindUpStretch = Slider("Wind-up stretch", t.spriteWindUpStretch, 0f, 0.5f);
+        t.spriteLungeDistance = Slider("Wind-up lunge (m)", t.spriteLungeDistance, 0f, 1.5f);
+        t.spriteWindUpGlow = Slider("Wind-up red glow", t.spriteWindUpGlow, 0f, 3f);
+
         GUILayout.Label("Goblin");
         t.goblinHealth = Slider("Health (new spawns)", t.goblinHealth, 5f, 200f);
         t.goblinMoveSpeed = Slider("Move speed", t.goblinMoveSpeed, 0.5f, 10f);

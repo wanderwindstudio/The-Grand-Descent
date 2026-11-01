@@ -7,6 +7,10 @@ public class GameBootstrap : MonoBehaviour
     public TuningConfig config;
     [Tooltip("Assets/Settings/GrayboxLit. Every coloured material is copied from it.")]
     public Material baseMaterial;
+    [Tooltip("Assets/Art/Materials/mat_billboardCutout. Lit, alpha-cutout material for sprites.")]
+    public Material billboardMaterial;
+    [Tooltip("Assets/Art/Enemies/enemy_goblinIntern_idle_01")]
+    public Texture2D goblinSprite;
 
     void Awake()
     {
@@ -18,6 +22,8 @@ public class GameBootstrap : MonoBehaviour
         Game.InputBlocked = false;
 
         Mats.Template = baseMaterial;
+        Art.BillboardMaterial = billboardMaterial;
+        Art.GoblinIdle = goblinSprite;
         // Work on a copy so live slider changes don't silently overwrite the asset.
         Game.TuningAsset = config;
         Game.Tuning = config != null ? Instantiate(config) : ScriptableObject.CreateInstance<TuningConfig>();
@@ -28,6 +34,7 @@ public class GameBootstrap : MonoBehaviour
         PostProcessSetup.Create(Game.Tuning, Game.Camera);
 
         gameObject.AddComponent<LootDropper>();
+        gameObject.AddComponent<GoblinCorpses>();
         var waves = gameObject.AddComponent<WaveSpawner>();
         gameObject.AddComponent<Hud>();
         gameObject.AddComponent<LevelUpScreen>();
