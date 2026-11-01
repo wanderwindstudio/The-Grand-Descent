@@ -83,7 +83,12 @@ public class DebugPanel : MonoBehaviour
         t.goldDropChance = Slider("Gold drop chance", t.goldDropChance, 0f, 1f);
         t.goldPerDrop = Slider("Gold per coin (floor 1)", t.goldPerDrop, 1f, 20f);
         t.deathBankFraction = Slider("Banked on death", t.deathBankFraction, 0f, 1f);
+        t.collapseStartFloor = IntSlider("Collapse from floor", t.collapseStartFloor, 1, 10);
+        t.collapseTime = Slider("Collapse time", t.collapseTime, 3f, 60f);
+        t.collapseTimeReductionPerFloor = Slider("Collapse time -/floor", t.collapseTimeReductionPerFloor, 0f, 10f);
+        t.collapseTimeMin = Slider("Collapse time minimum", t.collapseTimeMin, 1f, 60f);
         GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Descend now")) RunManager.Instance.DebugDescend();
         if (GUILayout.Button("Open portals now")) RunManager.Instance.ForceOpenPortals();
         if (GUILayout.Button("Reset banked gold + runs")) { MetaProgress.ResetAll(); Hud.ShowMessage("Meta progress reset"); }
         GUILayout.EndHorizontal();
@@ -142,7 +147,10 @@ public class DebugPanel : MonoBehaviour
         t.hitIndicatorDuration = Slider("Hit arrow duration", t.hitIndicatorDuration, 0.2f, 4f);
         t.hitIndicatorRadius = Slider("Hit arrow distance", t.hitIndicatorRadius, 40f, 400f);
         t.behindCueVolume = Slider("Behind-you beep volume", t.behindCueVolume, 0f, 1f);
+        t.behindCuePitchHz = Slider("Behind-you beep pitch", t.behindCuePitchHz, 200f, 2000f);
+        t.behindCueMinInterval = Slider("Beep min interval", t.behindCueMinInterval, 0f, 1f);
         t.behindCueEnabled = GUILayout.Toggle(t.behindCueEnabled, "Behind-you beep on");
+        t.offscreenWarningArrows = GUILayout.Toggle(t.offscreenWarningArrows, "Off-screen attack arrows on");
 
         GUILayout.Label("Atmosphere");
         t.ambientIntensity = Slider("Ambient brightness", t.ambientIntensity, 0f, 1f);

@@ -19,4 +19,58 @@ public static class ToneGenerator
         clip.SetData(data, 0);
         return clip;
     }
+
+    // Two quick rising blips with a soft edge: "bip-BIP". Easy to locate by ear.
+    public static AudioClip WarningChirp(string name, float frequency)
+    {
+        const float blip = 0.07f, gap = 0.04f;
+        int blipSamples = Mathf.RoundToInt(SampleRate * blip);
+        int gapSamples = Mathf.RoundToInt(SampleRate * gap);
+        var data = new float[blipSamples * 2 + gapSamples];
+        for (int b = 0; b < 2; b++)
+        {
+            float f = frequency * (b == 0 ? 1f : 1.5f);
+            int offset = b * (blipSamples + gapSamples);
+            for (int i = 0; i < blipSamples; i++)
+            {
+                float t = i / (float)SampleRate;
+                float edge = Mathf.Clamp01(Mathf.Min(i, blipSamples - i) / (SampleRate * 0.008f)); // no clicks
+                // A little square-ish harmonic makes it cut through the fight noise.
+                float wave = Mathf.Sin(2f * Mathf.PI * f * t) + 0.3f * Mathf.Sin(6f * Mathf.PI * f * t);
+                data[offset + i] = wave * 0.7f * edge;
+            }
+        }
+        var clip = AudioClip.Create(name, data.Length, 1, SampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    // A seamless low rumble for looping (filtered noise plus a deep hum).
+    public static AudioClip Rumble(string name)
+    {
+        int count = SampleRate * 2;
+        var data = new float[count];
+        var rng = new System.Random(7);
+        float smooth = 0f;
+        for (int i = 0; i < count; i++)
+        {
+            float noise = (float)rng.NextDouble() * 2f - 1f;
+            smooth += (noise - smooth) * 0.02f; // low-pass
+            float t = i / (float)SampleRate;
+            float hum = Mathf.Sin(2f * Mathf.PI * 45f * t) * 0.3f; // deep hum under the noise
+            data[i] = Mathf.Clamp(smooth * 6f + hum, -1f, 1f);
+        }
+        // Cross-fade the ends so the loop has no click.
+        int fade = SampleRate / 10;
+        for (int i = 0; i < fade; i++)
+        {
+            float k = i / (float)fade;
+            data[i] = data[i] * k + data[count - fade + i] * (1f - k);
+        }
+        var clip = AudioClip.Create(name, count - fade, 1, SampleRate, false);
+        var trimmed = new float[count - fade];
+        System.Array.Copy(data, trimmed, trimmed.Length);
+        clip.SetData(trimmed, 0);
+        return clip;
+    }
 }

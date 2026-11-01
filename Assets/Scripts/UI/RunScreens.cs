@@ -33,7 +33,7 @@ public class RunScreens : MonoBehaviour
 
     void DrawSummary(RunManager run, float w, float h)
     {
-        GUI.Label(new Rect(0, h * 0.12f, w, 70), run.Extracted ? "EXTRACTED" : "YOU DIED", title);
+        GUI.Label(new Rect(0, h * 0.12f, w, 70), run.Extracted ? "EXTRACTED" : run.DiedToCollapse ? "CRUSHED BY THE COLLAPSE" : "YOU DIED", title);
 
         int minutes = Mathf.FloorToInt(run.RunDuration / 60f);
         int seconds = Mathf.FloorToInt(run.RunDuration % 60f);

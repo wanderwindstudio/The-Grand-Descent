@@ -36,7 +36,9 @@ public static class GoblinBuilder
         audio.playOnAwake = false;
         audio.spatialBlend = 1f;
         audio.rolloffMode = AudioRolloffMode.Linear;
-        audio.minDistance = 2f;
+        audio.minDistance = 3f;
+        audio.spread = 0f;       // sharp left/right panning
+        audio.dopplerLevel = 0f; // no pitch smear when you turn
 
         return root.AddComponent<GoblinEnemy>();
     }

@@ -41,6 +41,14 @@ public class PlayerHealth : MonoBehaviour
         return true;
     }
 
+    // Instant death regardless of health (the collapse).
+    public void Kill()
+    {
+        if (IsDead) return;
+        Current = 0f;
+        Die();
+    }
+
     void Die()
     {
         IsDead = true;

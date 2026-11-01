@@ -9,11 +9,13 @@ public class GoblinEnemy : MonoBehaviour
     public static readonly List<GoblinEnemy> Active = new List<GoblinEnemy>();
     // (where it died). Used to drop loot.
     public static event System.Action<Vector3> Killed;
-    static AudioClip behindCueClip;
 
     enum State { Chase, WindUp, Recover }
 
     public bool IsDead { get; private set; }
+    public bool IsWindingUp => state == State.WindUp;
+    // 0 at the start of the wind-up, 1 when the hit lands.
+    public float WindUp01 => IsWindingUp ? 1f - stateTimer / Game.Tuning.goblinWindUpTime : 0f;
 
     NavMeshAgent agent;
     AudioSource audioSource;
@@ -110,7 +112,7 @@ public class GoblinEnemy : MonoBehaviour
         var t = Game.Tuning;
         state = State.WindUp;
         stateTimer = t.goblinWindUpTime;
-        if (t.behindCueEnabled && !IsOnScreen()) PlayBehindCue();
+        if (t.behindCueEnabled && !IsOnScreen()) BehindYouCue.TryPlay(audioSource, transform.position);
     }
 
     // k goes 0 -> 1 over the wind-up: swell up and glow red.
@@ -144,18 +146,10 @@ public class GoblinEnemy : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(flatDirection);
     }
 
-    bool IsOnScreen()
+    public bool IsOnScreen()
     {
         Vector3 vp = Game.Camera.WorldToViewportPoint(transform.position + Vector3.up * (Game.Tuning.goblinHeight / 2f));
         return vp.z > 0f && vp.x > 0f && vp.x < 1f && vp.y > 0f && vp.y < 1f;
-    }
-
-    void PlayBehindCue()
-    {
-        var t = Game.Tuning;
-        if (behindCueClip == null) behindCueClip = ToneGenerator.Beep("BehindCue", t.behindCuePitchHz, t.behindCueDuration);
-        audioSource.maxDistance = t.behindCueMaxDistance;
-        audioSource.PlayOneShot(behindCueClip, t.behindCueVolume);
     }
 
     public void TakeDamage(float amount)

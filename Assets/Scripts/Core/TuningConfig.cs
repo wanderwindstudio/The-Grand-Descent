@@ -68,12 +68,18 @@ public class TuningConfig : ScriptableObject
     public float goblinWidth = 0.8f;
     public float enemyHitFlashTime = 0.08f;
 
-    [Header("Behind-you audio cue")]
+    [Header("Behind-you warning (goblin winding up off-screen)")]
     public bool behindCueEnabled = true;
-    public float behindCueVolume = 0.7f;
-    public float behindCuePitchHz = 880f;
-    public float behindCueDuration = 0.15f;
+    public float behindCueVolume = 0.8f;
+    [Tooltip("Pitch of the first blip; the second is higher.")]
+    public float behindCuePitchHz = 700f;
     public float behindCueMaxDistance = 25f;
+    [Tooltip("The cue gets higher-pitched the closer the goblin is (0.3 = up to 30% higher).")]
+    public float behindCueClosePitchBoost = 0.3f;
+    [Tooltip("Minimum seconds between cues, so 30 goblins don't make a wall of noise.")]
+    public float behindCueMinInterval = 0.15f;
+    [Tooltip("Amber arrows at the screen edge for off-screen goblins about to hit you.")]
+    public bool offscreenWarningArrows = true;
 
     [Header("Waves")]
     [Tooltip("Goblins per wave. Add or remove entries to change the number of waves.")]
@@ -152,6 +158,19 @@ public class TuningConfig : ScriptableObject
     public float floorEnemyCountMultiplier = 1.2f;
     public float floorEnemyDamageMultiplier = 1.15f;
     public float floorGoldMultiplier = 1.3f;
+
+    [Header("Collapse (floors where portals start a countdown)")]
+    public int collapseStartFloor = 3;
+    [Tooltip("Seconds to reach a portal on the first collapsing floor.")]
+    public float collapseTime = 20f;
+    [Tooltip("Each deeper floor gives this many fewer seconds.")]
+    public float collapseTimeReductionPerFloor = 2f;
+    public float collapseTimeMin = 10f;
+    [Tooltip("Last seconds where the screen pulses red.")]
+    public float collapseWarningTime = 5f;
+    [Tooltip("Camera shake at the very end, in metres.")]
+    public float collapseShakeMax = 0.08f;
+    public float collapseRumbleVolume = 0.6f;
 
     [Header("Portals")]
     public float portalRadius = 1.5f;

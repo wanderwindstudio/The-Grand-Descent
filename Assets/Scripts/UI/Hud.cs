@@ -19,6 +19,7 @@ public class Hud : MonoBehaviour
     PlayerUpgrades upgrades;
     WaveSpawner waves;
     SpellSwap spellSwap;
+    CollapseTimer collapse;
 
     const float MessageDuration = 2.5f;
 
@@ -43,6 +44,7 @@ public class Hud : MonoBehaviour
         upgrades = Game.Player.GetComponent<PlayerUpgrades>();
         waves = GetComponent<WaveSpawner>();
         spellSwap = Game.Player.GetComponent<SpellSwap>();
+        collapse = GetComponent<CollapseTimer>();
     }
 
     void OnPlayerDamaged(Vector3 source, float amount)
@@ -77,6 +79,8 @@ public class Hud : MonoBehaviour
             Fill(new Rect(0, 0, w, h), new Color(1f, 0f, 0f, a));
         }
 
+        DrawCollapse(w, h);
+        DrawOffscreenWarnings(w, h);
         DrawHitMarkers(w, h);
 
         // Crosshair
@@ -111,6 +115,54 @@ public class Hud : MonoBehaviour
 
         if (messageTimeLeft > 0f)
             GUI.Label(new Rect(0, h * 0.2f, w, 50), message, bigText);
+    }
+
+    // Big countdown at the top; the screen edges pulse red in the last seconds.
+    void DrawCollapse(float w, float h)
+    {
+        if (!collapse.Active) return;
+        var t = Game.Tuning;
+        if (collapse.TimeLeft <= t.collapseWarningTime)
+        {
+            float pulse = 0.5f + 0.5f * Mathf.Sin(Time.time * 10f);
+            float a = 0.25f * pulse * (1f - collapse.TimeLeft / t.collapseWarningTime);
+            Color edge = new Color(1f, 0f, 0f, a);
+            Fill(new Rect(0, 0, w, 40), edge);
+            Fill(new Rect(0, h - 40, w, 40), edge);
+            Fill(new Rect(0, 0, 40, h), edge);
+            Fill(new Rect(w - 40, 0, 40, h), edge);
+        }
+        GUI.color = Palette.HitIndicator;
+        GUI.Label(new Rect(0, 30, w, 50), $"COLLAPSE  {collapse.TimeLeft:0.0}", bigText);
+        GUI.color = Color.white;
+    }
+
+    // Amber arrows for goblins you can't see that are winding up an attack. They grow as the hit nears.
+    void DrawOffscreenWarnings(float w, float h)
+    {
+        var t = Game.Tuning;
+        if (!t.offscreenWarningArrows) return;
+        Vector3 forward = Game.Player.forward;
+        forward.y = 0f;
+        Vector2 centre = new Vector2(w / 2f, h / 2f);
+
+        foreach (var g in GoblinEnemy.Active)
+        {
+            if (!g.IsWindingUp || g.IsOnScreen()) continue;
+            Vector3 toEnemy = g.transform.position - Game.Player.position;
+            toEnemy.y = 0f;
+            if (toEnemy.magnitude > t.behindCueMaxDistance) continue;
+
+            float k = g.WindUp01;
+            float size = t.hitIndicatorSize * Mathf.Lerp(0.6f, 1.1f, k);
+            float angle = Vector3.SignedAngle(forward, toEnemy, Vector3.up);
+            Matrix4x4 old = GUI.matrix;
+            GUIUtility.RotateAroundPivot(angle, centre);
+            GUI.color = new Color(Palette.OffscreenWarning.r, Palette.OffscreenWarning.g, Palette.OffscreenWarning.b, Mathf.Lerp(0.4f, 1f, k));
+            GUI.DrawTexture(new Rect(centre.x - size / 2f, centre.y - t.hitIndicatorRadius - size - 20f, size, size), arrow);
+            GUI.matrix = old;
+        }
+        GUI.color = Color.white;
     }
 
     // Floating names over the portals.

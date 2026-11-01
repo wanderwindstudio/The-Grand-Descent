@@ -17,12 +17,14 @@ public class RunManager : MonoBehaviour
 
     // Filled in when the run ends, for the summary screen.
     public bool Extracted { get; private set; }
+    public bool DiedToCollapse { get; private set; }
     public int GoldBankedThisRun { get; private set; }
     public float RunDuration { get; private set; }
     public int LevelReached { get; private set; }
 
     LevelLayout level;
     WaveSpawner waves;
+    CollapseTimer collapse;
     float runStartTime;
     bool hasRequest;
     PortalKind request;
@@ -45,15 +47,18 @@ public class RunManager : MonoBehaviour
         return level;
     }
 
-    public void Init(WaveSpawner spawner)
+    public void Init(WaveSpawner spawner, CollapseTimer collapseTimer)
     {
         waves = spawner;
+        collapse = collapseTimer;
         waves.FloorCleared += OpenPortals;
         Game.PlayerHealth.Died += () => EndRun(extracted: false);
         Current = State.StartScreen;
     }
 
     public void AddGold(int amount) => CarriedGold += amount;
+
+    public void MarkCollapseDeath() => DiedToCollapse = true;
 
     public void RequestPortal(PortalKind kind)
     {
@@ -109,11 +114,17 @@ public class RunManager : MonoBehaviour
         float s = Game.Tuning.portalSpacing;
         Portal.Create(PortalKind.Extract, level.portalSpot + Vector3.left * s, level.root.transform);
         Portal.Create(PortalKind.Descend, level.portalSpot + Vector3.right * s, level.root.transform);
-        Hud.ShowMessage("PORTALS OPEN - Extract or Descend?");
+        if (Game.Floor >= Game.Tuning.collapseStartFloor)
+        {
+            collapse.Begin();
+            Hud.ShowMessage($"THE FLOOR IS COLLAPSING - {collapse.Duration:0} SECONDS!");
+        }
+        else Hud.ShowMessage("PORTALS OPEN - Extract or Descend?");
     }
 
     void Descend()
     {
+        collapse.Stop();
         Game.Floor++;
         BuildFloor();
         TeleportPlayer(level.playerStart, level.playerStartYaw);
@@ -124,6 +135,7 @@ public class RunManager : MonoBehaviour
     void EndRun(bool extracted)
     {
         if (Current == State.Summary) return;
+        collapse.Stop();
         var t = Game.Tuning;
         Current = State.Summary;
         Extracted = extracted;
@@ -132,7 +144,7 @@ public class RunManager : MonoBehaviour
         GoldBankedThisRun = extracted ? CarriedGold : Mathf.FloorToInt(CarriedGold * t.deathBankFraction);
 
         MetaProgress.RecordRun(GoldBankedThisRun);
-        RunLog.Append(extracted ? "extracted" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
+        RunLog.Append(extracted ? "extracted" : DiedToCollapse ? "collapsed" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
             LevelReached, UpgradeList(), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences);
 
         Time.timeScale = 0f;
@@ -165,6 +177,12 @@ public class RunManager : MonoBehaviour
         cc.enabled = false;
         Game.Player.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
         cc.enabled = true;
+    }
+
+    // Debug: skip straight to the next floor.
+    public void DebugDescend()
+    {
+        if (Current == State.Playing) Descend();
     }
 
     // Debug: open the portals right now.

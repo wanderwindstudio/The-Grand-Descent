@@ -32,8 +32,9 @@ public class GameBootstrap : MonoBehaviour
         gameObject.AddComponent<Hud>();
         gameObject.AddComponent<LevelUpScreen>();
         gameObject.AddComponent<BuzzEffects>();
+        var collapse = gameObject.AddComponent<CollapseTimer>();
         gameObject.AddComponent<RunScreens>();
         gameObject.AddComponent<DebugPanel>();
-        run.Init(waves);
+        run.Init(waves, collapse);
     }
 }
