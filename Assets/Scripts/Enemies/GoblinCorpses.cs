@@ -1,6 +1,8 @@
 using UnityEngine;
 
-// When a goblin dies in sprite mode, a short-lived copy of its sprite tips over and dissolves.
+// When a goblin dies in sprite mode, a short-lived corpse sprite plays out the death:
+// a white flash in the flinch frame, then the dead frame on the floor, then it darkens and sinks.
+// (Without a dead frame, the idle sprite tips over instead.)
 // The goblin itself goes straight back to its pool, so gameplay is unaffected.
 public class GoblinCorpses : MonoBehaviour
 {
@@ -54,11 +56,16 @@ public class GoblinCorpses : MonoBehaviour
             if (k >= 1f) { pool.Release(this); return; }
 
             Art.SizeBillboard(pivot, Art.GoblinIdle, t.goblinSpriteHeight, t.goblinSpriteFillFraction);
-            // Fade out: cutout sprites can't go see-through, so in the second half it darkens and sinks into the floor.
-            float fade = Mathf.InverseLerp(0.4f, 1f, k);
+            bool flinching = age < t.spriteHitPoseTime;
+            bool hasDeadFrame = Art.GoblinDead != null;
+            material.SetTexture("_BaseMap", flinching ? Art.GoblinHit : hasDeadFrame ? Art.GoblinDead : Art.GoblinIdle);
+
+            // Fade out: cutout sprites can't go see-through, so near the end it darkens and sinks into the floor.
+            float fade = Mathf.InverseLerp(0.6f, 1f, k);
             pivot.position = transform.position + Vector3.down * (t.goblinSpriteHeight * 0.6f * fade * fade);
             Art.FaceCamera(pivot);
-            pivot.rotation *= Quaternion.Euler(0f, 0f, side * t.corpseTipDegrees * Mathf.Min(1f, k * 2.5f)); // tip over around the feet
+            if (!hasDeadFrame && !flinching)
+                pivot.rotation *= Quaternion.Euler(0f, 0f, side * t.corpseTipDegrees * Mathf.Min(1f, k * 2.5f)); // tip over around the feet
 
             material.SetColor("_EmissionColor", age < t.enemyHitFlashTime ? Color.white * t.spriteHitFlashStrength : Color.black);
             material.SetColor("_BaseColor", Color.Lerp(Color.white, new Color(0.15f, 0.15f, 0.15f), fade));

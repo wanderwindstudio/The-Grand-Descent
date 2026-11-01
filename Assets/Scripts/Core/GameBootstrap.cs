@@ -11,6 +11,12 @@ public class GameBootstrap : MonoBehaviour
     public Material billboardMaterial;
     [Tooltip("Assets/Art/Enemies/enemy_goblinIntern_idle_01")]
     public Texture2D goblinSprite;
+    [Tooltip("Assets/Art/Enemies/enemy_goblinIntern_windup_01 (optional)")]
+    public Texture2D goblinWindUpSprite;
+    [Tooltip("Assets/Art/Enemies/enemy_goblinIntern_hit_01 (optional)")]
+    public Texture2D goblinHitSprite;
+    [Tooltip("Assets/Art/Enemies/enemy_goblinIntern_dead_01 (optional)")]
+    public Texture2D goblinDeadSprite;
 
     void Awake()
     {
@@ -24,6 +30,9 @@ public class GameBootstrap : MonoBehaviour
         Mats.Template = baseMaterial;
         Art.BillboardMaterial = billboardMaterial;
         Art.GoblinIdle = goblinSprite;
+        Art.GoblinWindUp = goblinWindUpSprite != null ? goblinWindUpSprite : goblinSprite;
+        Art.GoblinHit = goblinHitSprite != null ? goblinHitSprite : goblinSprite;
+        Art.GoblinDead = goblinDeadSprite; // null = tip the idle sprite over instead
         // Work on a copy so live slider changes don't silently overwrite the asset.
         Game.TuningAsset = config;
         Game.Tuning = config != null ? Instantiate(config) : ScriptableObject.CreateInstance<TuningConfig>();

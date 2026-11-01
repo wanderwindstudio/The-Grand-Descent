@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.AI;
 
 // Goblin visuals as a billboard sprite. Purely cosmetic: reads the goblin's state, never changes it.
-// Fakes motion in code: a hop while walking, stretch + lunge during the wind-up, a white hit flash.
+// Frames: idle, wind-up (attack telegraph) and hit (flinch). Motion between them is faked in code:
+// a hop while walking, stretch + lunge during the wind-up, a white flash on hits.
 // The capsule (and its collider) stays; only its renderer is hidden while sprites are on.
 public class GoblinSprite : MonoBehaviour
 {
@@ -11,8 +12,11 @@ public class GoblinSprite : MonoBehaviour
     Renderer capsuleRenderer, eyesRenderer, spriteRenderer;
     Transform pivot;
     Material material;
+    Texture2D shownFrame;
     float bobPhase;
     float walkBlend;
+    float hitPoseUntil;
+    bool wasFlashing;
 
     void Awake()
     {
@@ -40,6 +44,13 @@ public class GoblinSprite : MonoBehaviour
         float dt = Time.deltaTime;
         Art.SizeBillboard(pivot, Art.GoblinIdle, t.goblinSpriteHeight, t.goblinSpriteFillFraction);
 
+        // Pick the frame. The wind-up wins over the flinch, so a hit never hides an incoming attack.
+        if (goblin.IsHitFlashing && !wasFlashing) hitPoseUntil = Time.time + t.spriteHitPoseTime;
+        wasFlashing = goblin.IsHitFlashing;
+        if (goblin.IsWindingUp) ShowFrame(Art.GoblinWindUp);
+        else if (Time.time < hitPoseUntil) ShowFrame(Art.GoblinHit);
+        else ShowFrame(Art.GoblinIdle);
+
         // Walking: hop and lean side to side, blended in and out smoothly.
         bool walking = !goblin.IsWindingUp && agent.velocity.sqrMagnitude > 0.04f;
         walkBlend = Mathf.MoveTowards(walkBlend, walking ? 1f : 0f, dt * 6f);
@@ -64,4 +75,13 @@ public class GoblinSprite : MonoBehaviour
             : Palette.GoblinWindUp * (t.spriteWindUpGlow * k);
         material.SetColor("_EmissionColor", glow);
     }
+
+    void ShowFrame(Texture2D frame)
+    {
+        if (frame == shownFrame) return;
+        shownFrame = frame;
+        material.SetTexture("_BaseMap", frame);
+    }
+
+    void OnDisable() => hitPoseUntil = 0f; // pooled goblins come back in their idle frame
 }

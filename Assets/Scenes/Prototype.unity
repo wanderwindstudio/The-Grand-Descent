@@ -152,6 +152,9 @@ MonoBehaviour:
   baseMaterial: {fileID: 2100000, guid: 247011594535b446abe338ab77cfd0d3, type: 2}
   billboardMaterial: {fileID: 2100000, guid: c64d9774497a34499a3ba31abe0ecbb2, type: 2}
   goblinSprite: {fileID: 2800000, guid: 787d833f7b42d4637b81fe9152c61892, type: 3}
+  goblinWindUpSprite: {fileID: 2800000, guid: 987af50f245e3412c97198ef832b0ba7, type: 3}
+  goblinHitSprite: {fileID: 2800000, guid: 3be849a9942344fe5a9ecfbeb1496abb, type: 3}
+  goblinDeadSprite: {fileID: 2800000, guid: 9104ddaf4dd8341798ea04566ab5be35, type: 3}
 --- !u!4 &53111712
 Transform:
   m_ObjectHideFlags: 0

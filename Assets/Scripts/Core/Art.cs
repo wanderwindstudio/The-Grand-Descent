@@ -5,6 +5,9 @@ public static class Art
 {
     public static Material BillboardMaterial;
     public static Texture2D GoblinIdle;
+    public static Texture2D GoblinWindUp;
+    public static Texture2D GoblinHit;
+    public static Texture2D GoblinDead;
 
     public static bool HasGoblinSprite => BillboardMaterial != null && GoblinIdle != null;
 

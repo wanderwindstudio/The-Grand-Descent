@@ -88,7 +88,11 @@ public class TuningConfig : ScriptableObject
     [Tooltip("Red glow on the sprite during the wind-up, for readability. 0 = off.")]
     public float spriteWindUpGlow = 0.25f;
     public float spriteHitFlashStrength = 1.5f;
-    public float corpseDuration = 0.7f;
+    [Tooltip("How long the flinch (hit) frame shows after a hit. The wind-up frame always wins.")]
+    public float spriteHitPoseTime = 0.2f;
+    [Tooltip("How long a dead goblin stays before it has sunk into the floor.")]
+    public float corpseDuration = 1.5f;
+    [Tooltip("Only used if there is no dead frame: the idle sprite tips over this far instead.")]
     public float corpseTipDegrees = 85f;
 
     [Header("Behind-you warning (goblin winding up off-screen)")]

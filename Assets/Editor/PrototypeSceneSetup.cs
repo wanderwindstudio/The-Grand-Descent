@@ -11,6 +11,9 @@ public static class PrototypeSceneSetup
     const string MaterialPath = "Assets/Settings/GrayboxLit.mat";
     const string BillboardMaterialPath = "Assets/Art/Materials/mat_billboardCutout.mat";
     const string GoblinSpritePath = "Assets/Art/Enemies/enemy_goblinIntern_idle_01.png";
+    const string GoblinWindUpPath = "Assets/Art/Enemies/enemy_goblinIntern_windup_01.png";
+    const string GoblinHitPath = "Assets/Art/Enemies/enemy_goblinIntern_hit_01.png";
+    const string GoblinDeadPath = "Assets/Art/Enemies/enemy_goblinIntern_dead_01.png";
     const string ScenePath = "Assets/Scenes/Prototype.unity";
 
     [MenuItem("Grand Descent/Create Prototype Scene")]
@@ -40,8 +43,7 @@ public static class PrototypeSceneSetup
         }
         KeepEmission(billboard);
 
-        AssetDatabase.ImportAsset(GoblinSpritePath, ImportAssetOptions.ForceUpdate); // apply ArtImportSettings
-        var goblinSprite = AssetDatabase.LoadAssetAtPath<Texture2D>(GoblinSpritePath);
+        var goblinSprite = LoadArt(GoblinSpritePath);
         if (goblinSprite == null) Debug.LogWarning("Goblin sprite not found at " + GoblinSpritePath);
 
         var scene = System.IO.File.Exists(ScenePath)
@@ -53,12 +55,23 @@ public static class PrototypeSceneSetup
         bootstrap.baseMaterial = material;
         bootstrap.billboardMaterial = billboard;
         bootstrap.goblinSprite = goblinSprite;
+        bootstrap.goblinWindUpSprite = LoadArt(GoblinWindUpPath);
+        bootstrap.goblinHitSprite = LoadArt(GoblinHitPath);
+        bootstrap.goblinDeadSprite = LoadArt(GoblinDeadPath);
         EditorUtility.SetDirty(bootstrap);
         EditorSceneManager.SaveScene(scene, ScenePath);
 
         EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
         AssetDatabase.SaveAssets();
         Debug.Log("Prototype scene ready at " + ScenePath);
+    }
+
+    // Re-imports an art file (so ArtImportSettings applies) and loads it. Null if the file isn't there.
+    static Texture2D LoadArt(string path)
+    {
+        if (!System.IO.File.Exists(path)) return null;
+        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
     }
 
     // URP Lit with alpha clipping: pixels are fully visible or fully gone, so sprites are lit by torches,
