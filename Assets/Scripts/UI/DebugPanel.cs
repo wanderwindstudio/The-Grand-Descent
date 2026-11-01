@@ -75,6 +75,20 @@ public class DebugPanel : MonoBehaviour
         t.spawnInterval = Slider("Spawn interval", t.spawnInterval, 0.05f, 2f);
         t.timeBetweenWaves = Slider("Time between waves", t.timeBetweenWaves, 0f, 15f);
 
+        GUILayout.Label($"Floors and gold (now on floor {Game.Floor})");
+        t.floorEnemyHealthMultiplier = Slider("Enemy health x per floor", t.floorEnemyHealthMultiplier, 1f, 3f);
+        t.floorEnemyCountMultiplier = Slider("Enemy count x per floor", t.floorEnemyCountMultiplier, 1f, 3f);
+        t.floorEnemyDamageMultiplier = Slider("Enemy damage x per floor", t.floorEnemyDamageMultiplier, 1f, 3f);
+        t.floorGoldMultiplier = Slider("Gold x per floor", t.floorGoldMultiplier, 1f, 3f);
+        t.goldDropChance = Slider("Gold drop chance", t.goldDropChance, 0f, 1f);
+        t.goldPerDrop = Slider("Gold per coin (floor 1)", t.goldPerDrop, 1f, 20f);
+        t.deathBankFraction = Slider("Banked on death", t.deathBankFraction, 0f, 1f);
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Open portals now")) RunManager.Instance.ForceOpenPortals();
+        if (GUILayout.Button("Reset banked gold + runs")) { MetaProgress.ResetAll(); Hud.ShowMessage("Meta progress reset"); }
+        GUILayout.EndHorizontal();
+        GUILayout.Label("Run log: " + RunLog.FilePath);
+
         GUILayout.Label("XP");
         t.xpPerGoblin = Slider("XP per goblin", t.xpPerGoblin, 0.1f, 5f);
         t.xpFirstLevel = Slider("XP for first level", t.xpFirstLevel, 1f, 30f);

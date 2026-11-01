@@ -1,0 +1,177 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+
+// One run from start screen to summary: builds floors, opens portals, handles extract / descend / death.
+public class RunManager : MonoBehaviour
+{
+    public enum State { StartScreen, Playing, Summary }
+
+    public static RunManager Instance { get; private set; }
+    // After the last wave every pickup flies to you, so nothing is left behind.
+    public static bool LootVacuum => Instance != null && Instance.PortalsOpen;
+
+    public State Current { get; private set; }
+    public bool PortalsOpen { get; private set; }
+    public int CarriedGold { get; private set; }
+
+    // Filled in when the run ends, for the summary screen.
+    public bool Extracted { get; private set; }
+    public int GoldBankedThisRun { get; private set; }
+    public float RunDuration { get; private set; }
+    public int LevelReached { get; private set; }
+
+    LevelLayout level;
+    WaveSpawner waves;
+    float runStartTime;
+    bool hasRequest;
+    PortalKind request;
+
+    void Awake() => Instance = this;
+
+    // Builds (or rebuilds) the current floor. Called before the player exists for floor 1.
+    public LevelLayout BuildFloor()
+    {
+        if (level != null)
+        {
+            waves.ClearEnemies();
+            Pickup.ReleaseAll();
+            DestroyImmediate(level.root);
+        }
+        PortalsOpen = false;
+        LevelLighting.Apply(Game.Tuning);
+        level = FloorBuilder.Build(Game.Tuning, FloorTemplates.PickRandom());
+        PlaceShrines();
+        return level;
+    }
+
+    public void Init(WaveSpawner spawner)
+    {
+        waves = spawner;
+        waves.FloorCleared += OpenPortals;
+        Game.PlayerHealth.Died += () => EndRun(extracted: false);
+        Current = State.StartScreen;
+    }
+
+    public void AddGold(int amount) => CarriedGold += amount;
+
+    public void RequestPortal(PortalKind kind)
+    {
+        hasRequest = true;
+        request = kind;
+    }
+
+    void Update()
+    {
+        var kb = Keyboard.current;
+        bool enter = kb != null && (kb.enterKey.wasPressedThisFrame || kb.numpadEnterKey.wasPressedThisFrame);
+
+        switch (Current)
+        {
+            case State.StartScreen:
+                Time.timeScale = 0f;
+                Game.InputBlocked = true;
+                PlayerLook.UnlockCursor();
+                if (enter) BeginRun();
+                break;
+
+            case State.Playing:
+                if (!hasRequest) break;
+                hasRequest = false;
+                if (request == PortalKind.Extract) EndRun(extracted: true);
+                else Descend();
+                break;
+
+            case State.Summary:
+                if (enter)
+                {
+                    Time.timeScale = 1f;
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                }
+                break;
+        }
+    }
+
+    void BeginRun()
+    {
+        Current = State.Playing;
+        Time.timeScale = 1f;
+        Game.InputBlocked = false;
+        PlayerLook.LockCursor();
+        runStartTime = Time.time;
+        waves.BeginFloor(level.spawnPoints);
+        Hud.ShowMessage("FLOOR 1");
+    }
+
+    void OpenPortals()
+    {
+        PortalsOpen = true;
+        float s = Game.Tuning.portalSpacing;
+        Portal.Create(PortalKind.Extract, level.portalSpot + Vector3.left * s, level.root.transform);
+        Portal.Create(PortalKind.Descend, level.portalSpot + Vector3.right * s, level.root.transform);
+        Hud.ShowMessage("PORTALS OPEN - Extract or Descend?");
+    }
+
+    void Descend()
+    {
+        Game.Floor++;
+        BuildFloor();
+        TeleportPlayer(level.playerStart, level.playerStartYaw);
+        waves.BeginFloor(level.spawnPoints);
+        Hud.ShowMessage($"FLOOR {Game.Floor}");
+    }
+
+    void EndRun(bool extracted)
+    {
+        if (Current == State.Summary) return;
+        var t = Game.Tuning;
+        Current = State.Summary;
+        Extracted = extracted;
+        RunDuration = Time.time - runStartTime;
+        LevelReached = Game.Player.GetComponent<PlayerLevel>().Level;
+        GoldBankedThisRun = extracted ? CarriedGold : Mathf.FloorToInt(CarriedGold * t.deathBankFraction);
+
+        MetaProgress.RecordRun(GoldBankedThisRun);
+        RunLog.Append(extracted ? "extracted" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
+            LevelReached, UpgradeList(), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences);
+
+        Time.timeScale = 0f;
+        Game.InputBlocked = true;
+        PlayerLook.UnlockCursor();
+    }
+
+    static string UpgradeList()
+    {
+        var names = new System.Collections.Generic.List<string>();
+        foreach (var u in Game.Player.GetComponent<PlayerUpgrades>().TakenInOrder) names.Add(PlayerUpgrades.Name(u));
+        return string.Join("; ", names);
+    }
+
+    void PlaceShrines()
+    {
+        var spots = new System.Collections.Generic.List<Vector3>(level.shrineSpots);
+        int count = Mathf.Min(spots.Count, Random.Range(Game.Tuning.shrinesMin, Game.Tuning.shrinesMax + 1));
+        for (int i = 0; i < count; i++)
+        {
+            int index = Random.Range(0, spots.Count);
+            PipeShrine.Create(spots[index], level.root.transform);
+            spots.RemoveAt(index);
+        }
+    }
+
+    static void TeleportPlayer(Vector3 position, float yaw)
+    {
+        var cc = Game.Player.GetComponent<CharacterController>();
+        cc.enabled = false;
+        Game.Player.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
+        cc.enabled = true;
+    }
+
+    // Debug: open the portals right now.
+    public void ForceOpenPortals()
+    {
+        if (PortalsOpen || Current != State.Playing) return;
+        waves.ClearEnemies();
+        OpenPortals();
+    }
+}

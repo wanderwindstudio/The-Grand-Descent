@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -5,7 +6,9 @@ using UnityEngine.AI;
 // Runs the waves of a floor: countdown, trickle goblins in out of sight, wait until all are dead.
 public class WaveSpawner : MonoBehaviour
 {
-    enum State { Countdown, Spawning, Fighting, FloorCleared }
+    enum State { Idle, Countdown, Spawning, Fighting }
+
+    public event Action FloorCleared;
 
     public int WaveNumber { get; private set; }    // 1-based; 0 before the first wave
     public int WaveCount => Game.Tuning.waveEnemyCounts.Length;
@@ -13,15 +16,27 @@ public class WaveSpawner : MonoBehaviour
 
     List<Vector3> spawnPoints;
     SimplePool<GoblinEnemy> pool;
-    State state;
+    State state = State.Idle;
     float timer;
     int toSpawn;
 
-    public void Init(List<Vector3> points)
+    void Awake() => pool = new SimplePool<GoblinEnemy>(GoblinBuilder.Create);
+
+    public void BeginFloor(List<Vector3> points)
     {
         spawnPoints = points;
-        pool = new SimplePool<GoblinEnemy>(GoblinBuilder.Create);
-        StartCountdown(Game.Tuning.firstWaveDelay);
+        WaveNumber = 0;
+        toSpawn = 0;
+        state = State.Countdown;
+        timer = Game.Tuning.firstWaveDelay;
+    }
+
+    // Removes every goblin without counting kills or dropping loot (used when leaving a floor).
+    public void ClearEnemies()
+    {
+        foreach (var g in GoblinEnemy.Active.ToArray()) g.Despawn();
+        toSpawn = 0;
+        state = State.Idle;
     }
 
     void Update()
@@ -49,38 +64,24 @@ public class WaveSpawner : MonoBehaviour
                 if (GoblinEnemy.Active.Count > 0) break;
                 if (WaveNumber >= WaveCount)
                 {
-                    state = State.FloorCleared;
-                    timer = t.floorClearedRestartDelay;
-                    Hud.ShowMessage("FLOOR CLEARED");
+                    state = State.Idle;
+                    FloorCleared?.Invoke();
                 }
                 else
                 {
                     Hud.ShowMessage($"Wave {WaveNumber} cleared");
-                    StartCountdown(t.timeBetweenWaves);
-                }
-                break;
-
-            case State.FloorCleared:
-                // Milestone 2 only: replay the waves. Portals replace this in milestone 4.
-                if (timer <= 0f)
-                {
-                    WaveNumber = 0;
-                    StartCountdown(0f);
+                    state = State.Countdown;
+                    timer = t.timeBetweenWaves;
                 }
                 break;
         }
     }
 
-    void StartCountdown(float seconds)
-    {
-        state = State.Countdown;
-        timer = seconds;
-    }
-
     void StartWave()
     {
         WaveNumber++;
-        toSpawn = Game.Tuning.waveEnemyCounts[WaveNumber - 1];
+        int baseCount = Game.Tuning.waveEnemyCounts[WaveNumber - 1];
+        toSpawn = Mathf.Max(1, Mathf.RoundToInt(baseCount * FloorScaling.EnemyCount));
         state = State.Spawning;
         timer = 0f;
         Hud.ShowMessage($"Wave {WaveNumber}");
@@ -90,7 +91,7 @@ public class WaveSpawner : MonoBehaviour
     {
         var t = Game.Tuning;
         Vector3 point = PickHiddenSpawnPoint();
-        Vector2 scatter = Random.insideUnitCircle * t.spawnScatter;
+        Vector2 scatter = UnityEngine.Random.insideUnitCircle * t.spawnScatter;
         point += new Vector3(scatter.x, 0f, scatter.y);
         if (NavMesh.SamplePosition(point, out NavMeshHit hit, t.spawnScatter * 2f, NavMesh.AllAreas))
             point = hit.position;
@@ -109,7 +110,7 @@ public class WaveSpawner : MonoBehaviour
             if (dist > farthestDist) { farthestDist = dist; farthest = p; }
             if (dist >= Game.Tuning.minSpawnDistance && !IsOnScreen(p)) hidden.Add(p);
         }
-        return hidden.Count > 0 ? hidden[Random.Range(0, hidden.Count)] : farthest;
+        return hidden.Count > 0 ? hidden[UnityEngine.Random.Range(0, hidden.Count)] : farthest;
     }
 
     static bool IsOnScreen(Vector3 point)

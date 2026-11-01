@@ -85,8 +85,6 @@ public class TuningConfig : ScriptableObject
     [Tooltip("Goblins never appear closer to you than this.")]
     public float minSpawnDistance = 8f;
     public float spawnScatter = 1.5f;
-    [Tooltip("Milestone 2 only: after the last wave, the waves restart after this many seconds.")]
-    public float floorClearedRestartDelay = 6f;
 
     [Header("XP and levels")]
     public float xpPerGoblin = 1f;
@@ -144,11 +142,29 @@ public class TuningConfig : ScriptableObject
     public float hitIndicatorRadius = 160f;
     public float hitIndicatorSize = 48f;
 
-    [Header("Level - room")]
-    public float roomSize = 30f;
+    [Header("Level - floors")]
+    [Tooltip("Size of one character in the floor layouts, in metres.")]
+    public float cellSize = 2f;
     public float wallHeight = 4f;
-    public float wallThickness = 0.5f;
-    public float pillarSize = 1.5f;
+
+    [Header("Descending - each floor multiplies these again")]
+    public float floorEnemyHealthMultiplier = 1.25f;
+    public float floorEnemyCountMultiplier = 1.2f;
+    public float floorEnemyDamageMultiplier = 1.15f;
+    public float floorGoldMultiplier = 1.3f;
+
+    [Header("Portals")]
+    public float portalRadius = 1.5f;
+    [Tooltip("Distance of each portal from the portal spot.")]
+    public float portalSpacing = 3f;
+
+    [Header("Gold")]
+    [Range(0f, 1f)] public float goldDropChance = 0.35f;
+    [Tooltip("Gold per coin on floor 1.")]
+    public float goldPerDrop = 1f;
+    public float goldCoinSize = 0.4f;
+    [Tooltip("When you die, this fraction of carried gold is banked anyway.")]
+    [Range(0f, 1f)] public float deathBankFraction = 0.25f;
 
     [Header("Level - lighting")]
     [Tooltip("Colour of the light that fills every shadow.")]

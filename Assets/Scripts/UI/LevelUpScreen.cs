@@ -19,7 +19,7 @@ public class LevelUpScreen : MonoBehaviour
 
     void Update()
     {
-        if (Game.PlayerHealth.IsDead) return;
+        if (Game.PlayerHealth.IsDead || RunManager.Instance.Current != RunManager.State.Playing) return;
 
         if (!showing && level.PendingLevelUps > 0) Open();
         if (!showing) return;

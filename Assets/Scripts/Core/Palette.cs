@@ -28,4 +28,7 @@ public static class Palette
     public static readonly Color CrashBar = new Color(0.45f, 0.45f, 0.5f);
     public static readonly Color HugeOrb = new Color(1f, 0.3f, 0.9f);
     public static readonly Color Spark = new Color(1f, 0.9f, 0.4f);
+    public static readonly Color Gold = new Color(1f, 0.8f, 0.2f);
+    public static readonly Color ExtractPortal = new Color(0.25f, 0.55f, 1f);
+    public static readonly Color DescendPortal = new Color(1f, 0.2f, 0.15f);
 }

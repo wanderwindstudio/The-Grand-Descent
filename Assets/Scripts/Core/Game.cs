@@ -9,6 +9,7 @@ public static class Game
     public static PlayerHealth PlayerHealth;
     public static Camera Camera;
     public static BuzzMeter Buzz;
+    public static int Floor = 1;
     public static bool GodMode;
     public static bool InputBlocked; // true while the debug panel is open
 }

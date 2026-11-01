@@ -14,10 +14,11 @@ public class PipeShrine : MonoBehaviour
 
     public bool Ready => rechargeLeft <= 0f;
 
-    public static PipeShrine Create(Vector3 position)
+    public static PipeShrine Create(Vector3 position, Transform parent)
     {
         var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         go.name = "Pipe Shrine";
+        go.transform.SetParent(parent, false);
         go.transform.position = position + Vector3.up * 1.5f;
         go.transform.localScale = new Vector3(0.7f, 1.5f, 0.7f);
         var shrine = go.AddComponent<PipeShrine>();

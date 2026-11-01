@@ -65,6 +65,7 @@ public class Hud : MonoBehaviour
 
     void OnGUI()
     {
+        if (RunManager.Instance.Current != RunManager.State.Playing) return; // RunScreens draws instead
         if (bigText == null) MakeStyles();
         var t = Game.Tuning;
         float w = Screen.width, h = Screen.height;
@@ -95,22 +96,34 @@ public class Hud : MonoBehaviour
         GUI.Label(new Rect(20, 14, 200, 24), $"Level {level.Level}", leftText);
 
         // Top right info
-        GUI.Label(new Rect(w - 260, 14, 240, 24), $"Wave {Mathf.Max(1, waves.WaveNumber)} / {waves.WaveCount}", rightText);
-        GUI.Label(new Rect(w - 260, 38, 240, 24), $"Enemies left: {waves.EnemiesRemaining}", rightText);
-        if (Game.GodMode) GUI.Label(new Rect(w - 260, 62, 240, 24), "GOD MODE", rightText);
+        GUI.Label(new Rect(w - 260, 14, 240, 24), $"Floor {Game.Floor}", rightText);
+        GUI.Label(new Rect(w - 260, 38, 240, 24), $"Wave {Mathf.Max(1, waves.WaveNumber)} / {waves.WaveCount}", rightText);
+        GUI.Label(new Rect(w - 260, 62, 240, 24), $"Enemies left: {waves.EnemiesRemaining}", rightText);
+        GUI.color = Palette.Gold;
+        GUI.Label(new Rect(w - 260, 86, 240, 24), $"Gold: {RunManager.Instance.CarriedGold}", rightText);
+        GUI.color = Color.white;
+        if (Game.GodMode) GUI.Label(new Rect(w - 260, 110, 240, 24), "GOD MODE", rightText);
+
+        DrawPortalLabels();
 
         // Upgrades owned, bottom right
         GUI.Label(new Rect(w - 260, h - 180, 240, 170), upgrades.Summary(), bottomRightText);
 
         if (messageTimeLeft > 0f)
             GUI.Label(new Rect(0, h * 0.2f, w, 50), message, bigText);
+    }
 
-        if (hp.IsDead)
+    // Floating names over the portals.
+    void DrawPortalLabels()
+    {
+        foreach (var portal in Portal.All)
         {
-            Fill(new Rect(0, 0, w, h), new Color(0f, 0f, 0f, 0.6f));
-            GUI.Label(new Rect(0, h / 2 - 40, w, 50), "YOU DIED", bigText);
-            GUI.Label(new Rect(0, h / 2 + 10, w, 30), "Press R to restart", smallText);
+            Vector3 sp = Game.Camera.WorldToScreenPoint(portal.transform.position + Vector3.up * 2f);
+            if (sp.z <= 0f) continue;
+            GUI.color = portal.Kind == PortalKind.Extract ? Palette.ExtractPortal : Palette.DescendPortal;
+            GUI.Label(new Rect(sp.x - 120, Screen.height - sp.y - 25, 240, 50), Portal.Label(portal.Kind), smallText);
         }
+        GUI.color = Color.white;
     }
 
     void DrawBuzzBar(Rect r)

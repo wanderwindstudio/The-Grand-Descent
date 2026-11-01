@@ -41,7 +41,7 @@ public class GoblinEnemy : MonoBehaviour
     {
         var t = Game.Tuning;
         pool = owner;
-        health = t.goblinHealth;
+        health = t.goblinHealth * FloorScaling.EnemyHealth;
         IsDead = false;
         state = State.Chase;
         repathTimer = 0f;
@@ -84,7 +84,7 @@ public class GoblinEnemy : MonoBehaviour
                 if (stateTimer <= 0f)
                 {
                     if (distance <= t.goblinHitRange)
-                        Game.PlayerHealth.TakeDamage(t.goblinDamage, transform.position);
+                        Game.PlayerHealth.TakeDamage(t.goblinDamage * FloorScaling.EnemyDamage, transform.position);
                     ResetLook();
                     state = State.Recover;
                     stateTimer = t.goblinAttackCooldown;
@@ -165,6 +165,15 @@ public class GoblinEnemy : MonoBehaviour
         hitFlashTimer = Game.Tuning.enemyHitFlashTime;
         material.SetColor("_BaseColor", Palette.EnemyHitFlash);
         if (health <= 0f) Die();
+    }
+
+    // Gone without counting as a kill (used when leaving a floor).
+    public void Despawn()
+    {
+        if (IsDead) return;
+        IsDead = true;
+        Active.Remove(this);
+        pool.Release(this);
     }
 
     public void Die()
