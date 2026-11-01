@@ -8,6 +8,7 @@ public static class Game
     public static Transform Player;
     public static PlayerHealth PlayerHealth;
     public static Camera Camera;
+    public static BuzzMeter Buzz;
     public static bool GodMode;
     public static bool InputBlocked; // true while the debug panel is open
 }

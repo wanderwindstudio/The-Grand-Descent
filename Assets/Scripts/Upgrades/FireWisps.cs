@@ -42,7 +42,7 @@ public class FireWisps : MonoBehaviour
             if (goblin == null || goblin.IsDead) continue;
             if (nextHitTime.TryGetValue(goblin, out float next) && Time.time < next) continue;
             nextHitTime[goblin] = Time.time + t.wispHitCooldown;
-            goblin.TakeDamage(t.wispDamage);
+            goblin.TakeDamage(t.wispDamage * Game.Buzz.DamageMultiplier);
         }
     }
 

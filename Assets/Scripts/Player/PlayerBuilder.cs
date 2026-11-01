@@ -31,6 +31,8 @@ public static class PlayerBuilder
 
         root.AddComponent<PlayerUpgrades>();
         root.AddComponent<PlayerLevel>();
+        Game.Buzz = root.AddComponent<BuzzMeter>();
+        root.AddComponent<SpellSwap>();
         root.AddComponent<PlayerMotor>();
         root.AddComponent<PlayerLook>().head = head.transform;
         root.AddComponent<PlayerShooter>();

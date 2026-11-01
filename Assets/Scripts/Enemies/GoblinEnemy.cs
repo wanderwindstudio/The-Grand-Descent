@@ -172,6 +172,7 @@ public class GoblinEnemy : MonoBehaviour
         if (IsDead) return;
         IsDead = true;
         Active.Remove(this);
+        RunStats.Kills++;
         Killed?.Invoke(transform.position);
         pool.Release(this);
     }

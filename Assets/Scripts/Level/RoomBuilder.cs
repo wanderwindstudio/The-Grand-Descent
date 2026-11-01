@@ -44,6 +44,13 @@ public static class RoomBuilder
                 if (x != 0 || z != 0)
                     layout.spawnPoints.Add(new Vector3(x * edge, 0f, z * edge));
 
+        // Shrines go in the far corners and on the side walls, close to where goblins come in.
+        float shrine = half - 4f;
+        layout.shrineSpots.Add(new Vector3(-shrine, 0f, shrine));
+        layout.shrineSpots.Add(new Vector3(shrine, 0f, shrine));
+        layout.shrineSpots.Add(new Vector3(-shrine, 0f, 0f));
+        layout.shrineSpots.Add(new Vector3(shrine, 0f, 0f));
+
         layout.playerStart = new Vector3(0f, 0.05f, -half + 3f);
         layout.playerStartYaw = 0f;
 

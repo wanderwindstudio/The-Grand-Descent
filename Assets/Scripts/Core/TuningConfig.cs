@@ -163,6 +163,72 @@ public class TuningConfig : ScriptableObject
     public float torchRange = 16f;
     public float torchHeight = 2.6f;
 
+    [Header("Buzz - meter")]
+    public float buzzMax = 100f;
+    public float buzzDrainPerSecond = 2f;
+    [Tooltip("Damage bonus at full Buzz (1 = +100%). Scales linearly from 0.")]
+    public float buzzMaxDamageBonus = 1f;
+    [Tooltip("Above this fraction of Buzz (0.7 = 70%) spell swaps start, and time is counted for the run stats.")]
+    [Range(0f, 1f)] public float buzzHighThreshold = 0.7f;
+
+    [Header("Buzz - pipe shrines and pickups")]
+    public int shrinesMin = 1;
+    public int shrinesMax = 2;
+    public float shrineBuzzAmount = 40f;
+    public float shrineInteractRange = 2.5f;
+    [Tooltip("Seconds until a used shrine works again.")]
+    public float shrineRechargeTime = 60f;
+    [Range(0f, 1f)] public float buzzPickupDropChance = 0.12f;
+    public float buzzPickupAmount = 5f;
+
+    [Header("Buzz - missile wobble")]
+    [Tooltip("Sideways drift of missiles at full Buzz, in metres.")]
+    public float wobbleMaxAmplitude = 1.2f;
+    [Tooltip("Wobbles per second.")]
+    public float wobbleFrequency = 2.5f;
+    [Tooltip("Seconds for the wobble to grow to full size after firing, so shots still leave from the crosshair.")]
+    public float wobbleRampTime = 0.25f;
+
+    [Header("Buzz - spell swap (above the high threshold)")]
+    public float spellSwapMinInterval = 3f;
+    public float spellSwapMaxInterval = 6f;
+    [Tooltip("How long the 'next shot' warning shows before the swap takes effect.")]
+    public float spellSwapWarning = 1f;
+    public float hugeOrbDamageMultiplier = 4f;
+    public float hugeOrbSpeedMultiplier = 0.35f;
+    public float hugeOrbSize = 1.2f;
+    public float hugeOrbHitRadius = 0.8f;
+    public int hugeOrbExtraPierce = 5;
+    public int sparkCount = 8;
+    public float sparkSpreadDegrees = 25f;
+    public float sparkDamageMultiplier = 0.3f;
+    public float sparkSpeedMultiplier = 1.4f;
+    public float sparkSize = 0.12f;
+
+    [Header("Buzz - Transcendence (at 100%) and Crash")]
+    public float transcendenceDuration = 10f;
+    public float transcendenceDamageMultiplier = 3f;
+    public float transcendenceFireRateMultiplier = 2f;
+    public float crashDuration = 6f;
+    public float crashMoveSpeedMultiplier = 0.5f;
+
+    [Header("Buzz - screen effects")]
+    [Range(0f, 1f)] public float buzzMaxChromaticAberration = 1f;
+    [Tooltip("Lens warp at full Buzz (0 to 1).")]
+    public float buzzMaxLensDistortion = 0.45f;
+    [Tooltip("Degrees the colours swing back and forth at full Buzz.")]
+    public float buzzMaxHueShift = 40f;
+    public float buzzSaturationBoost = 30f;
+    [Tooltip("Speed of the gentle pulsing.")]
+    public float buzzPulseSpeed = 2f;
+    public float transcendenceExposure = 0.6f;
+    public float transcendenceBloom = 3f;
+    public float crashExposure = -1.2f;
+    public float crashSaturation = -60f;
+    [Tooltip("Blur strength during the Crash (0.5 to 1.5).")]
+    public float crashBlur = 1.5f;
+    public float crashVignette = 0.55f;
+
     [Header("Post-processing")]
     public float bloomIntensity = 1.2f;
     public float bloomThreshold = 0.9f;

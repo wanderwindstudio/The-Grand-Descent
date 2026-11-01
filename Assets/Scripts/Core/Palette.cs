@@ -20,4 +20,12 @@ public static class Palette
     public static readonly Color XpBar = new Color(0.3f, 0.9f, 0.85f);
     public static readonly Color Wisp = new Color(1f, 0.45f, 0.1f);
     public static readonly Color Poison = new Color(0.65f, 0.9f, 0.1f);
+    public static readonly Color Buzz = new Color(0.75f, 0.3f, 1f);
+    public static readonly Color BuzzBar = new Color(0.65f, 0.25f, 0.95f);
+    public static readonly Color Shrine = new Color(0.7f, 0.2f, 1f);
+    public static readonly Color TranscendenceBar = new Color(1f, 0.8f, 0.25f);
+    public static readonly Color TranscendenceTint = new Color(1f, 0.92f, 0.75f);
+    public static readonly Color CrashBar = new Color(0.45f, 0.45f, 0.5f);
+    public static readonly Color HugeOrb = new Color(1f, 0.3f, 0.9f);
+    public static readonly Color Spark = new Color(1f, 0.9f, 0.4f);
 }

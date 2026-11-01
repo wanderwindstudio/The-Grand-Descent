@@ -5,9 +5,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMotor : MonoBehaviour
 {
-    [Tooltip("Multiplies move speed. Later used by the Buzz Crash.")]
-    public float speedMultiplier = 1f;
-
     CharacterController cc;
     PlayerHealth health;
     float verticalSpeed;
@@ -41,7 +38,7 @@ public class PlayerMotor : MonoBehaviour
         }
         input = Vector2.ClampMagnitude(input, 1f); // diagonals aren't faster
 
-        Vector3 move = (transform.right * input.x + transform.forward * input.y) * t.moveSpeed * speedMultiplier;
+        Vector3 move = (transform.right * input.x + transform.forward * input.y) * t.moveSpeed * Game.Buzz.MoveSpeedMultiplier;
 
         dashCooldownLeft -= dt;
         if (canControl && kb.spaceKey.wasPressedThisFrame && dashCooldownLeft <= 0f)

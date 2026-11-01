@@ -14,6 +14,7 @@ public class GameBootstrap : MonoBehaviour
     {
         Time.timeScale = 1f;
         GoblinEnemy.Active.Clear();
+        RunStats.Reset();
         Game.GodMode = false;
         Game.InputBlocked = false;
 
@@ -26,12 +27,27 @@ public class GameBootstrap : MonoBehaviour
         LevelLayout level = RoomBuilder.Build(Game.Tuning);
         PlayerBuilder.Create(level.playerStart, level.playerStartYaw, Game.Tuning);
         PostProcessSetup.Create(Game.Tuning, Game.Camera);
+        PlaceShrines(level);
 
         gameObject.AddComponent<LootDropper>();
         gameObject.AddComponent<WaveSpawner>().Init(level.spawnPoints);
         gameObject.AddComponent<Hud>();
         gameObject.AddComponent<LevelUpScreen>();
+        gameObject.AddComponent<BuzzEffects>();
         gameObject.AddComponent<DebugPanel>();
+    }
+
+    // 1-2 shrines on random spots from the layout's list.
+    static void PlaceShrines(LevelLayout level)
+    {
+        var spots = new System.Collections.Generic.List<Vector3>(level.shrineSpots);
+        int count = Mathf.Min(spots.Count, Random.Range(Game.Tuning.shrinesMin, Game.Tuning.shrinesMax + 1));
+        for (int i = 0; i < count; i++)
+        {
+            int index = Random.Range(0, spots.Count);
+            PipeShrine.Create(spots[index]);
+            spots.RemoveAt(index);
+        }
     }
 
     void Update()

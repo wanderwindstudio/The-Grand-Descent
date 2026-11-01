@@ -18,6 +18,7 @@ public class Hud : MonoBehaviour
     PlayerLevel level;
     PlayerUpgrades upgrades;
     WaveSpawner waves;
+    SpellSwap spellSwap;
 
     const float MessageDuration = 2.5f;
 
@@ -41,6 +42,7 @@ public class Hud : MonoBehaviour
         level = Game.Player.GetComponent<PlayerLevel>();
         upgrades = Game.Player.GetComponent<PlayerUpgrades>();
         waves = GetComponent<WaveSpawner>();
+        spellSwap = Game.Player.GetComponent<SpellSwap>();
     }
 
     void OnPlayerDamaged(Vector3 source, float amount)
@@ -84,6 +86,9 @@ public class Hud : MonoBehaviour
         var hp = Game.PlayerHealth;
         Bar(new Rect(20, h - 50, 300, 22), hp.Current / hp.Max, Palette.HealthBar, $"HP {Mathf.CeilToInt(hp.Current)} / {Mathf.CeilToInt(hp.Max)}");
         if (motor != null) Bar(new Rect(20, h - 22, 300, 8), motor.DashReady01, Palette.DashBar, null);
+        DrawBuzzBar(new Rect(20, h - 82, 300, 22));
+        DrawSpellSwapWarning(w, h);
+        DrawShrinePrompt(w, h);
 
         // XP bar across the top
         Bar(new Rect(0, 0, w, 10), level.Xp / level.XpToNext, Palette.XpBar, null);
@@ -106,6 +111,56 @@ public class Hud : MonoBehaviour
             GUI.Label(new Rect(0, h / 2 - 40, w, 50), "YOU DIED", bigText);
             GUI.Label(new Rect(0, h / 2 + 10, w, 30), "Press R to restart", smallText);
         }
+    }
+
+    void DrawBuzzBar(Rect r)
+    {
+        var t = Game.Tuning;
+        var buzz = Game.Buzz;
+        switch (buzz.Current)
+        {
+            case BuzzMeter.Phase.Transcendent:
+                Bar(r, buzz.PhaseTimeLeft / t.transcendenceDuration, Palette.TranscendenceBar, $"TRANSCENDENCE {buzz.PhaseTimeLeft:0.0}s   DMG x{buzz.DamageMultiplier:0.0}");
+                break;
+            case BuzzMeter.Phase.Crash:
+                Bar(r, buzz.PhaseTimeLeft / t.crashDuration, Palette.CrashBar, $"CRASH {buzz.PhaseTimeLeft:0.0}s");
+                break;
+            default:
+                Bar(r, buzz.Normalized, Palette.BuzzBar, $"BUZZ {buzz.Normalized * 100f:0}%   DMG x{buzz.DamageMultiplier:0.00}");
+                // Tick mark where spell swaps start.
+                Fill(new Rect(r.x + r.width * t.buzzHighThreshold - 1, r.y - 3, 2, r.height + 6), Color.white);
+                break;
+        }
+    }
+
+    // Under the crosshair: what the next shot will turn into, with a countdown bar.
+    void DrawSpellSwapWarning(float w, float h)
+    {
+        var t = Game.Tuning;
+        SpellVariant shown = spellSwap.Armed != SpellVariant.Normal ? spellSwap.Armed : spellSwap.Warning;
+        if (shown == SpellVariant.Normal) return;
+
+        Color color = shown == SpellVariant.HugeOrb ? Palette.HugeOrb : Palette.Spark;
+        bool armed = spellSwap.Armed != SpellVariant.Normal;
+        string text = armed ? $"{SpellSwap.Name(shown)} READY" : $"NEXT SHOT: {SpellSwap.Name(shown)}";
+        float y = h / 2f + 40f;
+
+        GUI.color = armed && Mathf.Repeat(Time.unscaledTime, 0.3f) < 0.15f ? Color.white : color;
+        GUI.Label(new Rect(0, y, w, 30), text, smallText);
+        GUI.color = Color.white;
+        float fill = armed ? 1f : 1f - spellSwap.WarningTimeLeft / t.spellSwapWarning;
+        Bar(new Rect(w / 2f - 80f, y + 30f, 160f, 6f), fill, color, null);
+    }
+
+    void DrawShrinePrompt(float w, float h)
+    {
+        var shrine = PipeShrine.InRange();
+        if (shrine == null) return;
+        string text;
+        if (!shrine.Ready) text = "Pipe is recharging...";
+        else if (Game.Buzz.Current != BuzzMeter.Phase.Normal) text = "Can't hit the pipe right now";
+        else text = $"Press E to hit the pipe  (+{Game.Tuning.shrineBuzzAmount:0} Buzz)";
+        GUI.Label(new Rect(0, h * 0.65f, w, 30), text, smallText);
     }
 
     // Arrows around the crosshair pointing toward whoever hurt you. They keep tracking as you turn.

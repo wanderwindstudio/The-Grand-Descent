@@ -13,7 +13,7 @@ public class DebugPanel : MonoBehaviour
         if (kb == null) return;
 
         if (kb.f1Key.wasPressedThisFrame) Toggle();
-        if (kb.f2Key.wasPressedThisFrame) Hud.ShowMessage("Buzz arrives in milestone 3");
+        if (kb.f2Key.wasPressedThisFrame) Game.Buzz.Fill();
         if (kb.f3Key.wasPressedThisFrame) Game.Player.GetComponent<PlayerLevel>().GainLevel();
         if (kb.f4Key.wasPressedThisFrame) KillAll();
         if (kb.f5Key.wasPressedThisFrame)
@@ -42,7 +42,7 @@ public class DebugPanel : MonoBehaviour
     {
         if (!open) return;
         GUILayout.BeginArea(new Rect(10, 10, 440, Screen.height - 20), GUI.skin.box);
-        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F3 level up  -  F4 kill all  -  F5 god mode");
+        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F2 fill Buzz  -  F3 level up  -  F4 kill all  -  F5 god mode");
         scroll = GUILayout.BeginScrollView(scroll);
 
         var t = Game.Tuning;
@@ -101,6 +101,28 @@ public class DebugPanel : MonoBehaviour
             if (GUILayout.Button($"{PlayerUpgrades.Name(u)} ({upgrades.Stacks(u)})")) upgrades.Apply(u);
         }
         GUILayout.EndHorizontal();
+
+        GUILayout.Label("Buzz");
+        float buzzNow = Slider("Current Buzz", Game.Buzz.Value, 0f, t.buzzMax);
+        if (Mathf.Abs(buzzNow - Game.Buzz.Value) > 0.5f) Game.Buzz.SetValue(buzzNow);
+        t.buzzDrainPerSecond = Slider("Drain per second", t.buzzDrainPerSecond, 0f, 15f);
+        t.shrineBuzzAmount = Slider("Shrine Buzz", t.shrineBuzzAmount, 5f, 100f);
+        t.buzzPickupDropChance = Slider("Buzz drop chance", t.buzzPickupDropChance, 0f, 1f);
+        t.buzzPickupAmount = Slider("Buzz per pickup", t.buzzPickupAmount, 1f, 30f);
+        t.buzzMaxDamageBonus = Slider("Damage bonus at max", t.buzzMaxDamageBonus, 0f, 3f);
+        t.wobbleMaxAmplitude = Slider("Wobble at max (m)", t.wobbleMaxAmplitude, 0f, 4f);
+        t.wobbleFrequency = Slider("Wobble speed", t.wobbleFrequency, 0.2f, 8f);
+        t.buzzHighThreshold = Slider("Spell swap threshold", t.buzzHighThreshold, 0f, 1f);
+        t.spellSwapMinInterval = Slider("Swap min interval", t.spellSwapMinInterval, 0.5f, 15f);
+        t.spellSwapMaxInterval = Slider("Swap max interval", t.spellSwapMaxInterval, 0.5f, 20f);
+        t.spellSwapWarning = Slider("Swap warning time", t.spellSwapWarning, 0.2f, 3f);
+        t.transcendenceDuration = Slider("Transcendence time", t.transcendenceDuration, 1f, 30f);
+        t.transcendenceDamageMultiplier = Slider("Transcendence damage x", t.transcendenceDamageMultiplier, 1f, 10f);
+        t.crashDuration = Slider("Crash time", t.crashDuration, 0f, 20f);
+        t.crashMoveSpeedMultiplier = Slider("Crash move speed x", t.crashMoveSpeedMultiplier, 0.1f, 1f);
+        t.buzzMaxChromaticAberration = Slider("Colour fringe at max", t.buzzMaxChromaticAberration, 0f, 1f);
+        t.buzzMaxLensDistortion = Slider("Lens warp at max", t.buzzMaxLensDistortion, 0f, 1f);
+        t.buzzMaxHueShift = Slider("Hue swing at max", t.buzzMaxHueShift, 0f, 180f);
 
         GUILayout.Label("Feedback");
         t.hitIndicatorDuration = Slider("Hit arrow duration", t.hitIndicatorDuration, 0.2f, 4f);

@@ -32,7 +32,7 @@ public class PoisonCloud : MonoBehaviour
         if (tickTimer > 0f) return;
         tickTimer = t.poisonTickInterval;
 
-        float damage = t.poisonDamagePerSecond * stacks * t.poisonTickInterval;
+        float damage = t.poisonDamagePerSecond * stacks * t.poisonTickInterval * Game.Buzz.DamageMultiplier;
         int n = Physics.OverlapSphereNonAlloc(transform.position + Vector3.up * 0.5f, t.poisonCloudRadius, overlaps, ~0, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < n; i++)
         {
