@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 // Menu: Grand Descent > Create Prototype Scene.
 // Makes the TuningConfig asset and materials (if missing), and a scene with just the GameBootstrap object.
@@ -14,6 +15,13 @@ public static class PrototypeSceneSetup
     const string GoblinWindUpPath = "Assets/Art/Enemies/enemy_goblinIntern_windup_01.png";
     const string GoblinHitPath = "Assets/Art/Enemies/enemy_goblinIntern_hit_01.png";
     const string GoblinDeadPath = "Assets/Art/Enemies/enemy_goblinIntern_dead_01.png";
+    const string FxMaterialPath = "Assets/Art/Materials/mat_fxTransparent.mat";
+    const string ControlsPath = "Assets/Settings/GrandDescentControls.inputactions";
+    const string HandLeftPath = "Assets/Art/Player/player_handLeft_idle_01.png";
+    const string HandRightPath = "Assets/Art/Player/player_handRight_staff_idle_01.png";
+    const string FxMissilePath = "Assets/Art/FX/fx_arcaneMissile_01.png";
+    const string FxImpactPath = "Assets/Art/FX/fx_arcaneImpact_01.png";
+    const string FxVortexPath = "Assets/Art/FX/fx_arcaneVortex_01.png";
     const string ScenePath = "Assets/Scenes/Prototype.unity";
 
     [MenuItem("Grand Descent/Create Prototype Scene")]
@@ -43,6 +51,13 @@ public static class PrototypeSceneSetup
         }
         KeepEmission(billboard);
 
+        var fx = AssetDatabase.LoadAssetAtPath<Material>(FxMaterialPath);
+        if (fx == null)
+        {
+            fx = CreateFxMaterial();
+            AssetDatabase.CreateAsset(fx, FxMaterialPath);
+        }
+
         var goblinSprite = LoadArt(GoblinSpritePath);
         if (goblinSprite == null) Debug.LogWarning("Goblin sprite not found at " + GoblinSpritePath);
 
@@ -58,6 +73,14 @@ public static class PrototypeSceneSetup
         bootstrap.goblinWindUpSprite = LoadArt(GoblinWindUpPath);
         bootstrap.goblinHitSprite = LoadArt(GoblinHitPath);
         bootstrap.goblinDeadSprite = LoadArt(GoblinDeadPath);
+        bootstrap.fxMaterial = fx;
+        bootstrap.controls = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ControlsPath);
+        bootstrap.handLeft = LoadArt(HandLeftPath);
+        bootstrap.handRight = LoadArt(HandRightPath);
+        bootstrap.fxArcaneMissile = LoadArt(FxMissilePath);
+        bootstrap.fxArcaneImpact = LoadArt(FxImpactPath);
+        bootstrap.fxArcaneVortex = LoadArt(FxVortexPath);
+        if (bootstrap.controls == null) Debug.LogWarning("Controls asset not found at " + ControlsPath + " - using built-in default bindings.");
         EditorUtility.SetDirty(bootstrap);
         EditorSceneManager.SaveScene(scene, ScenePath);
 
@@ -91,6 +114,24 @@ public static class PrototypeSceneSetup
         m.EnableKeyword("_SPECULARHIGHLIGHTS_OFF");
         m.SetFloat("_EnvironmentReflections", 0f);
         m.EnableKeyword("_ENVIRONMENTREFLECTIONS_OFF");
+        return m;
+    }
+
+    // URP Unlit, alpha-blended, double-sided: for spell effects that glow and fade out.
+    static Material CreateFxMaterial()
+    {
+        var m = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+        m.SetFloat("_Surface", 1f);
+        m.SetFloat("_Blend", 0f);
+        m.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        m.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m.SetFloat("_SrcBlendAlpha", (float)UnityEngine.Rendering.BlendMode.One);
+        m.SetFloat("_DstBlendAlpha", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        m.SetFloat("_ZWrite", 0f);
+        m.SetFloat("_Cull", 0f);
+        m.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        m.SetOverrideTag("RenderType", "Transparent");
+        m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
         return m;
     }
 

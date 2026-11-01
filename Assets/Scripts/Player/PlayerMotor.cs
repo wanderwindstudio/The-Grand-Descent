@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// WASD walking, gravity and the Space dash.
+// WASD walking, gravity and the Dash action (Blink upgrade: a short teleport instead).
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMotor : MonoBehaviour
 {
+    static readonly RaycastHit[] blinkHits = new RaycastHit[16];
+
     CharacterController cc;
     PlayerHealth health;
+    PlayerUpgrades upgrades;
     float verticalSpeed;
     float dashTimeLeft;
     float dashCooldownLeft;
@@ -19,7 +22,10 @@ public class PlayerMotor : MonoBehaviour
     {
         cc = GetComponent<CharacterController>();
         health = GetComponent<PlayerHealth>();
+        upgrades = GetComponent<PlayerUpgrades>();
     }
+
+    public void ResetCooldown() => dashCooldownLeft = 0f;
 
     void Update()
     {
@@ -41,12 +47,14 @@ public class PlayerMotor : MonoBehaviour
         Vector3 move = (transform.right * input.x + transform.forward * input.y) * t.moveSpeed * Game.Buzz.MoveSpeedMultiplier;
 
         dashCooldownLeft -= dt;
-        if (canControl && kb.spaceKey.wasPressedThisFrame && dashCooldownLeft <= 0f)
+        if (canControl && Controls.Dash.WasPressedThisFrame() && dashCooldownLeft <= 0f)
         {
             dashDirection = move.sqrMagnitude > 0.01f ? move.normalized : transform.forward;
-            dashTimeLeft = t.dashDuration;
             dashCooldownLeft = t.dashCooldown;
             health.GrantInvulnerability(t.dashInvulnerability);
+            FirstPersonHands.Instance?.OnDash();
+            if (upgrades.Has(UpgradeType.Blink)) Blink(dashDirection);
+            else dashTimeLeft = t.dashDuration;
         }
         if (dashTimeLeft > 0f)
         {
@@ -59,5 +67,31 @@ public class PlayerMotor : MonoBehaviour
         move.y = verticalSpeed;
 
         cc.Move(move * dt);
+    }
+
+    // Teleport up to blinkDistance, stopping just short of the first wall (goblins don't block it).
+    void Blink(Vector3 direction)
+    {
+        var t = Game.Tuning;
+        Vector3 start = transform.position;
+        Vector3 bottom = start + Vector3.up * (cc.radius + 0.1f);
+        Vector3 top = start + Vector3.up * (cc.height - cc.radius);
+        float distance = t.blinkDistance;
+
+        int count = Physics.CapsuleCastNonAlloc(bottom, top, cc.radius * 0.95f, direction, blinkHits, t.blinkDistance, ~0, QueryTriggerInteraction.Ignore);
+        for (int i = 0; i < count; i++)
+        {
+            Collider c = blinkHits[i].collider;
+            if (c.GetComponentInParent<PlayerHealth>() != null || c.GetComponentInParent<GoblinEnemy>() != null) continue;
+            if (blinkHits[i].distance <= 0f) continue; // already touching (e.g. the floor)
+            distance = Mathf.Min(distance, Mathf.Max(0f, blinkHits[i].distance - 0.1f));
+        }
+
+        // Afterimage where you were, a flash where you land.
+        SpellFx.Impact(start + Vector3.up * t.eyeHeight * 0.6f, 1.6f, 0.4f, 0.35f, t.impactLightIntensity, t.impactLightRange);
+        cc.enabled = false;
+        transform.position = start + direction * distance;
+        cc.enabled = true;
+        SpellFx.Impact(transform.position + Vector3.up * t.eyeHeight * 0.6f, 0.3f, 1.4f, 0.25f, t.impactLightIntensity, t.impactLightRange);
     }
 }

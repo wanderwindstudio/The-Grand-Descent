@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.InputSystem;
 
 // Glowing purple pillar. Press E nearby for a big hit of Buzz. Recharges after a while.
 public class PipeShrine : MonoBehaviour
@@ -55,8 +54,7 @@ public class PipeShrine : MonoBehaviour
         Mats.SetEmission(material, Palette.Shrine * (2.5f * pulse));
         glow.intensity = 2.5f * pulse;
 
-        var kb = Keyboard.current;
-        if (kb != null && kb.eKey.wasPressedThisFrame && PlayerInRange() && Game.Buzz.Current == BuzzMeter.Phase.Normal && !Game.InputBlocked)
+        if (Controls.Interact.WasPressedThisFrame() && PlayerInRange() && Game.Buzz.Current == BuzzMeter.Phase.Normal && !Game.InputBlocked)
         {
             Game.Buzz.Add(t.shrineBuzzAmount);
             rechargeLeft = t.shrineRechargeTime;

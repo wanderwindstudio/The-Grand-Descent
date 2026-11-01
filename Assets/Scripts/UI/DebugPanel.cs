@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// F1 = tuning sliders. F2 = fill Buzz, F3 = level up, F4 = kill all, F5 = god mode.
+// F1 = tuning sliders. F2 = fill Buzz, F3 = level up, F4 = kill all, F5 = god mode, F7 = reset cooldowns.
 public class DebugPanel : MonoBehaviour
 {
     bool open;
@@ -16,6 +16,7 @@ public class DebugPanel : MonoBehaviour
         if (kb.f2Key.wasPressedThisFrame) Game.Buzz.Fill();
         if (kb.f3Key.wasPressedThisFrame) Game.Player.GetComponent<PlayerLevel>().GainLevel();
         if (kb.f4Key.wasPressedThisFrame) KillAll();
+        if (kb.f7Key.wasPressedThisFrame) ResetCooldowns();
         if (kb.f5Key.wasPressedThisFrame)
         {
             Game.GodMode = !Game.GodMode;
@@ -31,6 +32,13 @@ public class DebugPanel : MonoBehaviour
         else if (!Game.PlayerHealth.IsDead) PlayerLook.LockCursor();
     }
 
+    static void ResetCooldowns()
+    {
+        Game.Player.GetComponent<PlayerMotor>().ResetCooldown();
+        Game.Player.GetComponent<VortexCaster>().ResetCooldown();
+        Hud.ShowMessage("Cooldowns reset");
+    }
+
     static void KillAll()
     {
         var all = GoblinEnemy.Active.ToArray();
@@ -42,7 +50,7 @@ public class DebugPanel : MonoBehaviour
     {
         if (!open) return;
         GUILayout.BeginArea(new Rect(10, 10, 440, Screen.height - 20), GUI.skin.box);
-        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F2 fill Buzz  -  F3 level up  -  F4 kill all  -  F5 god mode");
+        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F2 fill Buzz  -  F3 level up  -  F4 kill all  -  F5 god mode  -  F7 reset cooldowns");
         scroll = GUILayout.BeginScrollView(scroll);
 
         var t = Game.Tuning;
@@ -53,12 +61,31 @@ public class DebugPanel : MonoBehaviour
         t.dashCooldown = Slider("Dash cooldown", t.dashCooldown, 0.2f, 5f);
         t.dashInvulnerability = Slider("Dash invulnerability", t.dashInvulnerability, 0f, 1f);
 
-        GUILayout.Label("Missile");
+        GUILayout.Label("Arcane Missile");
         t.missileDamage = Slider("Damage", t.missileDamage, 1f, 50f);
         t.fireRate = Slider("Fire rate (/s)", t.fireRate, 0.5f, 20f);
         t.missileSpeed = Slider("Speed", t.missileSpeed, 5f, 80f);
         t.missileRadius = Slider("Hit radius", t.missileRadius, 0.05f, 1f);
-        t.missilePierce = IntSlider("Pierce", t.missilePierce, 0, 5);
+        t.arcaneMissileLength = Slider("Sprite length (m)", t.arcaneMissileLength, 0.1f, 2f);
+        t.chargeWindow = Slider("Charge window (s)", t.chargeWindow, 0.2f, 3f);
+        t.maxCharges = IntSlider("Max charges", t.maxCharges, 1, 8);
+        t.chargeDamageBonus = Slider("Damage per charge", t.chargeDamageBonus, 0f, 1f);
+        t.chargeFireRateBonus = Slider("Fire rate per charge", t.chargeFireRateBonus, 0f, 0.5f);
+
+        GUILayout.Label("Arcane Vortex");
+        t.vortexRadius = Slider("Radius (m)", t.vortexRadius, 1f, 15f);
+        t.vortexDuration = Slider("Duration (s)", t.vortexDuration, 0.5f, 10f);
+        t.vortexCooldown = Slider("Cooldown (s)", t.vortexCooldown, 0.5f, 30f);
+        t.vortexPullSpeed = Slider("Pull speed", t.vortexPullSpeed, 1f, 30f);
+        t.vortexTickDamage = Slider("Tick damage", t.vortexTickDamage, 0f, 30f);
+        t.vortexOpacity = Slider("Opacity", t.vortexOpacity, 0.1f, 1f);
+
+        GUILayout.Label("Hands");
+        t.showHands = GUILayout.Toggle(t.showHands, "Show hands");
+        t.handScreenHeight = Slider("Hand size (screen height)", t.handScreenHeight, 0.15f, 0.9f);
+        t.handBobAmount = Slider("Bob amount", t.handBobAmount, 0f, 0.08f);
+        t.handSwayAmount = Slider("Sway amount", t.handSwayAmount, 0f, 0.04f);
+        t.handLookLag = Slider("Turn lag", t.handLookLag, 0f, 0.015f);
 
         GUILayout.Label("Goblin visuals");
         if (!Art.HasGoblinSprite) GUILayout.Label("(sprite or material missing - run Grand Descent > Create Prototype Scene)");
@@ -113,7 +140,7 @@ public class DebugPanel : MonoBehaviour
         t.pickupMagnetRadius = Slider("Pickup magnet radius", t.pickupMagnetRadius, 0.5f, 15f);
 
         GUILayout.Label("Upgrades");
-        t.splitShotSpreadDegrees = Slider("Split Shot spread", t.splitShotSpreadDegrees, 0f, 30f);
+        t.splitShotSpreadDegrees = Slider("Splitting Missiles spread", t.splitShotSpreadDegrees, 0f, 30f);
         t.quickHandsBonus = Slider("Quick Hands bonus", t.quickHandsBonus, 0f, 1f);
         t.arcaneWeightBonus = Slider("Arcane Weight bonus", t.arcaneWeightBonus, 0f, 1f);
         t.wispDamage = Slider("Wisp damage", t.wispDamage, 1f, 50f);
@@ -127,7 +154,7 @@ public class DebugPanel : MonoBehaviour
         GUILayout.BeginHorizontal();
         for (int i = 0; i < PlayerUpgrades.All.Length; i++)
         {
-            if (i == 4) { GUILayout.EndHorizontal(); GUILayout.BeginHorizontal(); }
+            if (i > 0 && i % 3 == 0) { GUILayout.EndHorizontal(); GUILayout.BeginHorizontal(); }
             var u = PlayerUpgrades.All[i];
             if (GUILayout.Button($"{PlayerUpgrades.Name(u)} ({upgrades.Stacks(u)})")) upgrades.Apply(u);
         }

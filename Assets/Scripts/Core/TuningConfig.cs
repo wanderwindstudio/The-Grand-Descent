@@ -28,7 +28,7 @@ public class TuningConfig : ScriptableObject
     [Header("Player - health")]
     public float playerMaxHealth = 100f;
 
-    [Header("Magic missile (left mouse)")]
+    [Header("Arcane Missile (Fire)")]
     public float missileDamage = 10f;
     [Tooltip("Shots per second while holding the mouse button.")]
     public float fireRate = 4f;
@@ -37,13 +37,72 @@ public class TuningConfig : ScriptableObject
     public float missileRadius = 0.2f;
     public float missileVisualSize = 0.3f;
     public float missileLifetime = 2f;
-    [Tooltip("How far in front of the camera the missile appears.")]
+    [Tooltip("How far in front of the camera the missile appears (used if the hand would be inside a wall).")]
     public float missileSpawnOffset = 0.6f;
-    [Tooltip("How many extra enemies a missile passes through.")]
+    [Tooltip("How many extra enemies a missile passes through. Arcane Missile is single-target, so 0.")]
     public int missilePierce = 0;
-    public float missileGlowIntensity = 4f;
     public float missileLightRange = 4f;
     public float missileLightIntensity = 2f;
+    [Tooltip("Length of the missile sprite in metres.")]
+    public float arcaneMissileLength = 0.6f;
+    [Tooltip("Brightness of spell sprites (above 1 makes them bloom).")]
+    public float spellSpriteBrightness = 1.6f;
+    [Tooltip("Distance in front of the camera where missiles leave the left hand's fingertips.")]
+    public float handSpawnDepth = 0.5f;
+    [Tooltip("How far the crosshair aim ray looks for a target.")]
+    public float aimMaxDistance = 150f;
+
+    [Header("Arcane Charges")]
+    [Tooltip("A hit within this many seconds of the previous hit adds a charge. This long without a hit resets them.")]
+    public float chargeWindow = 1f;
+    public int maxCharges = 4;
+    [Tooltip("Missile damage bonus per charge (0.25 = +25%).")]
+    public float chargeDamageBonus = 0.25f;
+    [Tooltip("Fire rate bonus per charge (0.1 = +10%).")]
+    public float chargeFireRateBonus = 0.1f;
+    [Tooltip("Buzz gained each time you gain a charge.")]
+    public float buzzPerCharge = 1.5f;
+
+    [Header("Spell impact and cast flash")]
+    public float impactDuration = 0.2f;
+    public float impactStartSize = 0.25f;
+    public float impactEndSize = 0.9f;
+    public float impactLightIntensity = 3f;
+    public float impactLightRange = 4f;
+    public float castFlashDuration = 0.08f;
+    [Tooltip("Size of the fingertip cast flash, as a fraction of screen height.")]
+    public float castFlashSize = 0.09f;
+
+    [Header("Arcane Vortex (CastVortex)")]
+    public float vortexCooldown = 12f;
+    public float vortexOrbSpeed = 12f;
+    public float vortexOrbSize = 0.7f;
+    [Tooltip("The orb becomes a vortex after flying this far.")]
+    public float vortexMaxThrowDistance = 15f;
+    public float vortexDuration = 3f;
+    [Tooltip("Enemies inside this radius are pulled in and held.")]
+    public float vortexRadius = 6f;
+    [Tooltip("Pulled enemies stop this close to the centre.")]
+    public float vortexHoldRadius = 0.8f;
+    public float vortexPullSpeed = 9f;
+    public float vortexTickDamage = 3f;
+    public float vortexTickInterval = 0.5f;
+    [Tooltip("Width of the vortex sprite in metres.")]
+    public float vortexSize = 3f;
+    [Tooltip("Height of the vortex centre above the floor.")]
+    public float vortexHeight = 1f;
+    [Tooltip("Degrees per second.")]
+    public float vortexSpinSpeed = 300f;
+    [Tooltip("Size pulse (0.08 = 8% bigger and smaller).")]
+    public float vortexPulse = 0.08f;
+    public float vortexGrowTime = 0.15f;
+    public float vortexShrinkTime = 0.25f;
+    [Tooltip("1 = solid; lower lets you see the goblins it's holding.")]
+    [Range(0f, 1f)] public float vortexOpacity = 0.75f;
+    [Tooltip("Magenta glow on goblins held by a vortex.")]
+    public float heldGlow = 0.45f;
+    public float vortexLightIntensity = 3f;
+    public float vortexLightRange = 9f;
 
     [Header("Goblin intern")]
     public float goblinHealth = 30f;
@@ -67,6 +126,49 @@ public class TuningConfig : ScriptableObject
     public float goblinHeight = 1.5f;
     public float goblinWidth = 0.8f;
     public float enemyHitFlashTime = 0.08f;
+
+    [Header("First-person hands (screen overlay)")]
+    public bool showHands = true;
+    [Tooltip("Height of each hand as a fraction of the screen height.")]
+    [Range(0.1f, 1f)] public float handScreenHeight = 0.45f;
+    [Tooltip("Idle breathing sway, as a fraction of screen height.")]
+    public float handSwayAmount = 0.008f;
+    public float handSwaySpeed = 1.3f;
+    [Tooltip("Walking bob, as a fraction of screen height.")]
+    public float handBobAmount = 0.022f;
+    [Tooltip("Bob cycles per second at full walking speed.")]
+    public float handBobSpeed = 1.8f;
+    [Tooltip("How far the hands lag behind fast turns (fraction of screen height per degree turned).")]
+    public float handLookLag = 0.004f;
+    public float handLookLagMax = 0.05f;
+    [Tooltip("How quickly the hands catch up after a turn.")]
+    public float handCatchUpSpeed = 9f;
+    public float handCastPush = 0.05f;
+    public float handCastPushTime = 0.1f;
+    public float handThrowPush = 0.13f;
+    public float handThrowTime = 0.25f;
+    public float handDashSwing = 0.09f;
+    public float handDashTime = 0.22f;
+    public float handHitJolt = 0.04f;
+    public float handHitJoltTime = 0.15f;
+    [Tooltip("Sway and bob multiplier at full Buzz (1.5 = 150% stronger).")]
+    public float handBuzzBoost = 1.5f;
+    public float handTranscendenceTremble = 0.005f;
+    public float handCrashDroop = 0.08f;
+    [Tooltip("During the Crash the hands react this much slower (0.35 = 35% speed).")]
+    public float handCrashSluggishness = 0.35f;
+    [Tooltip("Darkest the hands get in the dark.")]
+    public float handLightMin = 0.4f;
+    [Tooltip("Brightest the hands get next to a torch.")]
+    public float handLightMax = 1.15f;
+    [Tooltip("How strongly nearby lights brighten the hands.")]
+    public float handLightGain = 0.6f;
+    [Tooltip("Left fingertips inside the hand image (0-1 from the left, 0-1 from the top). Missiles leave from here.")]
+    public Vector2 leftFingertip = new Vector2(0.56f, 0.3f);
+    [Tooltip("Staff crystal inside the right hand image (0-1 from the left, 0-1 from the top).")]
+    public Vector2 staffCrystal = new Vector2(0.8f, 0.13f);
+    [Tooltip("Size of the crystal glow, as a fraction of the hand image.")]
+    public float staffCrystalGlowSize = 0.3f;
 
     [Header("Goblin sprite (billboard visuals)")]
     [Tooltip("Off = the old green capsules. Also switchable in the F1 panel.")]
@@ -136,14 +238,24 @@ public class TuningConfig : ScriptableObject
     public float pickupHeight = 0.5f;
 
     [Header("Upgrades")]
-    [Tooltip("Split Shot: angle between missiles in the fan.")]
+    [Tooltip("Splitting Missiles: angle between the three missiles.")]
     public float splitShotSpreadDegrees = 6f;
     [Tooltip("Quick Hands: fire rate bonus per stack (0.2 = +20%).")]
     public float quickHandsBonus = 0.2f;
     [Tooltip("Arcane Weight: damage bonus per stack (0.25 = +25%).")]
     public float arcaneWeightBonus = 0.25f;
-    [Tooltip("Piercing: extra enemies passed through per stack.")]
-    public int piercingPerStack = 1;
+    [Tooltip("Implosion: damage when the vortex ends, per stack.")]
+    public float implosionBaseDamage = 20f;
+    [Tooltip("Implosion: extra damage for every enemy the vortex is holding, per stack.")]
+    public float implosionDamagePerHeld = 8f;
+    [Tooltip("Event Horizon: vortex radius bonus per stack (0.3 = +30%).")]
+    public float eventHorizonRadiusBonus = 0.3f;
+    [Tooltip("Event Horizon: extra vortex seconds per stack.")]
+    public float eventHorizonDurationBonus = 1f;
+    [Tooltip("Overload: health lost per missed missile.")]
+    public float overloadMissCost = 2f;
+    [Tooltip("Blink: teleport distance in metres (stops at walls).")]
+    public float blinkDistance = 6f;
     [Tooltip("Second Wind: max health added per stack.")]
     public float secondWindHealth = 25f;
 

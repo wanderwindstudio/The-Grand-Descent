@@ -1,7 +1,8 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-// Left mouse fires magic missiles from the camera. Hold to auto-fire.
+// Arcane Missile: hold Fire to auto-cast. Missiles leave the left hand and fly to the crosshair point.
+// Damage and fire rate grow with Arcane Charges; at max charges Splitting Missiles fires three.
+// At high Buzz the next shot may be swapped for a Huge Orb or a Spark Spray (see SpellSwap).
 public class PlayerShooter : MonoBehaviour
 {
     SimplePool<Missile> pool;
@@ -18,13 +19,13 @@ public class PlayerShooter : MonoBehaviour
 
     void Update()
     {
-        var mouse = Mouse.current;
-        if (mouse == null || Game.InputBlocked || Game.PlayerHealth.IsDead || Time.timeScale == 0f) return;
+        if (Game.InputBlocked || Game.PlayerHealth.IsDead || Time.timeScale == 0f) return;
         if (Cursor.lockState != CursorLockMode.Locked) return; // the click that grabs the mouse shouldn't shoot
 
-        if (mouse.leftButton.isPressed && Time.time >= nextFireTime)
+        if (Controls.Fire.IsPressed() && Time.time >= nextFireTime)
         {
-            nextFireTime = Time.time + 1f / (upgrades.FireRate * Game.Buzz.FireRateMultiplier);
+            float rate = upgrades.FireRate * Game.Charges.FireRateMultiplier * Game.Buzz.FireRateMultiplier;
+            nextFireTime = Time.time + 1f / rate;
             Fire();
         }
     }
@@ -32,58 +33,83 @@ public class PlayerShooter : MonoBehaviour
     void Fire()
     {
         var t = Game.Tuning;
+        Vector3 origin = Aim.HandOrigin();
+        Vector3 aim = (Aim.CrosshairTarget() - origin).normalized;
         Transform cam = Game.Camera.transform;
-        Vector3 origin = cam.position + cam.forward * t.missileSpawnOffset;
-        float damage = upgrades.Damage * Game.Buzz.DamageMultiplier;
-        float wobble = Game.Buzz.Normalized * t.wobbleMaxAmplitude;
+
+        var shot = new MissileShot
+        {
+            direction = aim,
+            damage = upgrades.Damage * Game.Charges.DamageMultiplier * Game.Buzz.DamageMultiplier,
+            pierce = t.missilePierce,
+            speed = t.missileSpeed,
+            hitRadius = t.missileRadius,
+            length = t.arcaneMissileLength,
+            wobble = Game.Buzz.Normalized * t.wobbleMaxAmplitude,
+            tint = Color.white,
+            countsHits = true,
+            countsMisses = true,
+        };
 
         switch (spellSwap.ConsumeArmed())
         {
             case SpellVariant.HugeOrb:
-                pool.Get(origin).Launch(cam.forward, damage * t.hugeOrbDamageMultiplier, upgrades.Pierce + t.hugeOrbExtraPierce,
-                    t.missileSpeed * t.hugeOrbSpeedMultiplier, t.hugeOrbHitRadius, t.hugeOrbSize, wobble, Palette.HugeOrb);
+                // Buzz variants neither build nor reset charges.
+                shot.damage *= t.hugeOrbDamageMultiplier;
+                shot.pierce += t.hugeOrbExtraPierce;
+                shot.speed *= t.hugeOrbSpeedMultiplier;
+                shot.hitRadius = t.hugeOrbHitRadius;
+                shot.length = t.hugeOrbSize * 1.5f;
+                shot.tint = Palette.HugeOrb;
+                shot.countsHits = shot.countsMisses = false;
+                pool.Get(origin).Launch(shot);
                 break;
 
             case SpellVariant.Sparks:
+                shot.damage *= t.sparkDamageMultiplier;
+                shot.speed *= t.sparkSpeedMultiplier;
+                shot.hitRadius *= 0.5f;
+                shot.length = t.sparkSize * 3f;
+                shot.tint = Palette.Spark;
+                shot.countsHits = shot.countsMisses = false;
                 for (int i = 0; i < t.sparkCount; i++)
                 {
                     float s = t.sparkSpreadDegrees;
-                    Vector3 dir = cam.rotation * Quaternion.Euler(Random.Range(-s, s), Random.Range(-s, s), 0f) * Vector3.forward;
-                    pool.Get(origin).Launch(dir, damage * t.sparkDamageMultiplier, upgrades.Pierce,
-                        t.missileSpeed * t.sparkSpeedMultiplier, t.missileRadius * 0.5f, t.sparkSize, wobble, Palette.Spark);
+                    shot.direction = Quaternion.AngleAxis(Random.Range(-s, s), cam.up) * Quaternion.AngleAxis(Random.Range(-s, s), cam.right) * aim;
+                    pool.Get(origin).Launch(shot);
                 }
                 break;
 
             default:
-                int count = upgrades.MissileCount;
-                for (int i = 0; i < count; i++)
+                bool split = upgrades.Has(UpgradeType.SplittingMissiles) && Game.Charges.AtMax;
+                pool.Get(origin).Launch(shot);
+                if (split)
                 {
-                    // Spread extra missiles evenly left and right of the crosshair.
-                    float angle = (i - (count - 1) / 2f) * t.splitShotSpreadDegrees;
-                    Vector3 dir = Quaternion.AngleAxis(angle, cam.up) * cam.forward;
-                    pool.Get(origin).Launch(dir, damage, upgrades.Pierce,
-                        t.missileSpeed, t.missileRadius, t.missileVisualSize, wobble, Palette.Missile);
+                    // Side missiles can build charges but never reset them; only the centre one counts as a miss.
+                    shot.countsMisses = false;
+                    foreach (float sign in new[] { -1f, 1f })
+                    {
+                        shot.direction = Quaternion.AngleAxis(sign * t.splitShotSpreadDegrees, cam.up) * aim;
+                        pool.Get(origin).Launch(shot);
+                    }
                 }
                 break;
         }
+
+        FirstPersonHands.Instance?.OnMissileCast();
     }
 
     Missile CreateMissile()
     {
-        var t = Game.Tuning;
-        var go = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        go.name = "Missile";
+        var go = new GameObject("Arcane Missile");
         go.SetActive(false);
-        DestroyImmediate(go.GetComponent<Collider>()); // must be gone before its first sphere cast
-        var rend = go.GetComponent<Renderer>();
-        rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+
+        var sprite = Art.CreateFxQuad("Sprite", Art.ArcaneMissile);
+        sprite.transform.SetParent(go.transform, false);
 
         var light = new GameObject("Glow").AddComponent<Light>();
         light.transform.SetParent(go.transform, false);
         light.type = LightType.Point;
-        light.color = Palette.Missile;
-        light.range = t.missileLightRange;
-        light.intensity = t.missileLightIntensity;
 
         var missile = go.AddComponent<Missile>();
         missile.SetPool(pool);

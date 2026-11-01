@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 // Goblin intern brain: chase, wind up (telegraph), strike, recover.
+// A vortex can hold it: pulled to the centre, unable to move or attack (and immune to knockback, once there is any).
 [RequireComponent(typeof(NavMeshAgent))]
 public class GoblinEnemy : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class GoblinEnemy : MonoBehaviour
     public bool IsWindingUp => state == State.WindUp;
     // 0 at the start of the wind-up, 1 when the hit lands.
     public bool IsHitFlashing => hitFlashTimer > 0f;
+    // Renewed every frame by a vortex; wears off a moment after the vortex ends.
+    public bool IsHeld => Time.time < heldUntil;
     public float WindUp01 => IsWindingUp ? 1f - stateTimer / Game.Tuning.goblinWindUpTime : 0f;
 
     NavMeshAgent agent;
@@ -30,6 +33,10 @@ public class GoblinEnemy : MonoBehaviour
     float repathTimer;
     float hitFlashTimer;
     float health;
+    float heldUntil;
+    bool wasHeld;
+    Vector3 holdCentre;
+    float holdPullSpeed, holdRadius;
 
     void Awake()
     {
@@ -49,6 +56,7 @@ public class GoblinEnemy : MonoBehaviour
         state = State.Chase;
         repathTimer = 0f;
         hitFlashTimer = 0f;
+        heldUntil = 0f;
         agent.Warp(transform.position);
         ResetLook();
         Active.Add(this);
@@ -65,6 +73,15 @@ public class GoblinEnemy : MonoBehaviour
         Vector3 toPlayer = Game.Player.position - transform.position;
         toPlayer.y = 0f;
         float distance = toPlayer.magnitude;
+
+        if (IsHeld)
+        {
+            wasHeld = true;
+            UpdateHeld(dt);
+            UpdateHitFlash(dt);
+            return;
+        }
+        if (wasHeld) { wasHeld = false; ResetLook(); } // drop the magenta tint
 
         switch (state)
         {
@@ -101,11 +118,42 @@ public class GoblinEnemy : MonoBehaviour
                 break;
         }
 
+        UpdateHitFlash(dt);
+    }
+
+    void UpdateHitFlash(float dt)
+    {
         if (hitFlashTimer > 0f)
         {
             hitFlashTimer -= dt;
             material.SetColor("_BaseColor", hitFlashTimer > 0f ? Palette.EnemyHitFlash : CurrentColor());
         }
+    }
+
+    // Called every frame by a vortex while this goblin is inside it.
+    public void Hold(Vector3 centre, float pullSpeed, float stopRadius)
+    {
+        if (IsDead) return;
+        heldUntil = Time.time + 0.1f;
+        holdCentre = centre;
+        holdPullSpeed = pullSpeed;
+        holdRadius = stopRadius;
+    }
+
+    // Held: any attack is cancelled, and the goblin slides toward the vortex centre.
+    void UpdateHeld(float dt)
+    {
+        if (state == State.WindUp) ResetLook();
+        state = State.Chase; // resume chasing once released
+        repathTimer = 0f;
+        agent.isStopped = true;
+
+        Vector3 toCentre = holdCentre - transform.position;
+        toCentre.y = 0f;
+        float gap = toCentre.magnitude - holdRadius;
+        if (gap > 0f) agent.Move(toCentre.normalized * Mathf.Min(gap, holdPullSpeed * dt));
+        if (hitFlashTimer <= 0f) material.SetColor("_BaseColor", Palette.HeldTint);
+        Mats.SetEmission(material, Palette.Arcane * Game.Tuning.heldGlow);
     }
 
     void StartWindUp()
@@ -127,6 +175,7 @@ public class GoblinEnemy : MonoBehaviour
 
     Color CurrentColor()
     {
+        if (IsHeld) return Palette.HeldTint;
         if (state != State.WindUp) return Palette.Goblin;
         float k = 1f - stateTimer / Game.Tuning.goblinWindUpTime;
         return Color.Lerp(Palette.Goblin, Palette.GoblinWindUp, k);
@@ -135,7 +184,7 @@ public class GoblinEnemy : MonoBehaviour
     void ResetLook()
     {
         body.localScale = bodyScale;
-        material.SetColor("_BaseColor", Palette.Goblin);
+        material.SetColor("_BaseColor", CurrentColor());
         Mats.SetEmission(material, BaseGlow());
     }
 

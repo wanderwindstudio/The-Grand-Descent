@@ -42,7 +42,9 @@ public class LevelUpScreen : MonoBehaviour
 
     void RollChoices()
     {
-        var pool = new List<UpgradeType>(PlayerUpgrades.All);
+        var pool = new List<UpgradeType>();
+        foreach (var u in PlayerUpgrades.All)
+            if (upgrades.CanOffer(u)) pool.Add(u);
         choices.Clear();
         int count = Mathf.Min(Game.Tuning.upgradeChoices, pool.Count);
         for (int i = 0; i < count; i++)

@@ -41,6 +41,14 @@ public class PlayerHealth : MonoBehaviour
         return true;
     }
 
+    // Health lost by your own doing (Overload misses): no hit arrow, ignores dash invulnerability.
+    public void LoseHealth(float amount)
+    {
+        if (IsDead || Game.GodMode) return;
+        Current = Mathf.Max(0f, Current - amount);
+        if (Current <= 0f) Die();
+    }
+
     // Instant death regardless of health (the collapse).
     public void Kill()
     {

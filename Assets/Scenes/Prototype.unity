@@ -155,6 +155,13 @@ MonoBehaviour:
   goblinWindUpSprite: {fileID: 2800000, guid: 987af50f245e3412c97198ef832b0ba7, type: 3}
   goblinHitSprite: {fileID: 2800000, guid: 3be849a9942344fe5a9ecfbeb1496abb, type: 3}
   goblinDeadSprite: {fileID: 2800000, guid: 9104ddaf4dd8341798ea04566ab5be35, type: 3}
+  fxMaterial: {fileID: 2100000, guid: df3d900ffb1d346329eac074347ba3db, type: 2}
+  controls: {fileID: -944628639613478452, guid: cf9df8409bf30465c8c54d29436e2d57, type: 3}
+  handLeft: {fileID: 2800000, guid: 1b9c5aea12c6a44db94d4bdfb56479dd, type: 3}
+  handRight: {fileID: 2800000, guid: e01ba4a9a5bbe4de68c3360f3fa7222e, type: 3}
+  fxArcaneMissile: {fileID: 2800000, guid: 3700a4a9737334ed1810cb80b8435e48, type: 3}
+  fxArcaneImpact: {fileID: 2800000, guid: 02fbb6858a3be487593bdf5cbf8fe7d8, type: 3}
+  fxArcaneVortex: {fileID: 2800000, guid: 522ad14da0eea454db22e0f02284d63d, type: 3}
 --- !u!4 &53111712
 Transform:
   m_ObjectHideFlags: 0

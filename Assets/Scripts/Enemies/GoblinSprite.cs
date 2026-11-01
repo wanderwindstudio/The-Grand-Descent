@@ -70,10 +70,11 @@ public class GoblinSprite : MonoBehaviour
         pivot.rotation *= Quaternion.Euler(0f, 0f, sway);
         pivot.localScale = new Vector3(1f - (stretch - 1f) * 0.5f, stretch, 1f);
 
-        Color glow = goblin.IsHitFlashing
-            ? Color.white * t.spriteHitFlashStrength
-            : Palette.GoblinWindUp * (t.spriteWindUpGlow * k);
+        Color glow = goblin.IsHitFlashing ? Color.white * t.spriteHitFlashStrength
+                   : goblin.IsHeld ? Palette.Arcane * t.heldGlow
+                   : Palette.GoblinWindUp * (t.spriteWindUpGlow * k);
         material.SetColor("_EmissionColor", glow);
+        material.SetColor("_BaseColor", goblin.IsHeld ? Palette.HeldTint : Color.white);
     }
 
     void ShowFrame(Texture2D frame)

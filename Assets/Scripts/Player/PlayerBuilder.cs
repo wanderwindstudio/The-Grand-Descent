@@ -30,12 +30,14 @@ public static class PlayerBuilder
         Game.PlayerHealth = health;
 
         root.AddComponent<PlayerUpgrades>();
+        Game.Charges = root.AddComponent<ArcaneCharges>();
         root.AddComponent<PlayerLevel>();
         Game.Buzz = root.AddComponent<BuzzMeter>();
         root.AddComponent<SpellSwap>();
         root.AddComponent<PlayerMotor>();
         root.AddComponent<PlayerLook>().head = head.transform;
         root.AddComponent<PlayerShooter>();
+        root.AddComponent<VortexCaster>();
         root.AddComponent<FireWisps>();
         root.AddComponent<PoisonTrail>();
         return health;

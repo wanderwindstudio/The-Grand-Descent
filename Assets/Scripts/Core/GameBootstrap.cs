@@ -17,6 +17,16 @@ public class GameBootstrap : MonoBehaviour
     public Texture2D goblinHitSprite;
     [Tooltip("Assets/Art/Enemies/enemy_goblinIntern_dead_01 (optional)")]
     public Texture2D goblinDeadSprite;
+    [Tooltip("Assets/Art/Materials/mat_fxTransparent. Glowing, fading material for spell effects.")]
+    public Material fxMaterial;
+    [Tooltip("Assets/Settings/GrandDescentControls. If empty, default bindings are used.")]
+    public UnityEngine.InputSystem.InputActionAsset controls;
+    [Header("Player and spell art (optional; coloured placeholders are used if missing)")]
+    public Texture2D handLeft;
+    public Texture2D handRight;
+    public Texture2D fxArcaneMissile;
+    public Texture2D fxArcaneImpact;
+    public Texture2D fxArcaneVortex;
 
     void Awake()
     {
@@ -33,6 +43,13 @@ public class GameBootstrap : MonoBehaviour
         Art.GoblinWindUp = goblinWindUpSprite != null ? goblinWindUpSprite : goblinSprite;
         Art.GoblinHit = goblinHitSprite != null ? goblinHitSprite : goblinSprite;
         Art.GoblinDead = goblinDeadSprite; // null = tip the idle sprite over instead
+        Art.FxMaterial = fxMaterial;
+        Art.HandLeft = handLeft != null ? handLeft : Art.Placeholder("HandLeftPlaceholder", Palette.HandPlaceholder, square: true);
+        Art.HandRight = handRight != null ? handRight : Art.Placeholder("HandRightPlaceholder", Palette.HandPlaceholder, square: true);
+        Art.ArcaneMissile = fxArcaneMissile != null ? fxArcaneMissile : Art.Placeholder("MissilePlaceholder", Palette.Arcane, square: false);
+        Art.ArcaneImpact = fxArcaneImpact != null ? fxArcaneImpact : Art.Placeholder("ImpactPlaceholder", Palette.Arcane, square: false);
+        Art.ArcaneVortex = fxArcaneVortex != null ? fxArcaneVortex : Art.Placeholder("VortexPlaceholder", Palette.Arcane, square: false);
+        Controls.Init(controls);
         // Work on a copy so live slider changes don't silently overwrite the asset.
         Game.TuningAsset = config;
         Game.Tuning = config != null ? Instantiate(config) : ScriptableObject.CreateInstance<TuningConfig>();
@@ -42,6 +59,8 @@ public class GameBootstrap : MonoBehaviour
         PlayerBuilder.Create(level.playerStart, level.playerStartYaw, Game.Tuning);
         PostProcessSetup.Create(Game.Tuning, Game.Camera);
 
+        gameObject.AddComponent<SpellFx>();
+        gameObject.AddComponent<FirstPersonHands>();
         gameObject.AddComponent<LootDropper>();
         gameObject.AddComponent<GoblinCorpses>();
         var waves = gameObject.AddComponent<WaveSpawner>();

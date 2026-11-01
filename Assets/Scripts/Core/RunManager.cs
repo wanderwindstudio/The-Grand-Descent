@@ -145,17 +145,19 @@ public class RunManager : MonoBehaviour
 
         MetaProgress.RecordRun(GoldBankedThisRun);
         RunLog.Append(extracted ? "extracted" : DiedToCollapse ? "collapsed" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
-            LevelReached, UpgradeList(), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences);
+            LevelReached, UpgradeList(arcaneOnly: false), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences,
+            RunStats.VortexCasts, RunStats.MaxChargesReached, UpgradeList(arcaneOnly: true));
 
         Time.timeScale = 0f;
         Game.InputBlocked = true;
         PlayerLook.UnlockCursor();
     }
 
-    static string UpgradeList()
+    static string UpgradeList(bool arcaneOnly)
     {
         var names = new System.Collections.Generic.List<string>();
-        foreach (var u in Game.Player.GetComponent<PlayerUpgrades>().TakenInOrder) names.Add(PlayerUpgrades.Name(u));
+        foreach (var u in Game.Player.GetComponent<PlayerUpgrades>().TakenInOrder)
+            if (!arcaneOnly || PlayerUpgrades.IsArcane(u)) names.Add(PlayerUpgrades.Name(u));
         return string.Join("; ", names);
     }
 

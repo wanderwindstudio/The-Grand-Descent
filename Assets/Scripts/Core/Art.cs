@@ -9,6 +9,10 @@ public static class Art
     public static Texture2D GoblinHit;
     public static Texture2D GoblinDead;
 
+    public static Material FxMaterial;
+    public static Texture2D HandLeft, HandRight;
+    public static Texture2D ArcaneMissile, ArcaneImpact, ArcaneVortex;
+
     public static bool HasGoblinSprite => BillboardMaterial != null && GoblinIdle != null;
 
     // A billboard quad with its pivot at the bottom-centre: the returned transform sits at the feet.
@@ -40,6 +44,69 @@ public static class Art
         var quad = pivot.GetChild(0);
         quad.localScale = new Vector3(w, h, 1f);
         quad.localPosition = Vector3.up * (h / 2f);
+    }
+
+    // A glowing effect quad (missile, impact, vortex). Faces the camera fully; the caller sets its rotation.
+    // Brightness above 1 makes it bloom; alpha fades it out.
+    public static Renderer CreateFxQuad(string name, Texture2D texture)
+    {
+        var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        quad.name = name;
+        Object.DestroyImmediate(quad.GetComponent<Collider>());
+        var renderer = quad.GetComponent<Renderer>();
+        renderer.sharedMaterial = new Material(FxMaterialOrFallback());
+        renderer.sharedMaterial.SetTexture("_BaseMap", texture);
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        return renderer;
+    }
+
+    public static void SetFxColor(Renderer fx, Color color, float brightness, float alpha)
+    {
+        fx.sharedMaterial.SetColor("_BaseColor", new Color(color.r * brightness, color.g * brightness, color.b * brightness, alpha));
+    }
+
+    // Face the camera fully, then spin by an angle in screen space (degrees, counter-clockwise).
+    public static void FaceCameraFully(Transform t, float screenAngle)
+    {
+        t.rotation = Game.Camera.transform.rotation * Quaternion.Euler(0f, 0f, screenAngle);
+    }
+
+    static Material fxFallback;
+    static Material FxMaterialOrFallback()
+    {
+        if (FxMaterial != null) return FxMaterial;
+        if (fxFallback == null)
+        {
+            // Same settings the setup script gives mat_fxTransparent (works in the editor).
+            fxFallback = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            fxFallback.SetFloat("_Surface", 1f);
+            fxFallback.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            fxFallback.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            fxFallback.SetFloat("_ZWrite", 0f);
+            fxFallback.SetFloat("_Cull", 0f);
+            fxFallback.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            fxFallback.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        }
+        return fxFallback;
+    }
+
+    // A coloured stand-in for a missing art file: a soft disc, or a solid rounded square.
+    public static Texture2D Placeholder(string name, Color color, bool square)
+    {
+        const int size = 64;
+        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false) { name = name, filterMode = FilterMode.Point };
+        for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+            {
+                float dx = (x + 0.5f) / size - 0.5f, dy = (y + 0.5f) / size - 0.5f;
+                float a = square ? (Mathf.Max(Mathf.Abs(dx), Mathf.Abs(dy)) < 0.45f ? 1f : 0f)
+                                 : Mathf.Clamp01(1f - Mathf.Sqrt(dx * dx + dy * dy) * 2.2f);
+                tex.SetPixel(x, y, new Color(color.r, color.g, color.b, a));
+            }
+        tex.Apply();
+        Debug.LogWarning($"Art missing - using a coloured placeholder for {name}.");
+        return tex;
     }
 
     // Turn a billboard around the vertical axis only, so it faces the camera.
