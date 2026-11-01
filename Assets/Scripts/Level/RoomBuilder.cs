@@ -37,11 +37,12 @@ public static class RoomBuilder
         LevelLighting.AddTorch(root, new Vector3(inner, t.torchHeight, 0f), t);
         LevelLighting.AddTorch(root, new Vector3(-inner, t.torchHeight, 0f), t);
 
-        float corner = half - 2.5f;
-        layout.spawnPoints.Add(new Vector3(-corner, 0f, corner));
-        layout.spawnPoints.Add(new Vector3(corner, 0f, corner));
-        layout.spawnPoints.Add(new Vector3(-corner, 0f, 0f));
-        layout.spawnPoints.Add(new Vector3(corner, 0f, 0f));
+        // Spawn points around the edge. The wave spawner picks ones you can't see.
+        float edge = half - 2.5f;
+        for (int x = -1; x <= 1; x++)
+            for (int z = -1; z <= 1; z++)
+                if (x != 0 || z != 0)
+                    layout.spawnPoints.Add(new Vector3(x * edge, 0f, z * edge));
 
         layout.playerStart = new Vector3(0f, 0.05f, -half + 3f);
         layout.playerStartYaw = 0f;

@@ -5,11 +5,13 @@ using UnityEngine.InputSystem;
 public class PlayerShooter : MonoBehaviour
 {
     SimplePool<Missile> pool;
+    PlayerUpgrades upgrades;
     float nextFireTime;
 
     void Awake()
     {
         pool = new SimplePool<Missile>(CreateMissile);
+        upgrades = GetComponent<PlayerUpgrades>();
     }
 
     void Update()
@@ -20,7 +22,7 @@ public class PlayerShooter : MonoBehaviour
 
         if (mouse.leftButton.isPressed && Time.time >= nextFireTime)
         {
-            nextFireTime = Time.time + 1f / Game.Tuning.fireRate;
+            nextFireTime = Time.time + 1f / upgrades.FireRate;
             Fire();
         }
     }
@@ -30,7 +32,14 @@ public class PlayerShooter : MonoBehaviour
         var t = Game.Tuning;
         Transform cam = Game.Camera.transform;
         Vector3 origin = cam.position + cam.forward * t.missileSpawnOffset;
-        pool.Get(origin).Launch(cam.forward, t.missileDamage, t.missilePierce);
+        int count = upgrades.MissileCount;
+        for (int i = 0; i < count; i++)
+        {
+            // Spread extra missiles evenly left and right of the crosshair.
+            float angle = (i - (count - 1) / 2f) * t.splitShotSpreadDegrees;
+            Vector3 dir = Quaternion.AngleAxis(angle, cam.up) * cam.forward;
+            pool.Get(origin).Launch(dir, upgrades.Damage, upgrades.Pierce);
+        }
     }
 
     Missile CreateMissile()

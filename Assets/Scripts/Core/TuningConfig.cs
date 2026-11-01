@@ -75,10 +75,66 @@ public class TuningConfig : ScriptableObject
     public float behindCueDuration = 0.15f;
     public float behindCueMaxDistance = 25f;
 
-    [Header("Test spawner (milestone 1 only)")]
-    public int testGoblinCount = 5;
-    public float testRespawnDelay = 3f;
+    [Header("Waves")]
+    [Tooltip("Goblins per wave. Add or remove entries to change the number of waves.")]
+    public int[] waveEnemyCounts = { 10, 18, 30 };
+    public float firstWaveDelay = 2f;
+    public float timeBetweenWaves = 4f;
+    [Tooltip("Seconds between each goblin appearing during a wave.")]
+    public float spawnInterval = 0.3f;
+    [Tooltip("Goblins never appear closer to you than this.")]
+    public float minSpawnDistance = 8f;
     public float spawnScatter = 1.5f;
+    [Tooltip("Milestone 2 only: after the last wave, the waves restart after this many seconds.")]
+    public float floorClearedRestartDelay = 6f;
+
+    [Header("XP and levels")]
+    public float xpPerGoblin = 1f;
+    [Tooltip("XP needed to go from level 1 to 2.")]
+    public float xpFirstLevel = 5f;
+    [Tooltip("Each level needs this much more XP than the one before.")]
+    public float xpPerLevelIncrease = 3f;
+    public int upgradeChoices = 3;
+
+    [Header("Pickups (XP orbs, later gold)")]
+    public float pickupMagnetRadius = 4f;
+    public float pickupMagnetSpeed = 14f;
+    public float pickupCollectRadius = 0.8f;
+    public float xpOrbSize = 0.25f;
+    public float xpOrbGlow = 3f;
+    public float pickupHeight = 0.5f;
+
+    [Header("Upgrades")]
+    [Tooltip("Split Shot: angle between missiles in the fan.")]
+    public float splitShotSpreadDegrees = 6f;
+    [Tooltip("Quick Hands: fire rate bonus per stack (0.2 = +20%).")]
+    public float quickHandsBonus = 0.2f;
+    [Tooltip("Arcane Weight: damage bonus per stack (0.25 = +25%).")]
+    public float arcaneWeightBonus = 0.25f;
+    [Tooltip("Piercing: extra enemies passed through per stack.")]
+    public int piercingPerStack = 1;
+    [Tooltip("Second Wind: max health added per stack.")]
+    public float secondWindHealth = 25f;
+
+    [Header("Upgrade - Fire Wisp")]
+    public float wispDamage = 8f;
+    [Tooltip("A wisp can hit the same goblin once per this many seconds.")]
+    public float wispHitCooldown = 0.4f;
+    public float wispOrbitRadius = 2f;
+    [Tooltip("Degrees per second.")]
+    public float wispOrbitSpeed = 200f;
+    public float wispHeight = 1f;
+    public float wispHitRadius = 0.5f;
+    public float wispSize = 0.4f;
+
+    [Header("Upgrade - Poison Trail")]
+    [Tooltip("Drop a new cloud every time you move this far.")]
+    public float poisonDropDistance = 1.2f;
+    public float poisonCloudDuration = 3f;
+    public float poisonCloudRadius = 1.3f;
+    [Tooltip("Per stack.")]
+    public float poisonDamagePerSecond = 6f;
+    public float poisonTickInterval = 0.5f;
 
     [Header("Hurt feedback")]
     public float damageFlashDuration = 0.35f;

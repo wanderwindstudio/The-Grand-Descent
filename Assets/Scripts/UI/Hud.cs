@@ -10,11 +10,14 @@ public class Hud : MonoBehaviour
     readonly List<HitMarker> hitMarkers = new List<HitMarker>();
 
     Texture2D arrow;
-    GUIStyle bigText, smallText;
+    GUIStyle bigText, smallText, leftText, rightText, bottomRightText;
     float flashTimeLeft;
     string message;
     float messageTimeLeft;
     PlayerMotor motor;
+    PlayerLevel level;
+    PlayerUpgrades upgrades;
+    WaveSpawner waves;
 
     const float MessageDuration = 2.5f;
 
@@ -35,6 +38,9 @@ public class Hud : MonoBehaviour
     {
         Game.PlayerHealth.Damaged += OnPlayerDamaged;
         motor = Game.Player.GetComponent<PlayerMotor>();
+        level = Game.Player.GetComponent<PlayerLevel>();
+        upgrades = Game.Player.GetComponent<PlayerUpgrades>();
+        waves = GetComponent<WaveSpawner>();
     }
 
     void OnPlayerDamaged(Vector3 source, float amount)
@@ -79,9 +85,17 @@ public class Hud : MonoBehaviour
         Bar(new Rect(20, h - 50, 300, 22), hp.Current / hp.Max, Palette.HealthBar, $"HP {Mathf.CeilToInt(hp.Current)} / {Mathf.CeilToInt(hp.Max)}");
         if (motor != null) Bar(new Rect(20, h - 22, 300, 8), motor.DashReady01, Palette.DashBar, null);
 
+        // XP bar across the top
+        Bar(new Rect(0, 0, w, 10), level.Xp / level.XpToNext, Palette.XpBar, null);
+        GUI.Label(new Rect(20, 14, 200, 24), $"Level {level.Level}", leftText);
+
         // Top right info
-        GUI.Label(new Rect(w - 260, 15, 240, 24), $"Enemies: {GoblinEnemy.Active.Count}", smallText);
-        if (Game.GodMode) GUI.Label(new Rect(w - 260, 40, 240, 24), "GOD MODE", smallText);
+        GUI.Label(new Rect(w - 260, 14, 240, 24), $"Wave {Mathf.Max(1, waves.WaveNumber)} / {waves.WaveCount}", rightText);
+        GUI.Label(new Rect(w - 260, 38, 240, 24), $"Enemies left: {waves.EnemiesRemaining}", rightText);
+        if (Game.GodMode) GUI.Label(new Rect(w - 260, 62, 240, 24), "GOD MODE", rightText);
+
+        // Upgrades owned, bottom right
+        GUI.Label(new Rect(w - 260, h - 180, 240, 170), upgrades.Summary(), bottomRightText);
 
         if (messageTimeLeft > 0f)
             GUI.Label(new Rect(0, h * 0.2f, w, 50), message, bigText);
@@ -136,6 +150,9 @@ public class Hud : MonoBehaviour
     {
         bigText = new GUIStyle(GUI.skin.label) { fontSize = 36, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
         smallText = new GUIStyle(GUI.skin.label) { fontSize = 18, alignment = TextAnchor.MiddleCenter };
+        leftText = new GUIStyle(smallText) { alignment = TextAnchor.MiddleLeft };
+        rightText = new GUIStyle(smallText) { alignment = TextAnchor.MiddleRight };
+        bottomRightText = new GUIStyle(smallText) { alignment = TextAnchor.LowerRight, fontSize = 15 };
     }
 
     // A white triangle pointing up.

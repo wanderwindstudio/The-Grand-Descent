@@ -29,9 +29,13 @@ public static class PlayerBuilder
         var health = root.AddComponent<PlayerHealth>();
         Game.PlayerHealth = health;
 
+        root.AddComponent<PlayerUpgrades>();
+        root.AddComponent<PlayerLevel>();
         root.AddComponent<PlayerMotor>();
         root.AddComponent<PlayerLook>().head = head.transform;
         root.AddComponent<PlayerShooter>();
+        root.AddComponent<FireWisps>();
+        root.AddComponent<PoisonTrail>();
         return health;
     }
 }

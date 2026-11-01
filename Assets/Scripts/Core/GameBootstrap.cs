@@ -27,9 +27,11 @@ public class GameBootstrap : MonoBehaviour
         PlayerBuilder.Create(level.playerStart, level.playerStartYaw, Game.Tuning);
         PostProcessSetup.Create(Game.Tuning, Game.Camera);
 
+        gameObject.AddComponent<LootDropper>();
+        gameObject.AddComponent<WaveSpawner>().Init(level.spawnPoints);
         gameObject.AddComponent<Hud>();
+        gameObject.AddComponent<LevelUpScreen>();
         gameObject.AddComponent<DebugPanel>();
-        gameObject.AddComponent<TestSpawner>().Init(level.spawnPoints);
     }
 
     void Update()

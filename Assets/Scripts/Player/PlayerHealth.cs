@@ -25,6 +25,12 @@ public class PlayerHealth : MonoBehaviour
         invulnerableUntil = Mathf.Max(invulnerableUntil, Time.time + seconds);
     }
 
+    public void AddMaxHealthAndHeal(float amount)
+    {
+        Max += amount;
+        Current = Max;
+    }
+
     public bool TakeDamage(float amount, Vector3 sourcePosition)
     {
         if (IsDead || Game.GodMode || Time.time < invulnerableUntil) return false;

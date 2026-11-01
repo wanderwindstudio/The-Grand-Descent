@@ -14,7 +14,7 @@ public class DebugPanel : MonoBehaviour
 
         if (kb.f1Key.wasPressedThisFrame) Toggle();
         if (kb.f2Key.wasPressedThisFrame) Hud.ShowMessage("Buzz arrives in milestone 3");
-        if (kb.f3Key.wasPressedThisFrame) Hud.ShowMessage("Level-ups arrive in milestone 2");
+        if (kb.f3Key.wasPressedThisFrame) Game.Player.GetComponent<PlayerLevel>().GainLevel();
         if (kb.f4Key.wasPressedThisFrame) KillAll();
         if (kb.f5Key.wasPressedThisFrame)
         {
@@ -42,7 +42,7 @@ public class DebugPanel : MonoBehaviour
     {
         if (!open) return;
         GUILayout.BeginArea(new Rect(10, 10, 440, Screen.height - 20), GUI.skin.box);
-        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F4 kill all  -  F5 god mode");
+        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F3 level up  -  F4 kill all  -  F5 god mode");
         scroll = GUILayout.BeginScrollView(scroll);
 
         var t = Game.Tuning;
@@ -68,7 +68,39 @@ public class DebugPanel : MonoBehaviour
         t.goblinAttackCooldown = Slider("Attack cooldown", t.goblinAttackCooldown, 0.1f, 4f);
         t.goblinAttackRange = Slider("Attack range", t.goblinAttackRange, 0.8f, 4f);
         t.goblinHitRange = Slider("Hit range", t.goblinHitRange, 0.8f, 5f);
-        t.testGoblinCount = IntSlider("Goblins per batch", t.testGoblinCount, 1, 30);
+
+        GUILayout.Label("Waves (counts apply from the next wave)");
+        for (int i = 0; i < t.waveEnemyCounts.Length; i++)
+            t.waveEnemyCounts[i] = IntSlider($"Wave {i + 1} goblins", t.waveEnemyCounts[i], 1, 60);
+        t.spawnInterval = Slider("Spawn interval", t.spawnInterval, 0.05f, 2f);
+        t.timeBetweenWaves = Slider("Time between waves", t.timeBetweenWaves, 0f, 15f);
+
+        GUILayout.Label("XP");
+        t.xpPerGoblin = Slider("XP per goblin", t.xpPerGoblin, 0.1f, 5f);
+        t.xpFirstLevel = Slider("XP for first level", t.xpFirstLevel, 1f, 30f);
+        t.xpPerLevelIncrease = Slider("XP increase per level", t.xpPerLevelIncrease, 0f, 20f);
+        t.pickupMagnetRadius = Slider("Pickup magnet radius", t.pickupMagnetRadius, 0.5f, 15f);
+
+        GUILayout.Label("Upgrades");
+        t.splitShotSpreadDegrees = Slider("Split Shot spread", t.splitShotSpreadDegrees, 0f, 30f);
+        t.quickHandsBonus = Slider("Quick Hands bonus", t.quickHandsBonus, 0f, 1f);
+        t.arcaneWeightBonus = Slider("Arcane Weight bonus", t.arcaneWeightBonus, 0f, 1f);
+        t.wispDamage = Slider("Wisp damage", t.wispDamage, 1f, 50f);
+        t.wispOrbitRadius = Slider("Wisp orbit radius", t.wispOrbitRadius, 0.5f, 6f);
+        t.wispOrbitSpeed = Slider("Wisp orbit speed", t.wispOrbitSpeed, 30f, 720f);
+        t.poisonDamagePerSecond = Slider("Poison damage/s", t.poisonDamagePerSecond, 0f, 40f);
+        t.poisonCloudRadius = Slider("Poison radius", t.poisonCloudRadius, 0.3f, 4f);
+        t.poisonCloudDuration = Slider("Poison duration", t.poisonCloudDuration, 0.5f, 10f);
+        GUILayout.Label("Give upgrade:");
+        var upgrades = Game.Player.GetComponent<PlayerUpgrades>();
+        GUILayout.BeginHorizontal();
+        for (int i = 0; i < PlayerUpgrades.All.Length; i++)
+        {
+            if (i == 4) { GUILayout.EndHorizontal(); GUILayout.BeginHorizontal(); }
+            var u = PlayerUpgrades.All[i];
+            if (GUILayout.Button($"{PlayerUpgrades.Name(u)} ({upgrades.Stacks(u)})")) upgrades.Apply(u);
+        }
+        GUILayout.EndHorizontal();
 
         GUILayout.Label("Feedback");
         t.hitIndicatorDuration = Slider("Hit arrow duration", t.hitIndicatorDuration, 0.2f, 4f);

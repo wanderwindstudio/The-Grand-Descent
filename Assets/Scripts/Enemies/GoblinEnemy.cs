@@ -7,6 +7,8 @@ using UnityEngine.AI;
 public class GoblinEnemy : MonoBehaviour
 {
     public static readonly List<GoblinEnemy> Active = new List<GoblinEnemy>();
+    // (where it died). Used to drop loot.
+    public static event System.Action<Vector3> Killed;
     static AudioClip behindCueClip;
 
     enum State { Chase, WindUp, Recover }
@@ -170,6 +172,7 @@ public class GoblinEnemy : MonoBehaviour
         if (IsDead) return;
         IsDead = true;
         Active.Remove(this);
+        Killed?.Invoke(transform.position);
         pool.Release(this);
     }
 }
