@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba5a27a72d3104ddfbc01cea027f06c3, type: 3}
+  m_Name: TuningConfig
+  m_EditorClassIdentifier: Assembly-CSharp::TuningConfig
+  moveSpeed: 6
+  mouseSensitivity: 0.12
+  pitchClamp: 85
+  gravity: -20
+  groundStickSpeed: -2
+  playerHeight: 1.8
+  playerRadius: 0.4
+  eyeHeight: 1.6
+  fieldOfView: 80
+  dashSpeed: 20
+  dashDuration: 0.18
+  dashCooldown: 1.5
+  dashInvulnerability: 0.3
+  playerMaxHealth: 100
+  missileDamage: 10
+  fireRate: 4
+  missileSpeed: 30
+  missileRadius: 0.2
+  missileVisualSize: 0.3
+  missileLifetime: 2
+  missileSpawnOffset: 0.6
+  missilePierce: 0
+  missileGlowIntensity: 4
+  missileLightRange: 4
+  missileLightIntensity: 2
+  goblinHealth: 30
+  goblinMoveSpeed: 3.5
+  goblinAcceleration: 20
+  goblinDamage: 10
+  goblinAttackRange: 1.6
+  goblinHitRange: 2.1
+  goblinWindUpTime: 0.6
+  goblinAttackCooldown: 1
+  goblinWindUpSwell: 0.3
+  goblinWindUpGlow: 3
+  goblinRepathInterval: 0.2
+  goblinHeight: 1.5
+  goblinWidth: 0.8
+  enemyHitFlashTime: 0.08
+  behindCueEnabled: 1
+  behindCueVolume: 0.7
+  behindCuePitchHz: 880
+  behindCueDuration: 0.15
+  behindCueMaxDistance: 25
+  testGoblinCount: 5
+  testRespawnDelay: 3
+  spawnScatter: 1.5
+  damageFlashDuration: 0.35
+  damageFlashMaxAlpha: 0.35
+  hitIndicatorDuration: 1.2
+  hitIndicatorRadius: 160
+  hitIndicatorSize: 48
+  roomSize: 30
+  wallHeight: 4
+  wallThickness: 0.5
+  pillarSize: 1.5
+  ambientColor: {r: 0.07, g: 0.07, b: 0.1, a: 1}
+  fogColor: {r: 0.02, g: 0.02, b: 0.03, a: 1}
+  fogDensity: 0.04
+  torchColor: {r: 1, g: 0.6, b: 0.3, a: 1}
+  torchIntensity: 3
+  torchRange: 12
+  torchHeight: 2.6
+  bloomIntensity: 1.2
+  bloomThreshold: 0.9
+  vignetteIntensity: 0.3
