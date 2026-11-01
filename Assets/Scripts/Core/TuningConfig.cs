@@ -61,6 +61,8 @@ public class TuningConfig : ScriptableObject
     [Tooltip("How much bigger the goblin swells during wind-up (0.3 = 30%).")]
     public float goblinWindUpSwell = 0.3f;
     public float goblinWindUpGlow = 3f;
+    [Tooltip("Faint green self-glow so goblins stand out in the dark. 0 = off.")]
+    public float goblinBaseGlow = 0.25f;
     public float goblinRepathInterval = 0.2f;
     public float goblinHeight = 1.5f;
     public float goblinWidth = 0.8f;
@@ -93,16 +95,20 @@ public class TuningConfig : ScriptableObject
     public float pillarSize = 1.5f;
 
     [Header("Level - lighting")]
-    public Color ambientColor = new Color(0.07f, 0.07f, 0.1f);
-    public Color fogColor = new Color(0.02f, 0.02f, 0.03f);
-    public float fogDensity = 0.04f;
+    [Tooltip("Colour of the light that fills every shadow.")]
+    public Color ambientColor = new Color(0.85f, 0.85f, 1f);
+    [Tooltip("Overall brightness of the shadows. 0.08 = pitch-dark dungeon, 0.3 = readable.")]
+    public float ambientIntensity = 0.3f;
+    public Color fogColor = new Color(0.06f, 0.06f, 0.08f);
+    [Tooltip("Higher = things vanish into the dark sooner.")]
+    public float fogDensity = 0.015f;
     public Color torchColor = new Color(1f, 0.6f, 0.3f);
-    public float torchIntensity = 3f;
-    public float torchRange = 12f;
+    public float torchIntensity = 4f;
+    public float torchRange = 16f;
     public float torchHeight = 2.6f;
 
     [Header("Post-processing")]
     public float bloomIntensity = 1.2f;
     public float bloomThreshold = 0.9f;
-    public float vignetteIntensity = 0.3f;
+    public float vignetteIntensity = 0.2f;
 }

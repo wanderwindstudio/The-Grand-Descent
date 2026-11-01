@@ -77,8 +77,12 @@ public class DebugPanel : MonoBehaviour
         t.behindCueEnabled = GUILayout.Toggle(t.behindCueEnabled, "Behind-you beep on");
 
         GUILayout.Label("Atmosphere");
+        t.ambientIntensity = Slider("Ambient brightness", t.ambientIntensity, 0f, 1f);
         t.fogDensity = Slider("Fog density", t.fogDensity, 0f, 0.15f);
-        RenderSettings.fogDensity = t.fogDensity;
+        t.torchIntensity = Slider("Torch brightness", t.torchIntensity, 0f, 10f);
+        t.torchRange = Slider("Torch reach", t.torchRange, 2f, 40f);
+        t.goblinBaseGlow = Slider("Goblin glow (new spawns)", t.goblinBaseGlow, 0f, 2f);
+        LevelLighting.Refresh(t);
 
         GUILayout.Space(10);
         if (GUILayout.Button("Reset to asset values")) ResetToAsset();

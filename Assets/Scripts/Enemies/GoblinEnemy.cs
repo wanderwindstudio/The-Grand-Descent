@@ -117,7 +117,7 @@ public class GoblinEnemy : MonoBehaviour
         var t = Game.Tuning;
         body.localScale = bodyScale * (1f + t.goblinWindUpSwell * k);
         if (hitFlashTimer <= 0f) material.SetColor("_BaseColor", CurrentColor());
-        Mats.SetEmission(material, Palette.GoblinWindUp * (t.goblinWindUpGlow * k));
+        Mats.SetEmission(material, BaseGlow() + Palette.GoblinWindUp * (t.goblinWindUpGlow * k));
     }
 
     Color CurrentColor()
@@ -131,8 +131,10 @@ public class GoblinEnemy : MonoBehaviour
     {
         body.localScale = bodyScale;
         material.SetColor("_BaseColor", Palette.Goblin);
-        Mats.SetEmission(material, Color.black);
+        Mats.SetEmission(material, BaseGlow());
     }
+
+    static Color BaseGlow() => Palette.Goblin * Game.Tuning.goblinBaseGlow;
 
     void Face(Vector3 flatDirection)
     {
