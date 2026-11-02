@@ -28,3 +28,7 @@
 
 # OS
 .DS_Store
+
+# Project
+output/
+*.blend1
