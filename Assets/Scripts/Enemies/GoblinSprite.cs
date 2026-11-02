@@ -52,7 +52,7 @@ public class GoblinSprite : MonoBehaviour
         else ShowFrame(Art.GoblinIdle);
 
         // Walking: hop and lean side to side, blended in and out smoothly.
-        bool walking = !goblin.IsWindingUp && agent.velocity.sqrMagnitude > 0.04f;
+        bool walking = !goblin.IsWindingUp && agent.enabled && agent.velocity.sqrMagnitude > 0.04f;
         walkBlend = Mathf.MoveTowards(walkBlend, walking ? 1f : 0f, dt * 6f);
         bobPhase += dt * t.spriteBobSpeed * Mathf.PI;
         float hop = Mathf.Abs(Mathf.Sin(bobPhase)) * t.spriteBobHeight * walkBlend;
@@ -68,13 +68,14 @@ public class GoblinSprite : MonoBehaviour
         pivot.position = transform.position + Vector3.up * hop + lunge;
         Art.FaceCamera(pivot);
         pivot.rotation *= Quaternion.Euler(0f, 0f, sway);
+        if (goblin.IsCrouching) stretch *= 0.8f; // about to hop a wall
         pivot.localScale = new Vector3(1f - (stretch - 1f) * 0.5f, stretch, 1f);
 
         Color glow = goblin.IsHitFlashing ? Color.white * t.spriteHitFlashStrength
                    : goblin.IsHeld ? Palette.Arcane * t.heldGlow
                    : Palette.GoblinWindUp * (t.spriteWindUpGlow * k);
         material.SetColor("_EmissionColor", glow);
-        material.SetColor("_BaseColor", goblin.IsHeld ? Palette.HeldTint : Color.white);
+        material.SetColor("_BaseColor", goblin.IsHeld ? Palette.HeldTint : goblin.SpriteTint);
     }
 
     void ShowFrame(Texture2D frame)

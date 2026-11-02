@@ -3,6 +3,7 @@ using UnityEngine;
 
 // A spinning Arcane vortex. For its lifetime it pulls every goblin within its radius to the centre and holds
 // them there (no moving, no attacking), ticking a little damage. With Implosion it explodes when it ends.
+// Over a pit it hangs at rim height and lifts what it holds; when it ends, they drop in (ring out).
 public class Vortex : MonoBehaviour
 {
     Renderer sprite;
@@ -10,6 +11,7 @@ public class Vortex : MonoBehaviour
     Vector3 ground;     // centre on the floor; goblins are pulled here
     float radius, duration, age, spin, tickTimer;
     int implosionStacks;
+    RoomPit pit;        // set when the vortex hangs over a pit
     readonly List<GoblinEnemy> held = new List<GoblinEnemy>();
 
     public static void Create(Vector3 point, PlayerUpgrades upgrades)
@@ -17,13 +19,16 @@ public class Vortex : MonoBehaviour
         var t = Game.Tuning;
         // Find the floor under the point, so a vortex thrown at a wall or ceiling still works on the ground.
         Vector3 ground = point;
-        if (Physics.Raycast(point + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 20f, ~0, QueryTriggerInteraction.Ignore))
+        RoomPit pit = RoomPit.Above(point);
+        if (pit != null) ground = new Vector3(point.x, pit.RimY, point.z); // hang over the pit at rim height
+        else if (Physics.Raycast(point + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, 20f, ~(1 << 2), QueryTriggerInteraction.Ignore))
             ground = hit.point;
 
         var go = new GameObject("Arcane Vortex");
         go.transform.position = ground + Vector3.up * t.vortexHeight;
         var v = go.AddComponent<Vortex>();
         v.ground = ground;
+        v.pit = pit;
         v.radius = upgrades.VortexRadius;
         v.duration = upgrades.VortexDuration;
         v.implosionStacks = upgrades.Stacks(UpgradeType.Implosion);
@@ -62,9 +67,20 @@ public class Vortex : MonoBehaviour
         foreach (var g in GoblinEnemy.Active)
         {
             Vector3 d = g.transform.position - ground;
+            float below = -d.y;
             d.y = 0f;
             if (d.magnitude > radius) continue;
-            g.Hold(ground, t.vortexPullSpeed, t.vortexHoldRadius);
+            if (pit != null)
+            {
+                // Over a pit: also reaches goblins down in it, and lifts them all off the floor.
+                if (below > ground.y - pit.Bounds.min.y + 0.5f || below < -2.5f) continue;
+                g.HoldOverPit(transform.position, t.vortexPullSpeed);
+            }
+            else
+            {
+                if (Mathf.Abs(below) > 2.5f) continue; // not someone on a balcony above, or a pit below
+                g.Hold(ground, t.vortexPullSpeed, t.vortexHoldRadius);
+            }
             held.Add(g);
         }
 

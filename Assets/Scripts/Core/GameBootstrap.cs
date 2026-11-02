@@ -21,6 +21,8 @@ public class GameBootstrap : MonoBehaviour
     public Material fxMaterial;
     [Tooltip("Assets/Settings/GrandDescentControls. If empty, default bindings are used.")]
     public UnityEngine.InputSystem.InputActionAsset controls;
+    [Tooltip("Assets/Rooms/RoomLibrary. Kept up to date automatically; lists every room prefab.")]
+    public RoomLibrary roomLibrary;
     [Header("Player and spell art (optional; coloured placeholders are used if missing)")]
     public Texture2D handLeft;
     [Tooltip("Assets/Art/Player/player_handLeft_cast_01 (optional). Shown briefly on every spell cast.")]
@@ -67,6 +69,7 @@ public class GameBootstrap : MonoBehaviour
         Art.ArcaneImpact = fxArcaneImpact != null ? fxArcaneImpact : Art.Placeholder("ImpactPlaceholder", Palette.Arcane, square: false);
         Art.ArcaneVortex = fxArcaneVortex != null ? fxArcaneVortex : Art.Placeholder("VortexPlaceholder", Palette.Arcane, square: false);
         Controls.Init(controls);
+        RoomLibrary.Current = roomLibrary;
         // Work on a copy so live slider changes don't silently overwrite the asset.
         Game.TuningAsset = config;
         Game.Tuning = config != null ? Instantiate(config) : ScriptableObject.CreateInstance<TuningConfig>();
@@ -81,6 +84,8 @@ public class GameBootstrap : MonoBehaviour
         gameObject.AddComponent<LootDropper>();
         gameObject.AddComponent<GoblinCorpses>();
         var waves = gameObject.AddComponent<WaveSpawner>();
+        gameObject.AddComponent<CampingWatcher>();
+        gameObject.AddComponent<WorldPopup>();
         gameObject.AddComponent<Hud>();
         gameObject.AddComponent<SpellBar>();
         gameObject.AddComponent<LevelUpScreen>();

@@ -13,14 +13,14 @@ public class Portal : MonoBehaviour
     Light glow;
     Color color;
 
-    public static Portal Create(PortalKind kind, Vector3 position, Transform parent)
+    public static Portal Create(PortalKind kind, Vector3 position, Transform parent, float yaw = 0f)
     {
         var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         go.name = kind + " Portal";
         Object.DestroyImmediate(go.GetComponent<Collider>()); // you walk through it
         go.transform.SetParent(parent, false);
         go.transform.position = position + Vector3.up * 1.6f;
-        go.transform.rotation = Quaternion.Euler(90f, 0f, 0f); // stand the disc up, facing south
+        go.transform.rotation = Quaternion.Euler(0f, yaw, 0f) * Quaternion.Euler(90f, 0f, 0f); // stand the disc up, facing along the spot
         go.transform.localScale = new Vector3(2.4f, 0.08f, 3f);
 
         var portal = go.AddComponent<Portal>();

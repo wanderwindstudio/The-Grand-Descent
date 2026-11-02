@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// F1 = tuning sliders. F2 = fill Buzz, F3 = level up, F4 = kill all, F5 = god mode, F7 = reset cooldowns.
+// F1 = tuning sliders. F2 = fill Buzz, F3 = level up, F4 = kill all, F5 = god mode, F7 = reset cooldowns,
+// F8 = rebuild the floor as the next single room prefab (room tester).
 public class DebugPanel : MonoBehaviour
 {
     bool open;
@@ -17,6 +18,7 @@ public class DebugPanel : MonoBehaviour
         if (kb.f3Key.wasPressedThisFrame) Game.Player.GetComponent<PlayerLevel>().GainLevel();
         if (kb.f4Key.wasPressedThisFrame) KillAll();
         if (kb.f7Key.wasPressedThisFrame) ResetCooldowns();
+        if (kb.f8Key.wasPressedThisFrame) RunManager.Instance.DebugNextTestRoom();
         if (kb.f5Key.wasPressedThisFrame)
         {
             Game.GodMode = !Game.GodMode;
@@ -50,7 +52,7 @@ public class DebugPanel : MonoBehaviour
     {
         if (!open) return;
         GUILayout.BeginArea(new Rect(10, 10, 440, Screen.height - 20), GUI.skin.box);
-        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F2 fill Buzz  -  F3 level up  -  F4 kill all  -  F5 god mode  -  F7 reset cooldowns");
+        GUILayout.Label("DEBUG PANEL (F1 to close)  -  F2 fill Buzz  -  F3 level up  -  F4 kill all  -  F5 god mode  -  F7 reset cooldowns  -  F8 next test room");
         scroll = GUILayout.BeginScrollView(scroll);
 
         var t = Game.Tuning;
@@ -60,6 +62,21 @@ public class DebugPanel : MonoBehaviour
         t.dashSpeed = Slider("Dash speed", t.dashSpeed, 5f, 40f);
         t.dashCooldown = Slider("Dash cooldown", t.dashCooldown, 0.2f, 5f);
         t.dashInvulnerability = Slider("Dash invulnerability", t.dashInvulnerability, 0f, 1f);
+
+        GUILayout.Label("Jumping");
+        t.jumpHeight = Slider("Jump height (m)", t.jumpHeight, 0.3f, 4f);
+        t.fallGravityMultiplier = Slider("Fall gravity multiplier", t.fallGravityMultiplier, 1f, 4f);
+        t.airControl = Slider("Air control", t.airControl, 0f, 1f);
+        t.jumpCutMultiplier = Slider("Early release cut", t.jumpCutMultiplier, 0f, 1f);
+        t.coyoteTime = Slider("Coyote time (s)", t.coyoteTime, 0f, 0.4f);
+        t.jumpBufferTime = Slider("Jump buffer (s)", t.jumpBufferTime, 0f, 0.4f);
+
+        GUILayout.Label("Goblin traversal");
+        t.goblinLedgeJumpHeight = Slider("Ledge-jump height (m, next floor/F8)", t.goblinLedgeJumpHeight, 0f, 8f);
+        t.goblinLadderSpeedFraction = Slider("Ladder speed fraction", t.goblinLadderSpeedFraction, 0.1f, 1f);
+        t.goblinHopDelay = Slider("Wall hop delay (s)", t.goblinHopDelay, 0f, 1.5f);
+        t.goblinLandingStun = Slider("Landing stun (s)", t.goblinLandingStun, 0f, 2f);
+        t.campTime = Slider("Camping time before sprayers (s)", t.campTime, 2f, 30f);
 
         GUILayout.Label("Arcane Missile");
         t.missileDamage = Slider("Damage", t.missileDamage, 1f, 50f);

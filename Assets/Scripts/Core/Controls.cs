@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 // (double-click it in Unity to rebind). If that asset is missing, the same defaults are built here.
 public static class Controls
 {
-    public static InputAction Fire, CastVortex, CastExplosion, Dash, Interact;
+    public static InputAction Fire, CastVortex, CastExplosion, Dash, Interact, Jump;
 
     static InputActionMap map;
 
@@ -25,6 +25,7 @@ public static class Controls
             map.AddAction("CastExplosion", InputActionType.Button, "<Keyboard>/e");
             map.AddAction("Dash", InputActionType.Button, "<Keyboard>/leftShift");
             map.AddAction("Interact", InputActionType.Button, "<Keyboard>/f");
+            map.AddAction("Jump", InputActionType.Button, "<Keyboard>/space");
         }
 
         Fire = map.FindAction("Fire", true);
@@ -32,6 +33,7 @@ public static class Controls
         CastExplosion = map.FindAction("CastExplosion", true);
         Dash = map.FindAction("Dash", true);
         Interact = map.FindAction("Interact", true);
+        Jump = map.FindAction("Jump", true);
         map.Enable();
     }
 

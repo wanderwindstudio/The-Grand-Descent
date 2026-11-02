@@ -9,7 +9,6 @@ public class CollapseTimer : MonoBehaviour
     public float Duration { get; private set; }
 
     AudioSource rumble;
-    Vector3 headRest;
 
     void Awake()
     {
@@ -33,7 +32,6 @@ public class CollapseTimer : MonoBehaviour
         Duration = TimeForFloor(Game.Floor);
         TimeLeft = Duration;
         Active = true;
-        headRest = Game.Camera.transform.localPosition;
         rumble.volume = 0f;
         rumble.Play();
     }
@@ -43,7 +41,7 @@ public class CollapseTimer : MonoBehaviour
         if (!Active) return;
         Active = false;
         rumble.Stop();
-        Game.Camera.transform.localPosition = headRest;
+        CameraOffsets.Shake = Vector3.zero;
     }
 
     // 0 when it starts, 1 at the moment of collapse.
@@ -73,6 +71,6 @@ public class CollapseTimer : MonoBehaviour
     {
         if (!Active || Time.timeScale == 0f) return;
         float k = Danger01 * Danger01; // shake mostly near the end
-        Game.Camera.transform.localPosition = headRest + Random.insideUnitSphere * (Game.Tuning.collapseShakeMax * k);
+        CameraOffsets.Shake = Random.insideUnitSphere * (Game.Tuning.collapseShakeMax * k);
     }
 }

@@ -111,6 +111,15 @@ public class Missile : MonoBehaviour
             if (col.GetComponentInParent<PlayerHealth>() != null) continue;
             Vector3 point = hits[i].distance > 0f ? hits[i].point : from;
 
+            var barrel = col.GetComponentInParent<ExplosiveBarrel>();
+            if (barrel != null)
+            {
+                barrel.Ignite(0f);
+                SpellFx.MissileImpact(point);
+                End(missed: false); // shooting a barrel on purpose doesn't break your charge streak
+                return true;
+            }
+
             var goblin = col.GetComponentInParent<GoblinEnemy>();
             if (goblin == null) // a wall or the floor
             {

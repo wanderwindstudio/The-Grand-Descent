@@ -23,6 +23,7 @@ public static class PlayerBuilder
         cam.clearFlags = CameraClearFlags.SolidColor;
         cam.backgroundColor = t.fogColor;
         head.AddComponent<AudioListener>();
+        head.AddComponent<CameraOffsets>();
 
         Game.Player = root.transform;
         Game.Camera = cam;
@@ -35,6 +36,7 @@ public static class PlayerBuilder
         Game.Buzz = root.AddComponent<BuzzMeter>();
         root.AddComponent<SpellSwap>();
         root.AddComponent<PlayerMotor>();
+        root.AddComponent<LandingFeedback>();
         root.AddComponent<PlayerLook>().head = head.transform;
         root.AddComponent<PlayerShooter>();
         root.AddComponent<VortexCaster>();

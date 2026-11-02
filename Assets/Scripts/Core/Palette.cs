@@ -37,4 +37,13 @@ public static class Palette
     public static readonly Color Gold = new Color(1f, 0.8f, 0.2f);
     public static readonly Color ExtractPortal = new Color(0.25f, 0.55f, 1f);
     public static readonly Color DescendPortal = new Color(1f, 0.2f, 0.15f);
+    public static readonly Color Barrel = new Color(0.75f, 0.1f, 0.08f);
+    public static readonly Color BarrelFlash = new Color(1f, 0.85f, 0.4f);
+    public static readonly Color Explosion = new Color(1f, 0.55f, 0.15f);
+    public static readonly Color Sprayer = new Color(0.2f, 0.45f, 0.95f);
+    public static readonly Color SprayerTint = new Color(0.55f, 0.7f, 1f);
+    public static readonly Color SprayerShot = new Color(0.35f, 0.6f, 1f);
+    public static readonly Color Stairs = new Color(0.4f, 0.32f, 0.24f);
+    public static readonly Color Ladder = new Color(0.55f, 0.4f, 0.22f);
+    public static readonly Color PitFloor = new Color(0.12f, 0.11f, 0.1f);
 }
