@@ -23,6 +23,8 @@ public class GameBootstrap : MonoBehaviour
     public UnityEngine.InputSystem.InputActionAsset controls;
     [Header("Player and spell art (optional; coloured placeholders are used if missing)")]
     public Texture2D handLeft;
+    [Tooltip("Assets/Art/Player/player_handLeft_cast_01 (optional). Shown briefly on every spell cast.")]
+    public Texture2D handLeftCast;
     public Texture2D handRight;
     public Texture2D fxArcaneMissile;
     public Texture2D fxArcaneImpact;
@@ -45,6 +47,7 @@ public class GameBootstrap : MonoBehaviour
         Art.GoblinDead = goblinDeadSprite; // null = tip the idle sprite over instead
         Art.FxMaterial = fxMaterial;
         Art.HandLeft = handLeft != null ? handLeft : Art.Placeholder("HandLeftPlaceholder", Palette.HandPlaceholder, square: true);
+        Art.HandLeftCast = handLeftCast;
         Art.HandRight = handRight != null ? handRight : Art.Placeholder("HandRightPlaceholder", Palette.HandPlaceholder, square: true);
         Art.ArcaneMissile = fxArcaneMissile != null ? fxArcaneMissile : Art.Placeholder("MissilePlaceholder", Palette.Arcane, square: false);
         Art.ArcaneImpact = fxArcaneImpact != null ? fxArcaneImpact : Art.Placeholder("ImpactPlaceholder", Palette.Arcane, square: false);

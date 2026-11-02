@@ -1,7 +1,8 @@
 using UnityEngine;
 
 // The wizard's hands as screen overlays (they can never clip into walls).
-// Left hand bottom-left, right hand with the staff bottom-right. One pose each, so all motion is faked:
+// Left hand bottom-left (idle pose, open cast pose for a moment after each spell), right hand with the staff
+// bottom-right. Everything else is faked:
 // breathing sway, walk bob, lag behind fast turns, cast pushes, dash swing, hit jolt, Buzz effects.
 // The staff crystal glows with Arcane Charges, and the hands take on the light around the player.
 public class FirstPersonHands : MonoBehaviour
@@ -16,7 +17,7 @@ public class FirstPersonHands : MonoBehaviour
     Vector2 lookLag;
     float leftScale = 1f;
     float bobPhase, prevYaw, prevPitch;
-    float castT = 99f, throwT = 99f, dashT = 99f, hitT = 99f, flashT = 99f;
+    float castT = 99f, poseT = 99f, throwT = 99f, dashT = 99f, hitT = 99f, flashT = 99f;
     float hitSide;     // -1 = hit from the left, 1 = from the right
     float flashRoll;
     float crashBlend;
@@ -40,8 +41,10 @@ public class FirstPersonHands : MonoBehaviour
     }
 
     // Events from the spells and the player
-    public void OnMissileCast() { castT = 0f; flashT = 0f; flashRoll = Random.Range(0f, 360f); }
-    public void OnVortexThrow() { throwT = 0f; flashT = 0f; flashRoll = Random.Range(0f, 360f); }
+    public void OnMissileCast() { castT = 0f; poseT = 0f; flashT = 0f; flashRoll = Random.Range(0f, 360f); }
+    public void OnVortexThrow() { throwT = 0f; poseT = 0f; flashT = 0f; flashRoll = Random.Range(0f, 360f); }
+
+    bool CastPose => Art.HandLeftCast != null && poseT < Game.Tuning.handCastPoseTime;
     public void OnDash() => dashT = 0f;
 
     void OnDamaged(Vector3 source, float amount)
@@ -65,7 +68,7 @@ public class FirstPersonHands : MonoBehaviour
         float pace = Mathf.Lerp(1f, t.handCrashSluggishness, crashBlend); // everything slows during the Crash
         float buzzBoost = 1f + buzz.Normalized * t.handBuzzBoost;
 
-        castT += dt; throwT += dt; dashT += dt; hitT += dt; flashT += dt;
+        castT += dt; poseT += dt; throwT += dt; dashT += dt; hitT += dt; flashT += dt;
 
         // Breathing sway
         float time = Time.time * t.handSwaySpeed * pace;
@@ -111,7 +114,9 @@ public class FirstPersonHands : MonoBehaviour
         float ls = size * leftScale;
         leftRect = new Rect(leftOffset.x * h, h - ls + leftOffset.y * h, ls, ls);
         rightRect = new Rect(w - size + rightOffset.x * h, h - size + rightOffset.y * h, size, size);
-        FingertipGuiPosition = new Vector2(leftRect.x + t.leftFingertip.x * ls, leftRect.y + t.leftFingertip.y * ls);
+        // With cast art, spells always leave from its flare: the hand opens the moment a spell goes.
+        Vector2 tip = Art.HandLeftCast != null ? t.castFingertip : t.leftFingertip;
+        FingertipGuiPosition = new Vector2(leftRect.x + tip.x * ls, leftRect.y + tip.y * ls);
 
         if (Time.time >= nextLightSample)
         {
@@ -154,8 +159,9 @@ public class FirstPersonHands : MonoBehaviour
         if (!t.showHands || RunManager.Instance.Current != RunManager.State.Playing) return;
         GUI.depth = 10; // behind the HUD
 
-        // Cast flash at the fingertips (drawn behind the hand so it seems to come from the palm)
-        if (flashT < t.castFlashDuration)
+        // Cast flash at the fingertips (drawn behind the hand so it seems to come from the palm).
+        // The cast art has its own flare, so this is only for the idle-only fallback.
+        if (Art.HandLeftCast == null && flashT < t.castFlashDuration)
         {
             float k = flashT / t.castFlashDuration;
             float s = Screen.height * t.castFlashSize * (0.5f + k);
@@ -168,7 +174,7 @@ public class FirstPersonHands : MonoBehaviour
         }
 
         GUI.color = lightTint;
-        GUI.DrawTexture(leftRect, Art.HandLeft);
+        GUI.DrawTexture(leftRect, CastPose ? Art.HandLeftCast : Art.HandLeft);
         GUI.DrawTexture(rightRect, Art.HandRight);
 
         // Staff crystal glow: brighter and bigger with each Arcane Charge, pulsing at max.

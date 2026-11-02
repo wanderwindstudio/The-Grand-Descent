@@ -18,6 +18,7 @@ public static class PrototypeSceneSetup
     const string FxMaterialPath = "Assets/Art/Materials/mat_fxTransparent.mat";
     const string ControlsPath = "Assets/Settings/GrandDescentControls.inputactions";
     const string HandLeftPath = "Assets/Art/Player/player_handLeft_idle_01.png";
+    const string HandLeftCastPath = "Assets/Art/Player/player_handLeft_cast_01.png";
     const string HandRightPath = "Assets/Art/Player/player_handRight_staff_idle_01.png";
     const string FxMissilePath = "Assets/Art/FX/fx_arcaneMissile_01.png";
     const string FxImpactPath = "Assets/Art/FX/fx_arcaneImpact_01.png";
@@ -76,6 +77,7 @@ public static class PrototypeSceneSetup
         bootstrap.fxMaterial = fx;
         bootstrap.controls = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ControlsPath);
         bootstrap.handLeft = LoadArt(HandLeftPath);
+        bootstrap.handLeftCast = LoadArt(HandLeftCastPath);
         bootstrap.handRight = LoadArt(HandRightPath);
         bootstrap.fxArcaneMissile = LoadArt(FxMissilePath);
         bootstrap.fxArcaneImpact = LoadArt(FxImpactPath);

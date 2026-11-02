@@ -86,6 +86,7 @@ public class DebugPanel : MonoBehaviour
         t.handBobAmount = Slider("Bob amount", t.handBobAmount, 0f, 0.08f);
         t.handSwayAmount = Slider("Sway amount", t.handSwayAmount, 0f, 0.04f);
         t.handLookLag = Slider("Turn lag", t.handLookLag, 0f, 0.015f);
+        t.handCastPoseTime = Slider("Cast pose time", t.handCastPoseTime, 0f, 0.5f);
 
         GUILayout.Label("Goblin visuals");
         if (!Art.HasGoblinSprite) GUILayout.Label("(sprite or material missing - run Grand Descent > Create Prototype Scene)");

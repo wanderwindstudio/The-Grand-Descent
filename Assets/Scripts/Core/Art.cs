@@ -11,6 +11,7 @@ public static class Art
 
     public static Material FxMaterial;
     public static Texture2D HandLeft, HandRight;
+    public static Texture2D HandLeftCast; // null if missing: the left hand then keeps its idle pose
     public static Texture2D ArcaneMissile, ArcaneImpact, ArcaneVortex;
 
     public static bool HasGoblinSprite => BillboardMaterial != null && GoblinIdle != null;

@@ -145,6 +145,8 @@ public class TuningConfig : ScriptableObject
     public float handCatchUpSpeed = 9f;
     public float handCastPush = 0.05f;
     public float handCastPushTime = 0.1f;
+    [Tooltip("How long the left hand holds its open cast pose after each spell (seconds).")]
+    public float handCastPoseTime = 0.15f;
     public float handThrowPush = 0.13f;
     public float handThrowTime = 0.25f;
     public float handDashSwing = 0.09f;
@@ -165,6 +167,8 @@ public class TuningConfig : ScriptableObject
     public float handLightGain = 0.6f;
     [Tooltip("Left fingertips inside the hand image (0-1 from the left, 0-1 from the top). Missiles leave from here.")]
     public Vector2 leftFingertip = new Vector2(0.56f, 0.3f);
+    [Tooltip("The flare inside the left-hand cast image. With cast art, missiles leave from here instead.")]
+    public Vector2 castFingertip = new Vector2(0.75f, 0.31f);
     [Tooltip("Staff crystal inside the right hand image (0-1 from the left, 0-1 from the top).")]
     public Vector2 staffCrystal = new Vector2(0.8f, 0.13f);
     [Tooltip("Size of the crystal glow, as a fraction of the hand image.")]
