@@ -134,6 +134,49 @@ public static class MenuSetup
         return asset;
     }
 
+    // Assets/Settings/EnvironmentArt.asset: dungeon textures, props and decals.
+    public static EnvironmentArt EnvironmentSetup()
+    {
+        const string path = "Assets/Settings/EnvironmentArt.asset";
+        var env = AssetDatabase.LoadAssetAtPath<EnvironmentArt>(path);
+        if (env == null)
+        {
+            env = ScriptableObject.CreateInstance<EnvironmentArt>();
+            AssetDatabase.CreateAsset(env, path);
+        }
+        Texture2D Tex(string folder, string name) => LoadTexture($"Assets/Art/{folder}/{name}.png");
+        env.stoneFloor = Tex("World", "tex_stoneFloor_01");
+        env.stoneWall = Tex("World", "tex_stoneWall_01");
+        env.brickWall = Tex("World", "tex_brickWall_01");
+        env.woodPlanks = Tex("World", "tex_woodPlanks_01");
+        env.stoneCeiling = Tex("World", "tex_stoneCeiling_01");
+        env.torchWall = Tex("Props", "prop_torchWall_01");
+        env.barrel = Tex("Props", "prop_barrel_01");
+        env.barrelExplosive = Tex("Props", "prop_barrelExplosive_01");
+        env.crate = Tex("Props", "prop_crate_01");
+        env.bonePile = Tex("Props", "prop_bonePile_01");
+        env.candles = Tex("Props", "prop_candles_01");
+        env.mopBucket = Tex("Props", "prop_mopBucket_01");
+        env.wetFloorSign = Tex("Props", "prop_wetFloorSign_01");
+        env.pipeShrine = Tex("Props", "prop_pipeShrine_01");
+        env.portalExtract = Tex("Props", "prop_portalExtract_01");
+        env.portalDescend = Tex("Props", "prop_portalDescend_01");
+        env.bannerCrown = Tex("Decals", "decal_bannerCrown_01");
+        env.posterSponsor = Tex("Decals", "decal_posterSponsor_01");
+        env.crack = Tex("Decals", "decal_crack_01");
+        env.scorch = Tex("Decals", "decal_scorch_01");
+        EditorUtility.SetDirty(env);
+        AssetDatabase.SaveAssets();
+        return env;
+    }
+
+    static Texture2D LoadTexture(string path)
+    {
+        if (!File.Exists(path)) { Debug.LogWarning("Environment art missing: " + path); return null; }
+        AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate); // so ArtImportSettings applies
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+    }
+
     // MainMenu.unity with just the MenuBootstrap object.
     public static void CreateMenuScene(UiArt art)
     {

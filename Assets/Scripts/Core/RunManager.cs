@@ -72,6 +72,8 @@ public class RunManager : MonoBehaviour
         level = FloorAssembler.Build(Game.Tuning, RoomLibrary.Current, testRoom);
         PlaceShrines();
         ExplosiveBarrel.SpawnForFloor(level.barrelSpots, level.root.transform);
+        SetDressing.Decorate(level, Game.Tuning);
+        ScorchMarks.Clear();
         Random.InitState(System.Environment.TickCount); // the fight itself stays unpredictable
         Debug.Log("Floor built from: " + string.Join(", ", level.roomNames));
         return level;

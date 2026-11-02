@@ -44,8 +44,10 @@ public static class FloorAssembler
         }
 
         foreach (var d in doors) if (!d.used) SealDoorway(root, d.marker);
+        Physics.SyncTransforms(); // so torches can find their walls
 
         CollectMarkers(t, layout, rooms);
+        SurfaceTexturer.Apply(root, t);
 
         var surface = root.AddComponent<NavMeshSurface>();
         surface.collectObjects = CollectObjects.Children;
@@ -176,10 +178,11 @@ public static class FloorAssembler
         LevelLighting.AddTorch(root, torch, t);
     }
 
-    // An unused doorway gets a wall plug just outside the opening.
+    // An unused doorway gets a wall plug just outside the opening (part of its room, so it gets the room's walls).
     static void SealDoorway(GameObject root, RoomDoorway d)
     {
-        var plug = LevelBlocks.Block(root, "Sealed Doorway", Vector3.zero, new Vector3(d.width + 0.4f, d.height + 0.2f, 0.5f), Palette.Wall);
+        var room = d.GetComponentInParent<RoomModule>();
+        var plug = LevelBlocks.Block(room != null ? room.gameObject : root, "Sealed Doorway", Vector3.zero, new Vector3(d.width + 0.4f, d.height + 0.2f, 0.5f), Palette.Wall);
         plug.transform.SetPositionAndRotation(d.transform.position + d.Outward * 0.25f + Vector3.up * (d.height / 2f + 0.05f), Quaternion.LookRotation(d.Outward));
     }
 

@@ -259,6 +259,11 @@ public class TuningConfig : ScriptableObject
     public float spriteHitFlashStrength = 1.5f;
     [Tooltip("How long the flinch (hit) frame shows after a hit. The wind-up frame always wins.")]
     public float spriteHitPoseTime = 0.2f;
+    [Tooltip("Glow of the cool outline behind each goblin, so it stands out against stone. 0 = off. (F1 panel)")]
+    public float goblinRimStrength = 1.1f;
+    [Tooltip("How far the outline sticks out, as a fraction of the sprite size. (F1 panel)")]
+    public float goblinRimWidth = 0.07f;
+    public Color goblinRimColor = new Color(0.45f, 0.7f, 1f);
     [Tooltip("How long a dead goblin stays before it has sunk into the floor.")]
     public float corpseDuration = 1.5f;
     [Tooltip("Only used if there is no dead frame: the idle sprite tips over this far instead.")]
@@ -461,6 +466,35 @@ public class TuningConfig : ScriptableObject
     public float torchIntensity = 4f;
     public float torchRange = 16f;
     public float torchHeight = 2.6f;
+    [Tooltip("How much torch lights flicker (0 = steady, 0.3 = +-30%).")]
+    [Range(0f, 1f)] public float torchFlicker = 0.18f;
+    public float torchFlickerSpeed = 7f;
+
+    [Header("Level - environment art")]
+    [Tooltip("Chance that a room gets brick walls instead of stone blocks (rooms set to Random).")]
+    [Range(0f, 1f)] public float brickRoomChance = 0.33f;
+    [Tooltip("Multiplies the wall, floor and ceiling textures. Above 1 brightens the dungeon without washing out sprites. (F1 panel)")]
+    public float worldTextureBrightness = 1.35f;
+    [Tooltip("Size of a wall torch sprite (its whole canvas), in metres.")]
+    public float torchSpriteSize = 0.9f;
+    public float portalSpriteHeight = 3.4f;
+    public float shrineSpriteHeight = 2f;
+    public float barrelSpriteHeight = 1.15f;
+    [Tooltip("Crates, barrels, bones, candles, buckets and signs per 100 square metres of room.")]
+    public float clutterPerHundredSquareMetres = 1f;
+    [Tooltip("Chance per room of a little scene: mop bucket + wet floor sign, or bones + candles.")]
+    [Range(0f, 1f)] public float clutterClusterChance = 0.5f;
+    public int bannersPerRoomMin = 1;
+    public int bannersPerRoomMax = 2;
+    [Range(0f, 1f)] public float posterChance = 0.6f;
+    public int cracksPerRoomMin = 1;
+    public int cracksPerRoomMax = 2;
+    [Tooltip("Missile and explosion scorch marks: how long they last, how many at once.")]
+    public float scorchLifetime = 8f;
+    public int scorchMaxCount = 30;
+    public float scorchSize = 0.7f;
+    [Range(0f, 1f)] public float scorchOpacity = 0.85f;
+    public float scorchBrightness = 0.6f;
 
     [Header("Buzz - meter")]
     public float buzzMax = 100f;

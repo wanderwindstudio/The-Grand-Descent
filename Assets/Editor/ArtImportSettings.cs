@@ -5,7 +5,8 @@ using UnityEditor;
 // - Player hands: max 512. FX and HUD icons: max 256.
 // - Menu and story art: UI sprites. Backgrounds max 2048, portraits and UI pieces max 1024.
 //   The trimmed, 9-sliced menu pieces in Art/Generated/UI are made by Grand Descent > Prepare Menu Art.
-// - World textures: max 64, tiling (Repeat). Props and decals: max 256.
+// - World textures: max 64, tiling (Repeat), with mipmaps (still point-filtered) so distant walls
+//   don't shimmer into speckle noise. Props and decals: max 256.
 public class ArtImportSettings : AssetPostprocessor
 {
     void OnPreprocessTexture()
@@ -41,6 +42,7 @@ public class ArtImportSettings : AssetPostprocessor
         {
             importer.maxTextureSize = 64;
             importer.wrapMode = UnityEngine.TextureWrapMode.Repeat;
+            importer.mipmapEnabled = true;
         }
         else if (assetPath.StartsWith("Assets/Art/Props/") || assetPath.StartsWith("Assets/Art/Decals/")) importer.maxTextureSize = 256;
     }

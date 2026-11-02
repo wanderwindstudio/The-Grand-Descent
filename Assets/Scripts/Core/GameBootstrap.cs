@@ -25,6 +25,8 @@ public class GameBootstrap : MonoBehaviour
     public RoomLibrary roomLibrary;
     [Tooltip("Assets/Settings/UiArt. Sprites and fonts for the pause menu and settings.")]
     public UiArt uiArt;
+    [Tooltip("Assets/Settings/EnvironmentArt. Dungeon textures, props and decals (gray-box without it).")]
+    public EnvironmentArt environmentArt;
     [Header("Player and spell art (optional; coloured placeholders are used if missing)")]
     public Texture2D handLeft;
     [Tooltip("Assets/Art/Player/player_handLeft_cast_01 (optional). Shown briefly on every spell cast.")]
@@ -73,6 +75,7 @@ public class GameBootstrap : MonoBehaviour
         Controls.Init(controls);
         RoomLibrary.Current = roomLibrary;
         UiArt.Current = uiArt;
+        EnvironmentArt.Current = environmentArt;
         // Work on a copy so live slider changes don't silently overwrite the asset.
         Game.TuningAsset = config;
         Game.Tuning = config != null ? Instantiate(config) : ScriptableObject.CreateInstance<TuningConfig>();
@@ -95,6 +98,7 @@ public class GameBootstrap : MonoBehaviour
         var waves = gameObject.AddComponent<WaveSpawner>();
         gameObject.AddComponent<CampingWatcher>();
         gameObject.AddComponent<WorldPopup>();
+        gameObject.AddComponent<ScorchMarks>();
         gameObject.AddComponent<Hud>();
         gameObject.AddComponent<SpellBar>();
         gameObject.AddComponent<LevelUpScreen>();

@@ -68,6 +68,7 @@ public static class PrototypeSceneSetup
 
         if (!StarterRooms.Exist()) StarterRooms.BuildAll();
         var uiArt = MenuSetup.Setup();
+        var environmentArt = MenuSetup.EnvironmentSetup();
         var roomLibrary = RoomLibraryUpdater.Refresh();
 
         var goblinSprite = LoadArt(GoblinSpritePath);
@@ -89,6 +90,7 @@ public static class PrototypeSceneSetup
         bootstrap.controls = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ControlsPath);
         bootstrap.roomLibrary = roomLibrary;
         bootstrap.uiArt = uiArt;
+        bootstrap.environmentArt = environmentArt;
         bootstrap.handLeft = LoadArt(HandLeftPath);
         bootstrap.handLeftCast = LoadArt(HandLeftCastPath);
         bootstrap.handRight = LoadArt(HandRightPath);

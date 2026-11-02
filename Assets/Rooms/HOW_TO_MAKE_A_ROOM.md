@@ -8,11 +8,11 @@ Every prefab in `Assets/Rooms` with a **Room Module** on its root is used automa
 
 1. **File > New Scene > Basic (URP)**, then **Create**. This is just a workbench. Delete everything in it except the Directional Light.
 2. **GameObject > Create Empty** and name it after the room (e.g. `Room_TheCrypt`). Set its Position to 0, 0, 0.
-3. In the Inspector, click **Add Component**, type `Room Module` and press Enter. Set **Display Name**.
+3. In the Inspector, click **Add Component**, type `Room Module` and press Enter. Set **Display Name**. **Walls** picks stone or brick (Random = brick in about a third of floors).
 4. **Tools > ProBuilder > ProBuilder Window**, then **New Shape** to draw the pieces: floor, walls, platforms, stairs, ramps. Drag each piece onto your room object in the Hierarchy so it becomes a child.
    - The main floor's top is at **height 0**. Build the room around the room object's position.
    - Walls are about **0.5 m** thick. Leave openings **3 m wide and 3.5 m high** where corridors may join, at floor height 0.
-   - For materials, drag the ones in `Assets/Rooms/Materials` onto the pieces.
+   - Materials are only for the editor: in game every piece is textured automatically (floor, wall, ceiling by the direction each face points). **Platforms, balconies, stairs, ramps and bridges:** select the piece, **Add Component > Room Surface** (Kind: Wood) so it gets wooden planks. Full details: `References/room-surfaces.md`.
    - ProBuilder gives every shape a collider, and the goblins walk on colliders. Don't remove them.
    - **Jump height is 1.3 m.** Anything the player can reach, goblins must also be able to reach, via stairs, ramps, ladders, ledges or low walls (see below). Otherwise make it higher than 1.3 m.
 
