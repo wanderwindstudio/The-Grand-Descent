@@ -10,6 +10,9 @@ public enum UpgradeType
     SplittingMissiles, Implosion, DeepFocus, EventHorizon, Overload, Blink,
 }
 
+// The spells with a slot on the spell bar. Upgrades tied to one show its icon on the level-up card.
+public enum Spell { None, ArcaneMissile, ArcaneVortex, ArcaneExplosion }
+
 // Which upgrades the player has, how many of each, and the resulting spell stats.
 public class PlayerUpgrades : MonoBehaviour
 {
@@ -35,6 +38,24 @@ public class PlayerUpgrades : MonoBehaviour
         u == UpgradeType.SplittingMissiles || u == UpgradeType.Overload || u == UpgradeType.Blink;
 
     public static bool IsArcane(UpgradeType u) => u >= UpgradeType.SplittingMissiles;
+
+    public static Spell SpellOf(UpgradeType u)
+    {
+        switch (u)
+        {
+            case UpgradeType.QuickHands:
+            case UpgradeType.ArcaneWeight:
+            case UpgradeType.SplittingMissiles:
+            case UpgradeType.DeepFocus:
+            case UpgradeType.Overload:
+                return Spell.ArcaneMissile;
+            case UpgradeType.Implosion:
+            case UpgradeType.EventHorizon:
+                return Spell.ArcaneVortex;
+            default:
+                return Spell.None;
+        }
+    }
 
     public bool CanOffer(UpgradeType u) => !(IsUnique(u) && Has(u));
 

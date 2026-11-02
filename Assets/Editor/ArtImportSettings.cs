@@ -2,7 +2,7 @@ using UnityEditor;
 
 // Every image dropped into Assets/Art gets pixel-art import settings automatically:
 // point filtering, no compression, no mipmaps, clamped edges, alpha as transparency.
-// Hands are capped at 512 px and effects at 256 px; the source files themselves are never changed.
+// Hands are capped at 512 px, effects and UI icons at 256 px; the source files themselves are never changed.
 public class ArtImportSettings : AssetPostprocessor
 {
     void OnPreprocessTexture()
@@ -19,6 +19,6 @@ public class ArtImportSettings : AssetPostprocessor
         importer.npotScale = TextureImporterNPOTScale.None;
 
         if (assetPath.StartsWith("Assets/Art/Player/")) importer.maxTextureSize = 512;
-        else if (assetPath.StartsWith("Assets/Art/FX/")) importer.maxTextureSize = 256;
+        else if (assetPath.StartsWith("Assets/Art/FX/") || assetPath.StartsWith("Assets/Art/UI/")) importer.maxTextureSize = 256;
     }
 }

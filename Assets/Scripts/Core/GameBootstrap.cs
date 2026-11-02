@@ -26,9 +26,16 @@ public class GameBootstrap : MonoBehaviour
     [Tooltip("Assets/Art/Player/player_handLeft_cast_01 (optional). Shown briefly on every spell cast.")]
     public Texture2D handLeftCast;
     public Texture2D handRight;
+    [Tooltip("Assets/Art/Player/player_handRight_staff_slam_01 (optional). The staff pose at max Arcane Charges.")]
+    public Texture2D handRightSlam;
     public Texture2D fxArcaneMissile;
     public Texture2D fxArcaneImpact;
     public Texture2D fxArcaneVortex;
+    [Header("UI icons (optional; coloured placeholders are used if missing)")]
+    public Texture2D iconArcaneMissile;
+    public Texture2D iconArcaneVortex;
+    public Texture2D iconArcaneExplosion;
+    public Texture2D iconArcaneCharge;
 
     void Awake()
     {
@@ -49,6 +56,13 @@ public class GameBootstrap : MonoBehaviour
         Art.HandLeft = handLeft != null ? handLeft : Art.Placeholder("HandLeftPlaceholder", Palette.HandPlaceholder, square: true);
         Art.HandLeftCast = handLeftCast;
         Art.HandRight = handRight != null ? handRight : Art.Placeholder("HandRightPlaceholder", Palette.HandPlaceholder, square: true);
+        Art.HandRightSlam = handRightSlam;
+        Art.IconMissile = iconArcaneMissile != null ? iconArcaneMissile : Art.Placeholder("MissileIconPlaceholder", Palette.Arcane, square: false);
+        Art.IconVortex = iconArcaneVortex != null ? iconArcaneVortex : Art.Placeholder("VortexIconPlaceholder", Palette.Arcane, square: false);
+        Art.IconExplosion = iconArcaneExplosion != null ? iconArcaneExplosion : Art.Placeholder("ExplosionIconPlaceholder", Palette.Arcane, square: false);
+        Art.IconCharge = iconArcaneCharge != null ? iconArcaneCharge : Art.Placeholder("ChargeIconPlaceholder", Palette.Arcane, square: false);
+        Art.IconExplosionGrey = Art.Greyscale(Art.IconExplosion);
+        Art.IconChargeGrey = Art.Greyscale(Art.IconCharge);
         Art.ArcaneMissile = fxArcaneMissile != null ? fxArcaneMissile : Art.Placeholder("MissilePlaceholder", Palette.Arcane, square: false);
         Art.ArcaneImpact = fxArcaneImpact != null ? fxArcaneImpact : Art.Placeholder("ImpactPlaceholder", Palette.Arcane, square: false);
         Art.ArcaneVortex = fxArcaneVortex != null ? fxArcaneVortex : Art.Placeholder("VortexPlaceholder", Palette.Arcane, square: false);
@@ -68,6 +82,7 @@ public class GameBootstrap : MonoBehaviour
         gameObject.AddComponent<GoblinCorpses>();
         var waves = gameObject.AddComponent<WaveSpawner>();
         gameObject.AddComponent<Hud>();
+        gameObject.AddComponent<SpellBar>();
         gameObject.AddComponent<LevelUpScreen>();
         gameObject.AddComponent<BuzzEffects>();
         var collapse = gameObject.AddComponent<CollapseTimer>();

@@ -20,6 +20,11 @@ public static class PrototypeSceneSetup
     const string HandLeftPath = "Assets/Art/Player/player_handLeft_idle_01.png";
     const string HandLeftCastPath = "Assets/Art/Player/player_handLeft_cast_01.png";
     const string HandRightPath = "Assets/Art/Player/player_handRight_staff_idle_01.png";
+    const string HandRightSlamPath = "Assets/Art/Player/player_handRight_staff_slam_01.png";
+    const string IconMissilePath = "Assets/Art/UI/icon_spell_arcaneMissile.png";
+    const string IconVortexPath = "Assets/Art/UI/icon_spell_arcaneVortex.png";
+    const string IconExplosionPath = "Assets/Art/UI/icon_spell_arcaneExplosion.png";
+    const string IconChargePath = "Assets/Art/UI/icon_hud_arcaneCharge.png";
     const string FxMissilePath = "Assets/Art/FX/fx_arcaneMissile_01.png";
     const string FxImpactPath = "Assets/Art/FX/fx_arcaneImpact_01.png";
     const string FxVortexPath = "Assets/Art/FX/fx_arcaneVortex_01.png";
@@ -79,6 +84,11 @@ public static class PrototypeSceneSetup
         bootstrap.handLeft = LoadArt(HandLeftPath);
         bootstrap.handLeftCast = LoadArt(HandLeftCastPath);
         bootstrap.handRight = LoadArt(HandRightPath);
+        bootstrap.handRightSlam = LoadArt(HandRightSlamPath);
+        bootstrap.iconArcaneMissile = LoadArt(IconMissilePath);
+        bootstrap.iconArcaneVortex = LoadArt(IconVortexPath);
+        bootstrap.iconArcaneExplosion = LoadArt(IconExplosionPath);
+        bootstrap.iconArcaneCharge = LoadArt(IconChargePath);
         bootstrap.fxArcaneMissile = LoadArt(FxMissilePath);
         bootstrap.fxArcaneImpact = LoadArt(FxImpactPath);
         bootstrap.fxArcaneVortex = LoadArt(FxVortexPath);

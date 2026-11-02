@@ -129,8 +129,20 @@ public class TuningConfig : ScriptableObject
 
     [Header("First-person hands (screen overlay)")]
     public bool showHands = true;
-    [Tooltip("Height of each hand as a fraction of the screen height.")]
+    [Tooltip("Base height of each hand image as a fraction of the screen height (multiplied by Hand scale).")]
     [Range(0.1f, 1f)] public float handScreenHeight = 0.45f;
+    [Tooltip("Size multiplier on top of the base height.")]
+    public float handScale = 1.15f;
+    [Tooltip("Gap between the screen centre and each hand's innermost point, as a fraction of screen width.")]
+    public float handCenterGap = 0.16f;
+    [Tooltip("The hands never come closer to the centre than this (fraction of screen width), keeping the crosshair clear.")]
+    public float handMinCenterGap = 0.15f;
+    [Tooltip("Push both hands down (fraction of screen height, 0 or less). They can't go higher than 0: the sleeves must stay cut off by the screen's bottom edge.")]
+    public float handVerticalOffset = -0.02f;
+    [Tooltip("Tilt of the left hand in degrees (negative = counter-clockwise). Makes the arm rise from the bottom edge.")]
+    public float handTiltLeft = -25f;
+    [Tooltip("Tilt of the right hand in degrees (positive = clockwise).")]
+    public float handTiltRight = 18f;
     [Tooltip("Idle breathing sway, as a fraction of screen height.")]
     public float handSwayAmount = 0.008f;
     public float handSwaySpeed = 1.3f;
@@ -171,8 +183,24 @@ public class TuningConfig : ScriptableObject
     public Vector2 castFingertip = new Vector2(0.75f, 0.31f);
     [Tooltip("Staff crystal inside the right hand image (0-1 from the left, 0-1 from the top).")]
     public Vector2 staffCrystal = new Vector2(0.8f, 0.13f);
+    [Tooltip("Staff crystal inside the max-charge (slam) image.")]
+    public Vector2 staffCrystalSlam = new Vector2(0.73f, 0.23f);
     [Tooltip("Size of the crystal glow, as a fraction of the hand image.")]
     public float staffCrystalGlowSize = 0.3f;
+    [Tooltip("Crossfade time between the idle staff and the max-charge staff, in seconds.")]
+    public float staffSlamFadeTime = 0.15f;
+
+    [Header("Spell bar and charge crystals (sizes in pixels at 1080p; they scale with the screen)")]
+    public float spellIconSize = 64f;
+    public float spellBarBottomMargin = 12f;
+    public float chargeIconSize = 56f;
+    [Tooltip("Opacity of an empty charge crystal.")]
+    public float emptyChargeAlpha = 0.35f;
+    public float chargePulseSpeed = 4f;
+    [Tooltip("How strongly lit charge crystals pulse (0 = steady).")]
+    public float chargePulseAmount = 0.2f;
+    [Tooltip("Darkness of the cooldown sweep over a spell icon. High because blending happens in linear colour space, which makes dark overlays look lighter.")]
+    public float cooldownSweepAlpha = 0.9f;
 
     [Header("Goblin sprite (billboard visuals)")]
     [Tooltip("Off = the old green capsules. Also switchable in the F1 panel.")]

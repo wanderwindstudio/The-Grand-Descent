@@ -20,7 +20,6 @@ public class Hud : MonoBehaviour
     WaveSpawner waves;
     SpellSwap spellSwap;
     CollapseTimer collapse;
-    VortexCaster vortex;
 
     const float MessageDuration = 2.5f;
 
@@ -46,7 +45,6 @@ public class Hud : MonoBehaviour
         waves = GetComponent<WaveSpawner>();
         spellSwap = Game.Player.GetComponent<SpellSwap>();
         collapse = GetComponent<CollapseTimer>();
-        vortex = Game.Player.GetComponent<VortexCaster>();
     }
 
     void OnPlayerDamaged(Vector3 source, float amount)
@@ -96,8 +94,6 @@ public class Hud : MonoBehaviour
         DrawBuzzBar(new Rect(20, h - 82, 300, 22));
         DrawSpellSwapWarning(w, h);
         DrawShrinePrompt(w, h);
-        DrawChargePips(w, h);
-        DrawVortexCooldown(w, h);
 
         // XP bar across the top
         Bar(new Rect(0, 0, w, 10), level.Xp / level.XpToNext, Palette.XpBar, null);
@@ -219,47 +215,6 @@ public class Hud : MonoBehaviour
         GUI.color = Color.white;
         float fill = armed ? 1f : 1f - spellSwap.WarningTimeLeft / t.spellSwapWarning;
         Bar(new Rect(w / 2f - 80f, y + 30f, 160f, 6f), fill, color, null);
-    }
-
-    // Arcane Charges as diamonds at the bottom centre: lit when charged, grey when empty, flashing on a reset.
-    void DrawChargePips(float w, float h)
-    {
-        var charges = Game.Charges;
-        int max = charges.Max;
-        const float size = 18f, gap = 12f;
-        float total = max * size + (max - 1) * gap;
-        float x0 = w / 2f - total / 2f, y = h - 70f;
-        bool flashing = Time.unscaledTime < charges.ResetFlashUntil;
-        bool flashOn = flashing && Mathf.Repeat(Time.unscaledTime, 0.16f) < 0.08f;
-
-        for (int i = 0; i < max; i++)
-        {
-            Color c = i < charges.Charges ? Palette.Arcane : Palette.ChargeEmpty;
-            if (flashing) c = flashOn ? Color.white : Palette.HitIndicator;
-            Vector2 centre = new Vector2(x0 + i * (size + gap) + size / 2f, y);
-            Matrix4x4 old = GUI.matrix;
-            GUIUtility.RotateAroundPivot(45f, centre);
-            Fill(new Rect(centre.x - size / 2f - 2f, centre.y - size / 2f - 2f, size + 4f, size + 4f), Color.black);
-            Fill(new Rect(centre.x - size / 2f, centre.y - size / 2f, size, size), c);
-            GUI.matrix = old;
-        }
-    }
-
-    // A square with the key label; a dark shade drains away as the cooldown runs out.
-    void DrawVortexCooldown(float w, float h)
-    {
-        const float size = 44f;
-        var r = new Rect(w / 2f + 110f, h - 70f - size / 2f, size, size);
-        Fill(new Rect(r.x - 2f, r.y - 2f, size + 4f, size + 4f), Color.black);
-        Fill(r, vortex.CooldownLeft > 0f ? Palette.ChargeEmpty : Palette.Arcane);
-        if (vortex.CooldownLeft > 0f)
-        {
-            float shade = size * vortex.Cooldown01;
-            Fill(new Rect(r.x, r.y, size, shade), new Color(0f, 0f, 0f, 0.6f));
-        }
-        GUI.Label(r, Controls.KeyName(Controls.CastVortex), smallText);
-        if (vortex.CooldownLeft > 0f)
-            GUI.Label(new Rect(r.x - 20f, r.yMax + 2f, size + 40f, 20f), $"{vortex.CooldownLeft:0.0}", smallText);
     }
 
     void DrawShrinePrompt(float w, float h)

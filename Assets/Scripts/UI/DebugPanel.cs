@@ -82,7 +82,11 @@ public class DebugPanel : MonoBehaviour
 
         GUILayout.Label("Hands");
         t.showHands = GUILayout.Toggle(t.showHands, "Show hands");
-        t.handScreenHeight = Slider("Hand size (screen height)", t.handScreenHeight, 0.15f, 0.9f);
+        t.handScale = Slider("Hand scale", t.handScale, 0.5f, 2f);
+        t.handCenterGap = Slider("Horizontal offset from centre (screen width)", t.handCenterGap, t.handMinCenterGap, 0.45f);
+        t.handVerticalOffset = Slider("Vertical offset (lower only)", t.handVerticalOffset, -0.25f, 0f);
+        t.handTiltLeft = Slider("Left hand tilt", t.handTiltLeft, -45f, 15f);
+        t.handTiltRight = Slider("Right hand tilt", t.handTiltRight, -15f, 45f);
         t.handBobAmount = Slider("Bob amount", t.handBobAmount, 0f, 0.08f);
         t.handSwayAmount = Slider("Sway amount", t.handSwayAmount, 0f, 0.04f);
         t.handLookLag = Slider("Turn lag", t.handLookLag, 0f, 0.015f);

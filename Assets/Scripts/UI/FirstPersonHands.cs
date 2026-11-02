@@ -1,8 +1,8 @@
 using UnityEngine;
 
 // The wizard's hands as screen overlays (they can never clip into walls).
-// Left hand bottom-left (idle pose, open cast pose for a moment after each spell), right hand with the staff
-// bottom-right. Everything else is faked:
+// Left hand (idle pose, open cast pose for a moment after each spell) and right hand with the staff (crossfades to
+// its glowing pose at max Arcane Charges), placed by HandLayout to frame the crosshair. Everything else is faked:
 // breathing sway, walk bob, lag behind fast turns, cast pushes, dash swing, hit jolt, Buzz effects.
 // The staff crystal glows with Arcane Charges, and the hands take on the light around the player.
 public class FirstPersonHands : MonoBehaviour
@@ -12,7 +12,8 @@ public class FirstPersonHands : MonoBehaviour
     // Fingertips of the left hand in GUI coordinates (y down). Spells spawn here.
     public Vector2 FingertipGuiPosition { get; private set; }
 
-    Rect leftRect, rightRect;
+    HandLayout leftLayout, rightLayout;
+    float slamBlend; // 0 = idle staff, 1 = max-charge staff
     Vector2 leftOffset, rightOffset;   // in fractions of screen height
     Vector2 lookLag;
     float leftScale = 1f;
@@ -35,6 +36,8 @@ public class FirstPersonHands : MonoBehaviour
     void Start()
     {
         body = Game.Player.GetComponent<CharacterController>();
+        leftLayout = new HandLayout(true, Art.HandLeft, Art.HandLeftCast);
+        rightLayout = new HandLayout(false, Art.HandRight, Art.HandRightSlam);
         Game.PlayerHealth.Damaged += OnDamaged;
         prevYaw = Game.Camera.transform.eulerAngles.y;
         prevPitch = Game.Camera.transform.eulerAngles.x;
@@ -110,13 +113,15 @@ public class FirstPersonHands : MonoBehaviour
         leftScale = 1f + push * 1.5f; // pushing forward = slightly bigger
 
         // Layout
-        float size = h * t.handScreenHeight;
-        float ls = size * leftScale;
-        leftRect = new Rect(leftOffset.x * h, h - ls + leftOffset.y * h, ls, ls);
-        rightRect = new Rect(w - size + rightOffset.x * h, h - size + rightOffset.y * h, size, size);
+        float size = h * t.handScreenHeight * t.handScale;
+        leftLayout.Place(w, h, size * leftScale, t.handTiltLeft, t.handCenterGap, t.handVerticalOffset, leftOffset);
+        rightLayout.Place(w, h, size, t.handTiltRight, t.handCenterGap, t.handVerticalOffset, rightOffset);
         // With cast art, spells always leave from its flare: the hand opens the moment a spell goes.
         Vector2 tip = Art.HandLeftCast != null ? t.castFingertip : t.leftFingertip;
-        FingertipGuiPosition = new Vector2(leftRect.x + tip.x * ls, leftRect.y + tip.y * ls);
+        FingertipGuiPosition = leftLayout.ToScreen(tip);
+
+        bool slam = Art.HandRightSlam != null && Game.Charges.AtMax;
+        slamBlend = Mathf.MoveTowards(slamBlend, slam ? 1f : 0f, dt / Mathf.Max(0.01f, t.staffSlamFadeTime));
 
         if (Time.time >= nextLightSample)
         {
@@ -174,8 +179,11 @@ public class FirstPersonHands : MonoBehaviour
         }
 
         GUI.color = lightTint;
-        GUI.DrawTexture(leftRect, CastPose ? Art.HandLeftCast : Art.HandLeft);
-        GUI.DrawTexture(rightRect, Art.HandRight);
+        leftLayout.Draw(CastPose ? Art.HandLeftCast : Art.HandLeft);
+
+        // Staff crossfade: each pose stays solid for the first half of its fade, so the background never shows through.
+        if (slamBlend < 1f) { GUI.color = WithAlpha(lightTint, Mathf.Min(1f, 2f * (1f - slamBlend))); rightLayout.Draw(Art.HandRight); }
+        if (slamBlend > 0f) { GUI.color = WithAlpha(lightTint, Mathf.Min(1f, 2f * slamBlend)); rightLayout.Draw(Art.HandRightSlam); }
 
         // Staff crystal glow: brighter and bigger with each Arcane Charge, pulsing at max.
         var charges = Game.Charges;
@@ -183,8 +191,8 @@ public class FirstPersonHands : MonoBehaviour
         if (c01 > 0f)
         {
             float pulse = charges.AtMax ? 0.85f + 0.15f * Mathf.Sin(Time.time * 10f) : 1f;
-            float gs = rightRect.width * t.staffCrystalGlowSize * (0.6f + 0.6f * c01) * pulse;
-            Vector2 cp = new Vector2(rightRect.x + t.staffCrystal.x * rightRect.width, rightRect.y + t.staffCrystal.y * rightRect.height);
+            float gs = rightLayout.Size * t.staffCrystalGlowSize * (0.6f + 0.6f * c01) * pulse;
+            Vector2 cp = rightLayout.ToScreen(Vector2.Lerp(t.staffCrystal, t.staffCrystalSlam, slamBlend));
             Color glow = Palette.Arcane;
             glow.a = Mathf.Lerp(0.25f, 0.95f, c01) * pulse;
             GUI.color = glow;
@@ -192,6 +200,8 @@ public class FirstPersonHands : MonoBehaviour
         }
         GUI.color = Color.white;
     }
+
+    static Color WithAlpha(Color c, float a) { c.a = a; return c; }
 
     // A soft round glow, bright in the middle.
     static Texture2D MakeGlowTexture(int size)

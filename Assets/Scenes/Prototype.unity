@@ -160,9 +160,14 @@ MonoBehaviour:
   handLeft: {fileID: 2800000, guid: 1b9c5aea12c6a44db94d4bdfb56479dd, type: 3}
   handLeftCast: {fileID: 2800000, guid: 84eaa57d4a9d04c8bb19ab8fc367374f, type: 3}
   handRight: {fileID: 2800000, guid: e01ba4a9a5bbe4de68c3360f3fa7222e, type: 3}
+  handRightSlam: {fileID: 2800000, guid: ce7ffe123033b4a33a158ce3855a10ac, type: 3}
   fxArcaneMissile: {fileID: 2800000, guid: 3700a4a9737334ed1810cb80b8435e48, type: 3}
   fxArcaneImpact: {fileID: 2800000, guid: 02fbb6858a3be487593bdf5cbf8fe7d8, type: 3}
   fxArcaneVortex: {fileID: 2800000, guid: 522ad14da0eea454db22e0f02284d63d, type: 3}
+  iconArcaneMissile: {fileID: 2800000, guid: a047198d4ddd249f594056245b9343d4, type: 3}
+  iconArcaneVortex: {fileID: 2800000, guid: fbade03892d1e44888e70368b431f4ee, type: 3}
+  iconArcaneExplosion: {fileID: 2800000, guid: e7234ae6e609d4efe99913991669b70a, type: 3}
+  iconArcaneCharge: {fileID: 2800000, guid: ac1ac71c7382d495c961acd2ff8c8f23, type: 3}
 --- !u!4 &53111712
 Transform:
   m_ObjectHideFlags: 0

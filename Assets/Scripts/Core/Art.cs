@@ -11,10 +11,24 @@ public static class Art
 
     public static Material FxMaterial;
     public static Texture2D HandLeft, HandRight;
-    public static Texture2D HandLeftCast; // null if missing: the left hand then keeps its idle pose
+    public static Texture2D HandLeftCast;  // null if missing: the left hand then keeps its idle pose
+    public static Texture2D HandRightSlam; // null if missing: the staff stays in its idle pose at max charges
+    public static Texture2D IconMissile, IconVortex, IconExplosion, IconCharge;
+    public static Texture2D IconExplosionGrey, IconChargeGrey; // greyscale copies for locked / empty
     public static Texture2D ArcaneMissile, ArcaneImpact, ArcaneVortex;
 
     public static bool HasGoblinSprite => BillboardMaterial != null && GoblinIdle != null;
+
+    public static Texture2D SpellIcon(Spell spell)
+    {
+        switch (spell)
+        {
+            case Spell.ArcaneMissile: return IconMissile;
+            case Spell.ArcaneVortex: return IconVortex;
+            case Spell.ArcaneExplosion: return IconExplosion;
+            default: return null;
+        }
+    }
 
     // A billboard quad with its pivot at the bottom-centre: the returned transform sits at the feet.
     public static Transform CreateBillboard(string name, Transform parent, Texture2D texture, out Renderer renderer)
@@ -107,6 +121,40 @@ public static class Art
             }
         tex.Apply();
         Debug.LogWarning($"Art missing - using a coloured placeholder for {name}.");
+        return tex;
+    }
+
+    // Copy a texture's pixels at the given size. Works on textures that aren't marked readable,
+    // by drawing them into a temporary render target and reading that back.
+    public static Color32[] ReadPixels(Texture texture, int width, int height)
+    {
+        var rt = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+        Graphics.Blit(texture, rt);
+        var previous = RenderTexture.active;
+        RenderTexture.active = rt;
+        var copy = new Texture2D(width, height, TextureFormat.RGBA32, false);
+        copy.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+        RenderTexture.active = previous;
+        RenderTexture.ReleaseTemporary(rt);
+        var pixels = copy.GetPixels32(); // row 0 is the bottom of the image
+        Object.Destroy(copy);
+        return pixels;
+    }
+
+    // A grey version of a texture (same alpha), for empty or locked icons.
+    public static Texture2D Greyscale(Texture2D texture)
+    {
+        int w = Mathf.Min(texture.width, 256), h = Mathf.Min(texture.height, 256);
+        var pixels = ReadPixels(texture, w, h);
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            var p = pixels[i];
+            byte grey = (byte)(0.3f * p.r + 0.59f * p.g + 0.11f * p.b);
+            pixels[i] = new Color32(grey, grey, grey, p.a);
+        }
+        var tex = new Texture2D(w, h, TextureFormat.RGBA32, false) { name = texture.name + "_grey", filterMode = texture.filterMode, wrapMode = TextureWrapMode.Clamp };
+        tex.SetPixels32(pixels);
+        tex.Apply();
         return tex;
     }
 

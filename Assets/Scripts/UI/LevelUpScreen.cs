@@ -9,7 +9,8 @@ public class LevelUpScreen : MonoBehaviour
     PlayerUpgrades upgrades;
     readonly List<UpgradeType> choices = new List<UpgradeType>();
     bool showing;
-    GUIStyle titleStyle, cardStyle;
+    const float IconSize = 56f;
+    GUIStyle titleStyle, cardStyle, iconCardStyle;
 
     void Start()
     {
@@ -77,6 +78,8 @@ public class LevelUpScreen : MonoBehaviour
         {
             titleStyle = new GUIStyle(GUI.skin.label) { fontSize = 40, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter };
             cardStyle = new GUIStyle(GUI.skin.button) { fontSize = 18, wordWrap = true, richText = true, alignment = TextAnchor.MiddleCenter };
+            iconCardStyle = new GUIStyle(cardStyle) { alignment = TextAnchor.UpperCenter };
+            iconCardStyle.padding.top = (int)(IconSize + 16f);
         }
 
         float w = Screen.width, h = Screen.height;
@@ -87,7 +90,7 @@ public class LevelUpScreen : MonoBehaviour
         string extra = level.PendingLevelUps > 1 ? $"   (+{level.PendingLevelUps - 1} more)" : "";
         GUI.Label(new Rect(0, h * 0.2f, w, 60), $"LEVEL {level.Level - level.PendingLevelUps + 1}!{extra}", titleStyle);
 
-        const float cardW = 260f, cardH = 170f, gap = 30f;
+        const float cardW = 260f, cardH = 220f, gap = 30f;
         float totalW = choices.Count * cardW + (choices.Count - 1) * gap;
         float x = (w - totalW) / 2f, y = h * 0.4f;
         for (int i = 0; i < choices.Count; i++)
@@ -95,7 +98,11 @@ public class LevelUpScreen : MonoBehaviour
             var u = choices[i];
             int owned = upgrades.Stacks(u);
             string text = $"[{i + 1}]\n<b>{PlayerUpgrades.Name(u)}</b>\n\n{PlayerUpgrades.Description(u)}" + (owned > 0 ? $"\n\nOwned: {owned}" : "");
-            if (GUI.Button(new Rect(x + i * (cardW + gap), y, cardW, cardH), text, cardStyle)) Pick(i);
+            // Upgrades tied to a spell show its icon at the top of the card.
+            var icon = Art.SpellIcon(PlayerUpgrades.SpellOf(u));
+            var card = new Rect(x + i * (cardW + gap), y, cardW, cardH);
+            if (GUI.Button(card, text, icon != null ? iconCardStyle : cardStyle)) Pick(i);
+            if (icon != null) GUI.DrawTexture(new Rect(card.center.x - IconSize / 2f, card.y + 10f, IconSize, IconSize), icon);
         }
     }
 }
