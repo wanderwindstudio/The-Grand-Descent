@@ -18,7 +18,7 @@ public static class PlayerBuilder
         head.transform.SetParent(root.transform, false);
         head.transform.localPosition = Vector3.up * t.eyeHeight;
         var cam = head.AddComponent<Camera>();
-        cam.fieldOfView = t.fieldOfView;
+        cam.fieldOfView = GameSettings.Current.fieldOfView;
         cam.nearClipPlane = 0.05f;
         cam.clearFlags = CameraClearFlags.SolidColor;
         cam.backgroundColor = t.fogColor;

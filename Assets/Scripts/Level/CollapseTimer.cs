@@ -51,7 +51,7 @@ public class CollapseTimer : MonoBehaviour
     {
         if (!Active) return;
         TimeLeft -= Time.deltaTime;
-        rumble.volume = Game.Tuning.collapseRumbleVolume * Mathf.Lerp(0.2f, 1f, Danger01);
+        rumble.volume = Game.Tuning.collapseRumbleVolume * Mathf.Lerp(0.2f, 1f, Danger01) * GameSettings.Sfx;
         rumble.pitch = Time.timeScale == 0f ? 0f : 1f; // silent pause during level-ups
 
         if (TimeLeft <= 0f)

@@ -13,6 +13,7 @@ public class DebugPanel : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
+        if (PauseMenu.IsOpen) return;
         if (kb.f1Key.wasPressedThisFrame) Toggle();
         if (kb.f2Key.wasPressedThisFrame) Game.Buzz.Fill();
         if (kb.f3Key.wasPressedThisFrame) Game.Player.GetComponent<PlayerLevel>().GainLevel();

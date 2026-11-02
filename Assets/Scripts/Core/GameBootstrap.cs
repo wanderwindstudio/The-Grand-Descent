@@ -23,6 +23,8 @@ public class GameBootstrap : MonoBehaviour
     public UnityEngine.InputSystem.InputActionAsset controls;
     [Tooltip("Assets/Rooms/RoomLibrary. Kept up to date automatically; lists every room prefab.")]
     public RoomLibrary roomLibrary;
+    [Tooltip("Assets/Settings/UiArt. Sprites and fonts for the pause menu and settings.")]
+    public UiArt uiArt;
     [Header("Player and spell art (optional; coloured placeholders are used if missing)")]
     public Texture2D handLeft;
     [Tooltip("Assets/Art/Player/player_handLeft_cast_01 (optional). Shown briefly on every spell cast.")]
@@ -70,11 +72,18 @@ public class GameBootstrap : MonoBehaviour
         Art.ArcaneVortex = fxArcaneVortex != null ? fxArcaneVortex : Art.Placeholder("VortexPlaceholder", Palette.Arcane, square: false);
         Controls.Init(controls);
         RoomLibrary.Current = roomLibrary;
+        UiArt.Current = uiArt;
         // Work on a copy so live slider changes don't silently overwrite the asset.
         Game.TuningAsset = config;
         Game.Tuning = config != null ? Instantiate(config) : ScriptableObject.CreateInstance<TuningConfig>();
 
+        GameSettings.Load();
+        GameSettings.Apply();
+        Controls.ApplyOverrides();
+        AudioListener.pause = false;
+
         var run = gameObject.AddComponent<RunManager>();
+        run.PrepareRun();
         LevelLayout level = run.BuildFloor();
         PlayerBuilder.Create(level.playerStart, level.playerStartYaw, Game.Tuning);
         PostProcessSetup.Create(Game.Tuning, Game.Camera);
@@ -93,6 +102,7 @@ public class GameBootstrap : MonoBehaviour
         var collapse = gameObject.AddComponent<CollapseTimer>();
         gameObject.AddComponent<RunScreens>();
         gameObject.AddComponent<DebugPanel>();
+        gameObject.AddComponent<PauseMenu>();
         run.Init(waves, collapse);
     }
 }

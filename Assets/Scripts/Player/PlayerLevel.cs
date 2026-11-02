@@ -25,5 +25,13 @@ public class PlayerLevel : MonoBehaviour
         PendingLevelUps++;
     }
 
+    // Loading a save.
+    public void Restore(int level, float xp, int pending)
+    {
+        Level = Mathf.Max(1, level);
+        Xp = xp;
+        PendingLevelUps = pending;
+    }
+
     public void ConsumeLevelUp() => PendingLevelUps = Mathf.Max(0, PendingLevelUps - 1);
 }

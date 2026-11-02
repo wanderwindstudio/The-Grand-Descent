@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9de55b8e26f241feb28d371bcf6692c, type: 3}
+  m_Name: UiArt
+  m_EditorClassIdentifier: Assembly-CSharp::UiArt
+  menuBackground: {fileID: 21300000, guid: 2ec59deb99ebf46d8ab7aaf316fef5f1, type: 3}
+  logo: {fileID: 21300000, guid: 61965c81150644ad4829bd2df3d71d25, type: 3}
+  buttonNormal: {fileID: 21300000, guid: 559a06c0b86f748d3a0b027f7bf6d1bc, type: 3}
+  buttonHover: {fileID: 21300000, guid: 9be1f157c4544434c916ab9e2e33bc63, type: 3}
+  panelFrame: {fileID: 21300000, guid: 00d9411f4bcab424fa1a01538ec438c5, type: 3}
+  sliderTrack: {fileID: 21300000, guid: 19748983138514b29a3293d46830b17b, type: 3}
+  sliderKnob: {fileID: 21300000, guid: d48bcefd90a7145e6bd7e9fdb05045a5, type: 3}
+  saveSlotFrame: {fileID: 21300000, guid: 4d301236d8a0b4163bd87c3a4c3ccda1, type: 3}
+  titleFont: {fileID: 11400000, guid: 32de5a8b8da3b42e1a4ebc022b86b32a, type: 2}
+  bodyFont: {fileID: 11400000, guid: 9ed07f73fb4ff4d49a69379aad6be92b, type: 2}
+  italicFont: {fileID: 11400000, guid: d7e702ccbe5b24424ba2e26f0e7064e5, type: 2}
+  introScript: {fileID: 4900000, guid: 4bccbed582984487eb9bbf37bf35698e, type: 3}
+  storyBackgrounds:
+  - id: attic
+    character: 
+    sprite: {fileID: 21300000, guid: f42b5be1fd2b84556b2fbac0f5fde0bb, type: 3}
+  - id: tv
+    character: 
+    sprite: {fileID: 21300000, guid: e36c25bfb7589433cad132a4113e486f, type: 3}
+  - id: desk
+    character: 
+    sprite: {fileID: 21300000, guid: eae377a1da80e4c788dcf8d8c181f7b9, type: 3}
+  portraits:
+  - id: stoned
+    character: hero
+    sprite: {fileID: 21300000, guid: 70d73244b9d9f407a9a697d191b23ec9, type: 3}
+  - id: startled
+    character: hero
+    sprite: {fileID: 21300000, guid: 108a988d4505f432b8c8ed81787da0e1, type: 3}
+  - id: determined
+    character: hero
+    sprite: {fileID: 21300000, guid: 07996a13d560a4881b9f1a7b6d71fce9, type: 3}
+  - id: angry
+    character: grumbleton
+    sprite: {fileID: 21300000, guid: 44be3c20b854542ffb78cd07f0c9f274, type: 3}
+  - id: notice
+    character: grumbleton
+    sprite: {fileID: 21300000, guid: 186fee2f63d394d2db542804307e0590, type: 3}
+  - id: host
+    character: skully
+    sprite: {fileID: 21300000, guid: 0888b7ddc7c534f5d8e56d0a76606880, type: 3}
+  - id: clerk
+    character: clerk
+    sprite: {fileID: 21300000, guid: 25a889eb63ced40a5968260662cc1ea2, type: 3}

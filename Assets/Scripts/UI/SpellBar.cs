@@ -21,7 +21,7 @@ public class SpellBar : MonoBehaviour
 
     void OnGUI()
     {
-        if (RunManager.Instance.Current != RunManager.State.Playing) return;
+        if (RunManager.Instance.Current != RunManager.State.Playing || PauseMenu.IsOpen) return;
         if (keyStyle == null)
         {
             keyStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };

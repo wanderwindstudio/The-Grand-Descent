@@ -104,7 +104,7 @@ public class ExplosiveBarrel : MonoBehaviour
 
         SpellFx.Impact(centre, 0.5f, t.barrelRadius * 2f, 0.5f, 8f, t.barrelRadius * 4f, Palette.Explosion, Palette.Explosion);
         if (boom == null) boom = ToneGenerator.Boom("Barrel Boom");
-        AudioSource.PlayClipAtPoint(boom, centre, 1f);
+        AudioSource.PlayClipAtPoint(boom, centre, GameSettings.Sfx);
 
         foreach (var g in GoblinEnemy.Active.ToArray())
         {

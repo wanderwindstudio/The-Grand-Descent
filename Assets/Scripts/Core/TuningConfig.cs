@@ -7,7 +7,7 @@ public class TuningConfig : ScriptableObject
 {
     [Header("Player - movement")]
     public float moveSpeed = 6f;
-    [Tooltip("Degrees of turn per pixel of mouse movement.")]
+    [Tooltip("Degrees of turn per pixel of mouse movement. The Settings screen multiplies it (100% = this value).")]
     public float mouseSensitivity = 0.12f;
     public float pitchClamp = 85f;
     public float gravity = -20f;
@@ -16,6 +16,7 @@ public class TuningConfig : ScriptableObject
     public float playerHeight = 1.8f;
     public float playerRadius = 0.4f;
     public float eyeHeight = 1.6f;
+    [Tooltip("Not used any more: the field of view is in the player's Settings (Video).")]
     public float fieldOfView = 80f;
 
     [Header("Player - jumping (Jump action)")]

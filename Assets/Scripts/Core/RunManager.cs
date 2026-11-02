@@ -2,10 +2,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-// One run from start screen to summary: builds floors, opens portals, handles extract / descend / death.
+// One run from the first floor to the summary: builds floors, opens portals, handles extract / descend / death,
+// autosaves at the start of every floor and resumes a saved run.
 public class RunManager : MonoBehaviour
 {
     public enum State { StartScreen, Playing, Summary }
+
+    public const string MenuScene = "MainMenu";
 
     public static RunManager Instance { get; private set; }
     // After the last wave every pickup flies to you, so nothing is left behind.
@@ -27,10 +30,29 @@ public class RunManager : MonoBehaviour
     WaveSpawner waves;
     CollapseTimer collapse;
     float runStartTime;
+    float savedRunSeconds; // play time before the save this run was loaded from
+    int seed;              // every floor's layout comes from this, so a loaded run rebuilds the same floor
     bool hasRequest;
     PortalKind request;
 
     void Awake() => Instance = this;
+
+    // Before the first floor is built: a fresh run, or the saved one.
+    public void PrepareRun()
+    {
+        if (SaveSystem.ResumeRun)
+        {
+            var saved = SaveSystem.Active.run;
+            seed = saved.seed;
+            Game.Floor = Mathf.Max(1, saved.floor);
+            savedRunSeconds = saved.runSeconds;
+        }
+        else
+        {
+            seed = System.Environment.TickCount;
+            Game.Floor = 1;
+        }
+    }
 
     int testRoomIndex = -1;
 
@@ -46,9 +68,11 @@ public class RunManager : MonoBehaviour
         }
         PortalsOpen = false;
         LevelLighting.Apply(Game.Tuning);
+        if (testRoom == null) Random.InitState(seed + Game.Floor * 7919); // same floor every time for this run
         level = FloorAssembler.Build(Game.Tuning, RoomLibrary.Current, testRoom);
         PlaceShrines();
         ExplosiveBarrel.SpawnForFloor(level.barrelSpots, level.root.transform);
+        Random.InitState(System.Environment.TickCount); // the fight itself stays unpredictable
         Debug.Log("Floor built from: " + string.Join(", ", level.roomNames));
         return level;
     }
@@ -60,6 +84,8 @@ public class RunManager : MonoBehaviour
         waves.FloorCleared += OpenPortals;
         Game.PlayerHealth.Died += () => EndRun(extracted: false);
         Current = State.StartScreen;
+        if (SaveSystem.ResumeRun) RunSaver.Restore(SaveSystem.Active.run);
+        BeginRun();
     }
 
     public void AddGold(int amount) => CarriedGold += amount;
@@ -79,13 +105,6 @@ public class RunManager : MonoBehaviour
 
         switch (Current)
         {
-            case State.StartScreen:
-                Time.timeScale = 0f;
-                Game.InputBlocked = true;
-                PlayerLook.UnlockCursor();
-                if (enter) BeginRun();
-                break;
-
             case State.Playing:
                 if (!hasRequest) break;
                 hasRequest = false;
@@ -94,11 +113,7 @@ public class RunManager : MonoBehaviour
                 break;
 
             case State.Summary:
-                if (enter)
-                {
-                    Time.timeScale = 1f;
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-                }
+                if (enter) LoadMenu();
                 break;
         }
     }
@@ -110,8 +125,40 @@ public class RunManager : MonoBehaviour
         Game.InputBlocked = false;
         PlayerLook.LockCursor();
         runStartTime = Time.time;
+        Autosave();
         waves.BeginFloor(level.spawnPoints);
-        Hud.ShowMessage("FLOOR 1");
+        Hud.ShowMessage(SaveSystem.ActiveSlot < 0 ? $"FLOOR {Game.Floor}  (test run - not saved)" : $"FLOOR {Game.Floor}");
+    }
+
+    float RunSeconds => savedRunSeconds + Time.time - runStartTime;
+
+    // At the start of every floor, before the first wave.
+    void Autosave()
+    {
+        if (SaveSystem.ActiveSlot < 0) return;
+        SaveSystem.Active.hasRun = true;
+        SaveSystem.Active.run = RunSaver.Capture(seed, RunSeconds);
+        MetaProgress.ReachedFloor(Game.Floor);
+        SaveSystem.SaveActive();
+    }
+
+    // Pause menu: keep everything earned so far; loading restarts this floor from its beginning.
+    public void SaveAndQuit()
+    {
+        if (Current == State.Playing) Autosave();
+        LoadMenu();
+    }
+
+    // Pause menu: back to the menu without saving (the last autosave stays).
+    public void QuitToMenu() => LoadMenu();
+
+    public static void LoadMenu()
+    {
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+        Game.InputBlocked = false;
+        if (Application.CanStreamedLevelBeLoaded(MenuScene)) SceneManager.LoadScene(MenuScene);
+        else SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); // menu scene missing: restart
     }
 
     void OpenPortals()
@@ -135,6 +182,7 @@ public class RunManager : MonoBehaviour
         Game.Floor++;
         BuildFloor();
         TeleportPlayer(level.playerStart, level.playerStartYaw);
+        Autosave();
         waves.BeginFloor(level.spawnPoints);
         Hud.ShowMessage($"FLOOR {Game.Floor}");
     }
@@ -146,11 +194,11 @@ public class RunManager : MonoBehaviour
         var t = Game.Tuning;
         Current = State.Summary;
         Extracted = extracted;
-        RunDuration = Time.time - runStartTime;
+        RunDuration = RunSeconds;
         LevelReached = Game.Player.GetComponent<PlayerLevel>().Level;
         GoldBankedThisRun = extracted ? CarriedGold : Mathf.FloorToInt(CarriedGold * t.deathBankFraction);
 
-        MetaProgress.RecordRun(GoldBankedThisRun);
+        MetaProgress.RecordRun(GoldBankedThisRun, Game.Floor);
         RunLog.Append(extracted ? "extracted" : DiedToCollapse ? "collapsed" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
             LevelReached, UpgradeList(arcaneOnly: false), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences,
             RunStats.VortexCasts, RunStats.MaxChargesReached, UpgradeList(arcaneOnly: true),

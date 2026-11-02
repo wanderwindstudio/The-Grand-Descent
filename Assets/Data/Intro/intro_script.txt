@@ -1,0 +1,23 @@
+# The intro, one line of dialogue per row:  scene | speaker | portrait | line
+# scene:    attic, tv or desk (the background; see UiArt.asset to add more)
+# speaker:  the name shown on the tab, or — for narration (centred, italic, no portrait)
+# portrait: stoned, startled, determined, angry, notice, host, clerk, or — for none
+# Lines starting with # are ignored. A line in CAPITALS with full stops (BANG. BANG.) shakes the screen.
+
+attic | — | — | Ten years ago, they wrote songs about you.
+attic | — | — | Now you owe three months' rent.
+attic | Hero | stoned | ...
+attic | — | — | BANG. BANG. BANG.
+attic | Grumbleton | angry | Three months, wizard. THREE.
+attic | Hero | startled | Is it Tuesday already?
+attic | Grumbleton | notice | It's been Tuesday for twelve weeks. Pay up by the full moon, or you're out. Staff, couch and all.
+attic | Hero | stoned | The couch stays with me. We've been through things.
+tv | Skully | host | Tired of being poor? Tired of being alive? Then THE GRAND DESCENT wants YOU!
+tv | Skully | host | Fame! Glory! Prize money! Some contestants even survive!
+tv | Hero | determined | ...I could do that.
+desk | — | — | The next morning.
+desk | Hero | determined | Hi. I'd like to sign up. For the dying thing.
+desk | — | — | SPLOSH.
+desk | Goblin Clerk | clerk | ...That floor was mopped.
+desk | Goblin Clerk | clerk | Forty minutes. Of mopping.
+desk | Skully | host | Oh, folks. He's offended the Cleaning Crew. This is going to be GREAT television.

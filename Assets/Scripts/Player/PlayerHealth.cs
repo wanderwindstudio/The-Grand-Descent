@@ -31,6 +31,13 @@ public class PlayerHealth : MonoBehaviour
         Current = Max;
     }
 
+    // Loading a save.
+    public void Restore(float current, float max)
+    {
+        Max = max;
+        Current = Mathf.Clamp(current, 1f, max);
+    }
+
     public bool TakeDamage(float amount, Vector3 sourcePosition)
     {
         if (IsDead || Game.GodMode || Time.time < invulnerableUntil) return false;

@@ -5,7 +5,8 @@ using UnityEngine.InputSystem;
 
 // Menu: Grand Descent > Create Prototype Scene.
 // Makes the TuningConfig asset and materials (if missing), the starter rooms (if missing),
-// and a scene with just the GameBootstrap object.
+// the menu art, fonts and UiArt asset, the MainMenu scene, and a game scene with just the GameBootstrap object.
+// MainMenu is the first scene in the build; Play from it to test the whole flow.
 // Safe to run again: it reuses the existing scene and only refreshes the bootstrap's references.
 public static class PrototypeSceneSetup
 {
@@ -66,6 +67,7 @@ public static class PrototypeSceneSetup
         }
 
         if (!StarterRooms.Exist()) StarterRooms.BuildAll();
+        var uiArt = MenuSetup.Setup();
         var roomLibrary = RoomLibraryUpdater.Refresh();
 
         var goblinSprite = LoadArt(GoblinSpritePath);
@@ -86,6 +88,7 @@ public static class PrototypeSceneSetup
         bootstrap.fxMaterial = fx;
         bootstrap.controls = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ControlsPath);
         bootstrap.roomLibrary = roomLibrary;
+        bootstrap.uiArt = uiArt;
         bootstrap.handLeft = LoadArt(HandLeftPath);
         bootstrap.handLeftCast = LoadArt(HandLeftCastPath);
         bootstrap.handRight = LoadArt(HandRightPath);
@@ -101,9 +104,14 @@ public static class PrototypeSceneSetup
         EditorUtility.SetDirty(bootstrap);
         EditorSceneManager.SaveScene(scene, ScenePath);
 
-        EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
+        MenuSetup.CreateMenuScene(uiArt); // left open, ready to press Play
+        EditorBuildSettings.scenes = new[]
+        {
+            new EditorBuildSettingsScene(MenuSetup.MenuScenePath, true),
+            new EditorBuildSettingsScene(ScenePath, true),
+        };
         AssetDatabase.SaveAssets();
-        Debug.Log("Prototype scene ready at " + ScenePath);
+        Debug.Log("Scenes ready: " + MenuSetup.MenuScenePath + " (start here) and " + ScenePath);
     }
 
     // Re-imports an art file (so ArtImportSettings applies) and loads it. Null if the file isn't there.
