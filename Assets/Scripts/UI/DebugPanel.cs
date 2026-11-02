@@ -13,6 +13,7 @@ public class DebugPanel : MonoBehaviour
         var kb = Keyboard.current;
         if (kb == null) return;
 
+        if (PauseMenu.IsOpen) return;
         if (kb.f1Key.wasPressedThisFrame) Toggle();
         if (kb.f2Key.wasPressedThisFrame) Game.Buzz.Fill();
         if (kb.f3Key.wasPressedThisFrame) Game.Player.GetComponent<PlayerLevel>().GainLevel();
@@ -114,6 +115,8 @@ public class DebugPanel : MonoBehaviour
         if (GUILayout.Button(t.useSpriteEnemies ? "Showing: SPRITE  (click for capsule)" : "Showing: CAPSULE  (click for sprite)"))
             t.useSpriteEnemies = !t.useSpriteEnemies;
         t.goblinSpriteHeight = Slider("Sprite height (m)", t.goblinSpriteHeight, 0.5f, 3f);
+        t.goblinRimStrength = Slider("Outline glow (readability)", t.goblinRimStrength, 0f, 2f);
+        t.goblinRimWidth = Slider("Outline width", t.goblinRimWidth, 0f, 0.2f);
         t.spriteBobHeight = Slider("Walk hop height", t.spriteBobHeight, 0f, 0.3f);
         t.spriteBobSpeed = Slider("Walk steps/s", t.spriteBobSpeed, 0.5f, 8f);
         t.spriteSwayDegrees = Slider("Walk lean", t.spriteSwayDegrees, 0f, 15f);
@@ -219,7 +222,9 @@ public class DebugPanel : MonoBehaviour
         t.torchIntensity = Slider("Torch brightness", t.torchIntensity, 0f, 10f);
         t.torchRange = Slider("Torch reach", t.torchRange, 2f, 40f);
         t.goblinBaseGlow = Slider("Goblin glow (new spawns)", t.goblinBaseGlow, 0f, 2f);
+        t.worldTextureBrightness = Slider("Wall/floor texture brightness", t.worldTextureBrightness, 0.5f, 2.5f);
         LevelLighting.Refresh(t);
+        SurfaceTexturer.Refresh(t);
 
         GUILayout.Space(10);
         if (GUILayout.Button("Reset to asset values")) ResetToAsset();

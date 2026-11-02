@@ -10,7 +10,8 @@
                 { "name": "CastExplosion", "type": "Button", "id": "382fd46a-c02f-4ef3-b4f8-d9156e31611a", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
                 { "name": "Dash", "type": "Button", "id": "1c0068bb-4691-44d8-a1c6-34da6ed0de8e", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
                 { "name": "Interact", "type": "Button", "id": "e80fa6c9-0dd4-4705-b0e4-3d009139d2e2", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
-                { "name": "Jump", "type": "Button", "id": "5b2f0c1e-7d3a-4e8b-9c41-2f6a8d0e3b77", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
+                { "name": "Jump", "type": "Button", "id": "5b2f0c1e-7d3a-4e8b-9c41-2f6a8d0e3b77", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false },
+                { "name": "Pause", "type": "Button", "id": "c3a1e8d4-6b2f-4a97-8e15-0d4f7b9c2a61", "expectedControlType": "Button", "processors": "", "interactions": "", "initialStateCheck": false }
             ],
             "bindings": [
                 { "name": "", "id": "a5b098d7-00b8-4844-8313-f506bba2544e", "path": "<Mouse>/leftButton", "interactions": "", "processors": "", "groups": "", "action": "Fire", "isComposite": false, "isPartOfComposite": false },
@@ -18,7 +19,8 @@
                 { "name": "", "id": "15259295-29f6-4579-bc06-c65b0e39e31c", "path": "<Keyboard>/e", "interactions": "", "processors": "", "groups": "", "action": "CastExplosion", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "c005e9a0-83c8-4477-b429-6d5bd5b1f03c", "path": "<Keyboard>/leftShift", "interactions": "", "processors": "", "groups": "", "action": "Dash", "isComposite": false, "isPartOfComposite": false },
                 { "name": "", "id": "272a857a-e8e3-47ec-96c8-769cf6a7a329", "path": "<Keyboard>/f", "interactions": "", "processors": "", "groups": "", "action": "Interact", "isComposite": false, "isPartOfComposite": false },
-                { "name": "", "id": "9e4a6c12-3b5d-4f70-8a19-6c2e7b4d5f08", "path": "<Keyboard>/space", "interactions": "", "processors": "", "groups": "", "action": "Jump", "isComposite": false, "isPartOfComposite": false }
+                { "name": "", "id": "9e4a6c12-3b5d-4f70-8a19-6c2e7b4d5f08", "path": "<Keyboard>/space", "interactions": "", "processors": "", "groups": "", "action": "Jump", "isComposite": false, "isPartOfComposite": false },
+                { "name": "", "id": "f18b2d6e-4c7a-49e3-b05d-8a3e6c1f9d24", "path": "<Keyboard>/escape", "interactions": "", "processors": "", "groups": "", "action": "Pause", "isComposite": false, "isPartOfComposite": false }
             ]
         }
     ],

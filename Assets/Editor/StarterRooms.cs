@@ -6,6 +6,7 @@ using UnityEngine;
 // Builds the three gray-box starter rooms out of cubes and saves them as prefabs in Assets/Rooms:
 // The Balcony, The Pillar Hall and The Pit. Running it again overwrites those three prefabs (not your own rooms).
 // Every room: floor at height 0, walls 0.5 m thick outside the interior, doorways 3 m wide and 3.5 m high.
+// Balconies, stairs, the ramp and bridges carry a RoomSurface (Wood); the rest is textured by face direction.
 public static class StarterRooms
 {
     const string Folder = "Assets/Rooms";
@@ -204,6 +205,9 @@ public static class StarterRooms
         return m;
     }
 
+    // Pieces that get wooden planks in game (everything else is textured by face direction).
+    static readonly string[] WoodPieces = { "Balcony", "Step", "Pit Step", "Ramp", "Bridge" };
+
     // An axis-aligned block from min corner to max corner.
     static GameObject Box(GameObject parent, string name, Vector3 min, Vector3 max, Material mat)
     {
@@ -213,6 +217,7 @@ public static class StarterRooms
         go.transform.localPosition = (min + max) / 2f;
         go.transform.localScale = max - min;
         go.GetComponent<Renderer>().sharedMaterial = mat;
+        if (System.Array.IndexOf(WoodPieces, name) >= 0) go.AddComponent<RoomSurface>().kind = RoomSurface.Kind.Wood;
         return go;
     }
 

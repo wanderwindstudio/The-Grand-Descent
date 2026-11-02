@@ -21,7 +21,9 @@ public class PlayerLook : MonoBehaviour
             return;
         }
 
-        Vector2 delta = mouse.delta.ReadValue() * Game.Tuning.mouseSensitivity;
+        Game.Camera.fieldOfView = GameSettings.Current.fieldOfView;
+        Vector2 delta = mouse.delta.ReadValue() * (Game.Tuning.mouseSensitivity * GameSettings.Current.mouseSensitivity);
+        if (GameSettings.Current.invertY) delta.y = -delta.y;
         transform.Rotate(0f, delta.x, 0f);
         pitch = Mathf.Clamp(pitch - delta.y, -Game.Tuning.pitchClamp, Game.Tuning.pitchClamp);
         head.localEulerAngles = new Vector3(pitch, 0f, 0f);

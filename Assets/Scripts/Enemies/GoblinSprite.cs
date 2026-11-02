@@ -5,11 +5,14 @@ using UnityEngine.AI;
 // Frames: idle, wind-up (attack telegraph) and hit (flinch). Motion between them is faked in code:
 // a hop while walking, stretch + lunge during the wind-up, a white flash on hits.
 // The capsule (and its collider) stays; only its renderer is hidden while sprites are on.
+// A cool-coloured rim (the same silhouette, a little bigger, just behind) keeps goblins readable
+// against the stone textures; strength and width are on the F1 panel.
 public class GoblinSprite : MonoBehaviour
 {
     GoblinEnemy goblin;
     NavMeshAgent agent;
-    Renderer capsuleRenderer, eyesRenderer, spriteRenderer;
+    Renderer capsuleRenderer, eyesRenderer, spriteRenderer, rimRenderer;
+    Material rimMaterial;
     Transform pivot;
     Material material;
     Texture2D shownFrame;
@@ -29,6 +32,7 @@ public class GoblinSprite : MonoBehaviour
         if (!Art.HasGoblinSprite) { enabled = false; return; }
         pivot = Art.CreateBillboard("Sprite", transform, Art.GoblinIdle, out spriteRenderer);
         material = spriteRenderer.sharedMaterial;
+        MakeRim();
         bobPhase = Random.Range(0f, Mathf.PI * 2f); // goblins don't hop in sync
     }
 
@@ -39,6 +43,7 @@ public class GoblinSprite : MonoBehaviour
         capsuleRenderer.enabled = !sprites;
         eyesRenderer.enabled = !sprites;
         spriteRenderer.enabled = sprites;
+        rimRenderer.enabled = sprites && t.goblinRimStrength > 0f;
         if (!sprites) return;
 
         float dt = Time.deltaTime;
@@ -76,6 +81,31 @@ public class GoblinSprite : MonoBehaviour
                    : Palette.GoblinWindUp * (t.spriteWindUpGlow * k);
         material.SetColor("_EmissionColor", glow);
         material.SetColor("_BaseColor", goblin.IsHeld ? Palette.HeldTint : goblin.SpriteTint);
+        UpdateRim(t);
+    }
+
+    // A black copy of the quad whose glow is the rim colour: an outline once it peeks out behind the sprite.
+    void MakeRim()
+    {
+        var quad = spriteRenderer.transform;
+        var rim = Instantiate(quad.gameObject, quad.parent);
+        rim.name = "Rim";
+        rimRenderer = rim.GetComponent<Renderer>();
+        rimMaterial = new Material(material) { name = "Goblin Rim" };
+        rimMaterial.SetColor("_BaseColor", Color.black);
+        rimMaterial.EnableKeyword("_EMISSION");
+        rimRenderer.sharedMaterial = rimMaterial;
+    }
+
+    void UpdateRim(TuningConfig t)
+    {
+        if (!rimRenderer.enabled) return;
+        var quad = spriteRenderer.transform;
+        var rim = rimRenderer.transform;
+        rim.localScale = Vector3.Scale(quad.localScale, new Vector3(1f + t.goblinRimWidth, 1f + t.goblinRimWidth * 0.5f, 1f));
+        rim.localPosition = quad.localPosition + Vector3.forward * 0.03f; // just behind (the pivot faces away from the camera)
+        rimMaterial.SetTexture("_BaseMap", shownFrame);
+        rimMaterial.SetColor("_EmissionColor", t.goblinRimColor * t.goblinRimStrength);
     }
 
     void ShowFrame(Texture2D frame)

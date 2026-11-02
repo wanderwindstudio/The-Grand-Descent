@@ -12,15 +12,16 @@ public class BuzzEffects : MonoBehaviour
         var buzz = Game.Buzz;
         shown = Mathf.MoveTowards(shown, buzz.Normalized, Time.deltaTime * 2f);
 
+        float distortion = GameSettings.Distortion; // comfort setting: scales every warping effect
         float pulse = 0.7f + 0.3f * Mathf.Sin(Time.time * t.buzzPulseSpeed);
         float k = shown * pulse;
 
         bool transcendent = buzz.Current == BuzzMeter.Phase.Transcendent;
         bool crash = buzz.Current == BuzzMeter.Phase.Crash;
 
-        PostProcessSetup.Chromatic.intensity.value = Mathf.Clamp01(t.buzzMaxChromaticAberration * k);
-        PostProcessSetup.Lens.intensity.value = -t.buzzMaxLensDistortion * k;
-        PostProcessSetup.Colors.hueShift.value = t.buzzMaxHueShift * shown * Mathf.Sin(Time.time * t.buzzPulseSpeed * 0.5f);
+        PostProcessSetup.Chromatic.intensity.value = Mathf.Clamp01(t.buzzMaxChromaticAberration * k * distortion);
+        PostProcessSetup.Lens.intensity.value = -t.buzzMaxLensDistortion * k * distortion;
+        PostProcessSetup.Colors.hueShift.value = t.buzzMaxHueShift * shown * distortion * Mathf.Sin(Time.time * t.buzzPulseSpeed * 0.5f);
 
         float saturation = t.buzzSaturationBoost * shown;
         float exposure = 0f;
@@ -41,12 +42,12 @@ public class BuzzEffects : MonoBehaviour
             exposure = t.crashExposure * fade;
             saturation = t.crashSaturation * fade;
             vignette = Mathf.Lerp(t.vignetteIntensity, t.crashVignette, fade);
-            PostProcessSetup.Blur.gaussianMaxRadius.value = t.crashBlur * fade;
+            PostProcessSetup.Blur.gaussianMaxRadius.value = t.crashBlur * fade * distortion;
         }
-        PostProcessSetup.Blur.active = crash;
+        PostProcessSetup.Blur.active = crash && distortion > 0f;
 
         PostProcessSetup.Colors.saturation.value = saturation;
-        PostProcessSetup.Colors.postExposure.value = exposure;
+        PostProcessSetup.Colors.postExposure.value = exposure + GameSettings.Current.brightness;
         PostProcessSetup.Colors.colorFilter.value = filter;
         PostProcessSetup.Bloom.intensity.value = bloom;
         PostProcessSetup.Vignette.intensity.value = vignette;

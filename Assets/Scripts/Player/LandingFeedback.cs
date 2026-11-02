@@ -25,7 +25,7 @@ public class LandingFeedback : MonoBehaviour
         float k = Mathf.Clamp01(fall / Mathf.Max(0.1f, t.jumpHeight * 1.5f));
         dipAmount = big ? t.bigLandingDip : t.landingDip * Mathf.Lerp(0.4f, 1f, k);
         dipT = 0f;
-        audioSource.PlayOneShot(big ? heavyThud : thud, t.landingSoundVolume * (big ? 1.6f : Mathf.Lerp(0.5f, 1f, k)));
+        audioSource.PlayOneShot(big ? heavyThud : thud, t.landingSoundVolume * (big ? 1.6f : Mathf.Lerp(0.5f, 1f, k)) * GameSettings.Sfx);
         FirstPersonHands.Instance?.OnLand(big ? 1.6f : Mathf.Lerp(0.5f, 1f, k));
     }
 

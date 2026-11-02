@@ -124,6 +124,7 @@ public class Missile : MonoBehaviour
             if (goblin == null) // a wall or the floor
             {
                 SpellFx.MissileImpact(point);
+                if (hits[i].distance > 0f) ScorchMarks.Add(point, hits[i].normal, Game.Tuning.scorchSize);
                 End(missed: !hitSomething);
                 return true;
             }

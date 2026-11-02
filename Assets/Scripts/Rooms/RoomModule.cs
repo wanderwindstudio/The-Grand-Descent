@@ -5,8 +5,12 @@ using UnityEngine;
 // Build the room around its own origin with the floor at height 0.
 public class RoomModule : MonoBehaviour
 {
+    public enum WallStyle { Random, Stone, Brick }
+
     [Tooltip("Shown by the F8 room tester.")]
     public string displayName = "New Room";
+    [Tooltip("Wall texture. Random: brick in about a third of rooms, stone blocks otherwise.")]
+    public WallStyle walls = WallStyle.Random;
 
     // World-space box around everything solid in the room (walls included).
     public Bounds CalculateBounds()

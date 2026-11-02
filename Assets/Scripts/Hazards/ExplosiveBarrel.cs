@@ -44,6 +44,20 @@ public class ExplosiveBarrel : MonoBehaviour
         drum.GetComponent<Renderer>().sharedMaterial = barrel.material;
         barrel.body = drum.transform;
 
+        // With art: the sponsored-barrel sprite. The drum stays as the (invisible) thing you shoot.
+        var art = EnvironmentArt.Current;
+        if (art != null && art.barrelExplosive != null && PropSprites.Ready)
+        {
+            drum.GetComponent<Renderer>().enabled = false;
+            barrel.body = PropSprites.Billboard("Sprite", root.transform, position, art.barrelExplosive, Game.Tuning.barrelSpriteHeight, out Renderer r);
+            barrel.material = r.sharedMaterial;
+            barrel.material.EnableKeyword("_EMISSION");
+            barrel.bodyScale = barrel.body.localScale;
+            AddObstacle(root);
+            return barrel;
+        }
+        barrel.bodyScale = barrel.body.localScale;
+
         // Gold rim band and a little crown "sponsor" logo on two sides.
         Material gold = Mats.Glow(Palette.Gold, 0.4f);
         Deco(root, "Band", new Vector3(0f, 0.72f, 0f), new Vector3(0.72f, 0.03f, 0.72f), gold, PrimitiveType.Cylinder);
@@ -55,14 +69,21 @@ public class ExplosiveBarrel : MonoBehaviour
                 Deco(root, "Crown Point", new Vector3(i * 0.09f, 0.5f + (i == 0 ? 0.03f : 0f), z), new Vector3(0.05f, 0.09f + (i == 0 ? 0.04f : 0f), 0.03f), gold, PrimitiveType.Cube);
         }
 
+        AddObstacle(root);
+        return barrel;
+    }
+
+    static void AddObstacle(GameObject root)
+    {
         var obstacle = root.AddComponent<NavMeshObstacle>();
         obstacle.shape = NavMeshObstacleShape.Capsule;
         obstacle.center = Vector3.up * 0.45f;
         obstacle.radius = 0.4f;
         obstacle.height = 0.9f;
         obstacle.carving = true;
-        return barrel;
     }
+
+    Vector3 bodyScale;
 
     static void Deco(GameObject parent, string name, Vector3 pos, Vector3 size, Material mat, PrimitiveType shape)
     {
@@ -92,7 +113,7 @@ public class ExplosiveBarrel : MonoBehaviour
         // Flash faster and faster, and swell a little.
         bool on = Mathf.Sin(Time.time * 50f) > 0f;
         Mats.SetEmission(material, on ? Palette.BarrelFlash * 3f : Color.black);
-        body.localScale = new Vector3(0.7f, 0.45f, 0.7f) * (1f + 0.08f * (1f - Mathf.Clamp01(fuseLeft / Game.Tuning.barrelFuseTime)));
+        body.localScale = bodyScale * (1f + 0.08f * (1f - Mathf.Clamp01(fuseLeft / Game.Tuning.barrelFuseTime)));
         if (fuseLeft <= 0f) Explode();
     }
 
@@ -104,7 +125,7 @@ public class ExplosiveBarrel : MonoBehaviour
 
         SpellFx.Impact(centre, 0.5f, t.barrelRadius * 2f, 0.5f, 8f, t.barrelRadius * 4f, Palette.Explosion, Palette.Explosion);
         if (boom == null) boom = ToneGenerator.Boom("Barrel Boom");
-        AudioSource.PlayClipAtPoint(boom, centre, 1f);
+        AudioSource.PlayClipAtPoint(boom, centre, GameSettings.Sfx);
 
         foreach (var g in GoblinEnemy.Active.ToArray())
         {
@@ -123,6 +144,7 @@ public class ExplosiveBarrel : MonoBehaviour
             Game.Player.GetComponent<PlayerMotor>().AddImpulse(Push(toPlayer, k));
         }
 
+        ScorchMarks.OnFloor(transform.position, 2.4f);
         foreach (var other in All.ToArray())
             if (other != this && Vector3.Distance(other.transform.position, transform.position) <= t.barrelRadius)
                 other.Ignite(t.barrelChainDelay);

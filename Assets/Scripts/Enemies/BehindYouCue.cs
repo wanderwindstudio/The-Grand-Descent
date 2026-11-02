@@ -25,6 +25,6 @@ public static class BehindYouCue
         float closeness = 1f - distance / t.behindCueMaxDistance;
         source.maxDistance = t.behindCueMaxDistance;
         source.pitch = 1f + t.behindCueClosePitchBoost * closeness;
-        source.PlayOneShot(clip, t.behindCueVolume);
+        source.PlayOneShot(clip, t.behindCueVolume * GameSettings.Sfx);
     }
 }

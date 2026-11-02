@@ -28,7 +28,7 @@ public class WorldPopup : MonoBehaviour
 
     void OnGUI()
     {
-        if (popups.Count == 0 || Game.Camera == null) return;
+        if (popups.Count == 0 || Game.Camera == null || PauseMenu.IsOpen) return;
         if (style == null) style = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
         style.fontSize = Mathf.RoundToInt(Screen.height * 0.045f);
 

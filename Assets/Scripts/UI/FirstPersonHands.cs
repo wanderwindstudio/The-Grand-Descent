@@ -79,14 +79,15 @@ public class FirstPersonHands : MonoBehaviour
 
         // Breathing sway
         float time = Time.time * t.handSwaySpeed * pace;
-        Vector2 sway = new Vector2(Mathf.Cos(time * 0.5f), Mathf.Sin(time)) * (t.handSwayAmount * buzzBoost);
+        float bobSetting = GameSettings.Bob; // comfort setting: scales bob, sway and landing bounce
+        Vector2 sway = new Vector2(Mathf.Cos(time * 0.5f), Mathf.Sin(time)) * (t.handSwayAmount * buzzBoost * bobSetting);
 
         // Walking bob, the two hands slightly out of phase
         Vector3 v = body.velocity;
         v.y = 0f;
         float speed01 = Mathf.Clamp(v.magnitude / Mathf.Max(0.1f, t.moveSpeed), 0f, 1.5f);
         bobPhase += dt * t.handBobSpeed * 2f * Mathf.PI * speed01 * pace;
-        float bob = t.handBobAmount * buzzBoost * Mathf.Min(1f, speed01);
+        float bob = t.handBobAmount * buzzBoost * Mathf.Min(1f, speed01) * bobSetting;
         Vector2 bobLeft = new Vector2(Mathf.Cos(bobPhase) * 0.5f, Mathf.Abs(Mathf.Sin(bobPhase))) * bob;
         Vector2 bobRight = new Vector2(Mathf.Cos(bobPhase + 0.8f) * 0.5f, Mathf.Abs(Mathf.Sin(bobPhase + 0.8f))) * bob;
 
@@ -114,7 +115,7 @@ public class FirstPersonHands : MonoBehaviour
         bool airborne = !motor.IsGrounded && !motor.IsClimbing;
         airBlend = Mathf.MoveTowards(airBlend, airborne ? 1f : 0f, dt * 6f);
         float bounce = Pulse(landT, t.handLandBounceTime) * t.handLandBounce * landStrength;
-        common += new Vector2(0f, bounce - t.handAirLift * airBlend);
+        common += new Vector2(0f, (bounce - t.handAirLift * airBlend) * bobSetting);
         if (transcendent) common += Random.insideUnitCircle * t.handTranscendenceTremble;
 
         leftOffset = common + bobLeft + new Vector2(push * 0.6f, -push) + new Vector2(-dash * 0.5f, dash);
@@ -170,7 +171,7 @@ public class FirstPersonHands : MonoBehaviour
     void OnGUI()
     {
         var t = Game.Tuning;
-        if (!t.showHands || RunManager.Instance.Current != RunManager.State.Playing) return;
+        if (!t.showHands || RunManager.Instance.Current != RunManager.State.Playing || PauseMenu.IsOpen) return;
         GUI.depth = 10; // behind the HUD
 
         // Cast flash at the fingertips (drawn behind the hand so it seems to come from the palm).

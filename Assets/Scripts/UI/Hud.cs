@@ -67,7 +67,7 @@ public class Hud : MonoBehaviour
 
     void OnGUI()
     {
-        if (RunManager.Instance.Current != RunManager.State.Playing) return; // RunScreens draws instead
+        if (RunManager.Instance.Current != RunManager.State.Playing || PauseMenu.IsOpen) return; // RunScreens draws instead
         if (bigText == null) MakeStyles();
         var t = Game.Tuning;
         float w = Screen.width, h = Screen.height;

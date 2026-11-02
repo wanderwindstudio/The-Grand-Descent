@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32216ab7b306b40c5b65edfb8c50fd41, type: 3}
+  m_Name: EnvironmentArt
+  m_EditorClassIdentifier: Assembly-CSharp::EnvironmentArt
+  stoneFloor: {fileID: 2800000, guid: 2df0bd781d7f7485791511facf33aec8, type: 3}
+  stoneWall: {fileID: 2800000, guid: a3e671c971419451c93641d70017f605, type: 3}
+  brickWall: {fileID: 2800000, guid: acd09ed444a1d4789aa01fcd9aa11f64, type: 3}
+  woodPlanks: {fileID: 2800000, guid: 8128e84a1d94b41d0bb0bb36315c47af, type: 3}
+  stoneCeiling: {fileID: 2800000, guid: 41bc0d82e4fd54617b368cf8c874e00c, type: 3}
+  torchWall: {fileID: 2800000, guid: 1b120821aec4244888aeb3ce22b54fdc, type: 3}
+  barrel: {fileID: 2800000, guid: ab90379029c604f85b476e3cf845bfa4, type: 3}
+  barrelExplosive: {fileID: 2800000, guid: dc5001491cec14978b9c0ddacb036921, type: 3}
+  crate: {fileID: 2800000, guid: d6b62a2c878bd4b449c951e4c0dd6879, type: 3}
+  bonePile: {fileID: 2800000, guid: 59db622c91cad4216af98fd2d4d069a7, type: 3}
+  candles: {fileID: 2800000, guid: b829a23e0e37043b59f784bd51c789e7, type: 3}
+  mopBucket: {fileID: 2800000, guid: 1b0c366f4829a4e9baf82398f24014ac, type: 3}
+  wetFloorSign: {fileID: 2800000, guid: 28d9a06dd5d1f4657be45001f6319878, type: 3}
+  pipeShrine: {fileID: 2800000, guid: 4ce0c82ef167d4a16828d4c603182adf, type: 3}
+  portalExtract: {fileID: 2800000, guid: 235b760f7353049b889ad2531f262870, type: 3}
+  portalDescend: {fileID: 2800000, guid: c92e7701dff994226aea300e43ffb060, type: 3}
+  bannerCrown: {fileID: 2800000, guid: 215e0d364537748938a5dc2d23d6ee8e, type: 3}
+  posterSponsor: {fileID: 2800000, guid: 5a5249836a5b14ddab3f7e86631f4e86, type: 3}
+  crack: {fileID: 2800000, guid: 3569de384faf94e4faf6380627e98508, type: 3}
+  scorch: {fileID: 2800000, guid: 88f60739e39d14a7ba7b8d0a372d7438, type: 3}
