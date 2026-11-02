@@ -18,7 +18,8 @@ public class FirstPersonHands : MonoBehaviour
     Vector2 lookLag;
     float leftScale = 1f;
     float bobPhase, prevYaw, prevPitch;
-    float castT = 99f, poseT = 99f, throwT = 99f, dashT = 99f, hitT = 99f, flashT = 99f;
+    float castT = 99f, poseT = 99f, throwT = 99f, dashT = 99f, hitT = 99f, flashT = 99f, landT = 99f;
+    float landStrength, airBlend;
     float hitSide;     // -1 = hit from the left, 1 = from the right
     float flashRoll;
     float crashBlend;
@@ -26,6 +27,7 @@ public class FirstPersonHands : MonoBehaviour
     float nextLightSample;
     Texture2D glowTexture;
     CharacterController body;
+    PlayerMotor motor;
 
     void Awake()
     {
@@ -36,6 +38,7 @@ public class FirstPersonHands : MonoBehaviour
     void Start()
     {
         body = Game.Player.GetComponent<CharacterController>();
+        motor = Game.Player.GetComponent<PlayerMotor>();
         leftLayout = new HandLayout(true, Art.HandLeft, Art.HandLeftCast);
         rightLayout = new HandLayout(false, Art.HandRight, Art.HandRightSlam);
         Game.PlayerHealth.Damaged += OnDamaged;
@@ -49,6 +52,7 @@ public class FirstPersonHands : MonoBehaviour
 
     bool CastPose => Art.HandLeftCast != null && poseT < Game.Tuning.handCastPoseTime;
     public void OnDash() => dashT = 0f;
+    public void OnLand(float strength) { landT = 0f; landStrength = strength; }
 
     void OnDamaged(Vector3 source, float amount)
     {
@@ -71,7 +75,7 @@ public class FirstPersonHands : MonoBehaviour
         float pace = Mathf.Lerp(1f, t.handCrashSluggishness, crashBlend); // everything slows during the Crash
         float buzzBoost = 1f + buzz.Normalized * t.handBuzzBoost;
 
-        castT += dt; poseT += dt; throwT += dt; dashT += dt; hitT += dt; flashT += dt;
+        castT += dt; poseT += dt; landT += dt; throwT += dt; dashT += dt; hitT += dt; flashT += dt;
 
         // Breathing sway
         float time = Time.time * t.handSwaySpeed * pace;
@@ -106,6 +110,11 @@ public class FirstPersonHands : MonoBehaviour
         Vector2 common = sway + lookLag
                          + new Vector2(-hitSide * jolt, jolt * 0.5f)                  // knocked away from the hit
                          + new Vector2(0f, t.handCrashDroop * crashBlend);            // Crash: hands hang lower
+        // Airborne: hands rise a little; landing: a quick bounce down.
+        bool airborne = !motor.IsGrounded && !motor.IsClimbing;
+        airBlend = Mathf.MoveTowards(airBlend, airborne ? 1f : 0f, dt * 6f);
+        float bounce = Pulse(landT, t.handLandBounceTime) * t.handLandBounce * landStrength;
+        common += new Vector2(0f, bounce - t.handAirLift * airBlend);
         if (transcendent) common += Random.insideUnitCircle * t.handTranscendenceTremble;
 
         leftOffset = common + bobLeft + new Vector2(push * 0.6f, -push) + new Vector2(-dash * 0.5f, dash);

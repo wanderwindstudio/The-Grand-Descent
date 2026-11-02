@@ -18,7 +18,41 @@ public class TuningConfig : ScriptableObject
     public float eyeHeight = 1.6f;
     public float fieldOfView = 80f;
 
-    [Header("Player - dash (Space)")]
+    [Header("Player - jumping (Jump action)")]
+    [Tooltip("Peak height of a full jump in metres. 1.3 clears low walls and crates but not a balcony.")]
+    public float jumpHeight = 1.3f;
+    [Tooltip("Gravity is this much stronger while falling than while rising.")]
+    public float fallGravityMultiplier = 1.6f;
+    [Tooltip("Releasing Jump early while rising multiplies the upward speed by this (shorter hop).")]
+    [Range(0f, 1f)] public float jumpCutMultiplier = 0.55f;
+    [Tooltip("You can still jump this long after walking off a ledge.")]
+    public float coyoteTime = 0.1f;
+    [Tooltip("A Jump pressed this long before landing still happens on landing.")]
+    public float jumpBufferTime = 0.1f;
+    [Tooltip("Steering in the air compared with the ground (0.6 = 60%).")]
+    [Range(0f, 1f)] public float airControl = 0.6f;
+    [Tooltip("How fast you change direction in the air at full air control (m/s per second).")]
+    public float airAcceleration = 40f;
+    public float maxFallSpeed = 40f;
+    public float ladderClimbSpeed = 3f;
+    [Tooltip("How fast knockback on the player fades on the ground.")]
+    public float knockbackDecay = 6f;
+    [Tooltip("Falls from higher than this (metres) hurt.")]
+    public float playerFallDamageHeight = 5f;
+    public float playerFallDamagePerMetre = 8f;
+    [Tooltip("Camera dip on a normal landing, in metres.")]
+    public float landingDip = 0.06f;
+    [Tooltip("Camera dip after a fall over the fall damage height.")]
+    public float bigLandingDip = 0.22f;
+    public float landingDipTime = 0.25f;
+    public float landingSoundVolume = 0.35f;
+    [Tooltip("Hands lift this much while airborne (fraction of screen height).")]
+    public float handAirLift = 0.02f;
+    [Tooltip("Hands bounce down this much on landing (fraction of screen height).")]
+    public float handLandBounce = 0.035f;
+    public float handLandBounceTime = 0.22f;
+
+    [Header("Player - dash (Dash action)")]
     public float dashSpeed = 20f;
     public float dashDuration = 0.18f;
     public float dashCooldown = 1.5f;
@@ -319,10 +353,68 @@ public class TuningConfig : ScriptableObject
     public float hitIndicatorRadius = 160f;
     public float hitIndicatorSize = 48f;
 
-    [Header("Level - floors")]
-    [Tooltip("Size of one character in the floor layouts, in metres.")]
-    public float cellSize = 2f;
-    public float wallHeight = 4f;
+    [Header("Level - rooms and corridors")]
+    [Tooltip("Rooms per floor, picked at random from Assets/Rooms and joined by corridors.")]
+    public int roomsPerFloor = 3;
+    public float corridorLengthMin = 5f;
+    public float corridorLengthMax = 9f;
+    public float corridorHeight = 4f;
+    [Tooltip("Goblin drop-down links are placed this far apart along ledges; hop links along low walls.")]
+    public float traversalLinkSpacing = 1.5f;
+    [Tooltip("Ledges lower than this need no drop link (goblins just walk down).")]
+    public float minDropLinkHeight = 1f;
+
+    [Header("Goblin traversal")]
+    [Tooltip("Goblins jump down ledges up to this high. Applies when a floor is built.")]
+    public float goblinLedgeJumpHeight = 4f;
+    [Tooltip("Short stun after a goblin lands from a jump or a knockback.")]
+    public float goblinLandingStun = 0.5f;
+    [Tooltip("Ladder climbing speed as a fraction of normal speed.")]
+    public float goblinLadderSpeedFraction = 0.33f;
+    [Tooltip("Pause before a goblin hops a low wall.")]
+    public float goblinHopDelay = 0.35f;
+    public float goblinHopTime = 0.45f;
+    [Tooltip("Goblins only hit you if you're within this height of them (so a balcony is safe from below).")]
+    public float goblinAttackVerticalReach = 1.5f;
+    public float goblinGravity = -25f;
+    [Tooltip("Knocked-back goblins take damage when they fall further than this.")]
+    public float goblinFallDamageHeight = 1.5f;
+    public float goblinFallDamagePerMetre = 12f;
+
+    [Header("Ring-outs and explosive barrels")]
+    [Tooltip("Extra XP for knocking or dropping a goblin into a pit.")]
+    public float ringOutXpBonus = 2f;
+    public int barrelsMin = 2;
+    public int barrelsMax = 3;
+    public float barrelRadius = 3.5f;
+    [Tooltip("Damage to goblins at the centre of the blast. Kept below their health so they get thrown (fall damage, ring-outs).")]
+    public float barrelDamage = 20f;
+    [Tooltip("Damage to you at the centre of the blast (less toward the edge).")]
+    public float barrelPlayerDamage = 25f;
+    public float barrelKnockback = 6f;
+    public float barrelKnockbackUp = 4f;
+    [Tooltip("How long a hit barrel flashes before it explodes.")]
+    public float barrelFuseTime = 0.4f;
+    [Tooltip("Delay before a barrel caught in another blast goes off.")]
+    public float barrelChainDelay = 0.15f;
+
+    [Header("Sprayers (punish camping where goblins can't reach)")]
+    [Tooltip("Seconds standing in one spot goblins can't reach before sprayers arrive.")]
+    public float campTime = 8f;
+    [Tooltip("Moving less than this counts as staying in one spot.")]
+    public float campRadius = 3f;
+    public int sprayersMin = 1;
+    public int sprayersMax = 2;
+    [Tooltip("Seconds before sprayers can be called again.")]
+    public float sprayerCooldown = 20f;
+    public float sprayerHealth = 25f;
+    [Tooltip("Sprayers stop and shoot from this distance.")]
+    public float sprayerRange = 14f;
+    public float sprayerWindUpTime = 0.7f;
+    public float sprayerFireCooldown = 2.2f;
+    public float sprayerProjectileSpeed = 7f;
+    public float sprayerProjectileDamage = 8f;
+    public float sprayerProjectileSize = 0.35f;
 
     [Header("Descending - each floor multiplies these again")]
     public float floorEnemyHealthMultiplier = 1.25f;

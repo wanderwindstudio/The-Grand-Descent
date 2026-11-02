@@ -73,4 +73,45 @@ public static class ToneGenerator
         clip.SetData(trimmed, 0);
         return clip;
     }
+
+    // A soft, low thump (landing): a falling-pitch sine with a little noise, fading out fast.
+    public static AudioClip Thud(string name, float frequency, float duration)
+    {
+        int count = Mathf.Max(1, Mathf.RoundToInt(SampleRate * duration));
+        var data = new float[count];
+        var rng = new System.Random(3);
+        float phase = 0f;
+        for (int i = 0; i < count; i++)
+        {
+            float k = i / (float)count;
+            phase += 2f * Mathf.PI * frequency * (1f - 0.5f * k) / SampleRate;
+            float env = Mathf.Exp(-k * 6f) * Mathf.Clamp01(i / (SampleRate * 0.003f));
+            float noise = ((float)rng.NextDouble() * 2f - 1f) * 0.25f * Mathf.Exp(-k * 20f);
+            data[i] = (Mathf.Sin(phase) + noise) * env * 0.8f;
+        }
+        var clip = AudioClip.Create(name, count, 1, SampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    // An explosion: a noisy boom that drops in pitch.
+    public static AudioClip Boom(string name)
+    {
+        int count = SampleRate * 7 / 10;
+        var data = new float[count];
+        var rng = new System.Random(11);
+        float smooth = 0f, phase = 0f;
+        for (int i = 0; i < count; i++)
+        {
+            float k = i / (float)count;
+            float noise = (float)rng.NextDouble() * 2f - 1f;
+            smooth += (noise - smooth) * Mathf.Lerp(0.5f, 0.05f, k); // gets duller as it fades
+            phase += 2f * Mathf.PI * Mathf.Lerp(70f, 35f, k) / SampleRate;
+            float env = Mathf.Exp(-k * 5f);
+            data[i] = Mathf.Clamp((smooth * 2.5f + Mathf.Sin(phase) * 0.6f) * env, -1f, 1f);
+        }
+        var clip = AudioClip.Create(name, count, 1, SampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
 }

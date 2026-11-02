@@ -12,6 +12,7 @@ public class RunManager : MonoBehaviour
     public static bool LootVacuum => Instance != null && Instance.PortalsOpen;
 
     public State Current { get; private set; }
+    public GameObject LevelRoot => level != null ? level.root : null;
     public bool PortalsOpen { get; private set; }
     public int CarriedGold { get; private set; }
 
@@ -31,8 +32,11 @@ public class RunManager : MonoBehaviour
 
     void Awake() => Instance = this;
 
+    int testRoomIndex = -1;
+
     // Builds (or rebuilds) the current floor. Called before the player exists for floor 1.
-    public LevelLayout BuildFloor()
+    // testRoom: just that one room (F8 room tester).
+    public LevelLayout BuildFloor(GameObject testRoom = null)
     {
         if (level != null)
         {
@@ -42,8 +46,10 @@ public class RunManager : MonoBehaviour
         }
         PortalsOpen = false;
         LevelLighting.Apply(Game.Tuning);
-        level = FloorBuilder.Build(Game.Tuning, FloorTemplates.PickRandom());
+        level = FloorAssembler.Build(Game.Tuning, RoomLibrary.Current, testRoom);
         PlaceShrines();
+        ExplosiveBarrel.SpawnForFloor(level.barrelSpots, level.root.transform);
+        Debug.Log("Floor built from: " + string.Join(", ", level.roomNames));
         return level;
     }
 
@@ -112,8 +118,9 @@ public class RunManager : MonoBehaviour
     {
         PortalsOpen = true;
         float s = Game.Tuning.portalSpacing;
-        Portal.Create(PortalKind.Extract, level.portalSpot + Vector3.left * s, level.root.transform);
-        Portal.Create(PortalKind.Descend, level.portalSpot + Vector3.right * s, level.root.transform);
+        Vector3 right = Quaternion.Euler(0f, level.portalYaw, 0f) * Vector3.right;
+        Portal.Create(PortalKind.Extract, level.portalSpot - right * s, level.root.transform, level.portalYaw);
+        Portal.Create(PortalKind.Descend, level.portalSpot + right * s, level.root.transform, level.portalYaw);
         if (Game.Floor >= Game.Tuning.collapseStartFloor)
         {
             collapse.Begin();
@@ -146,7 +153,8 @@ public class RunManager : MonoBehaviour
         MetaProgress.RecordRun(GoldBankedThisRun);
         RunLog.Append(extracted ? "extracted" : DiedToCollapse ? "collapsed" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
             LevelReached, UpgradeList(arcaneOnly: false), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences,
-            RunStats.VortexCasts, RunStats.MaxChargesReached, UpgradeList(arcaneOnly: true));
+            RunStats.VortexCasts, RunStats.MaxChargesReached, UpgradeList(arcaneOnly: true),
+            RunStats.RingOutKills, RunStats.BarrelKills, RunStats.Jumps);
 
         Time.timeScale = 0f;
         Game.InputBlocked = true;
@@ -179,6 +187,21 @@ public class RunManager : MonoBehaviour
         cc.enabled = false;
         Game.Player.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
         cc.enabled = true;
+        Game.Player.GetComponent<PlayerMotor>().ResetMotion();
+    }
+
+    // Debug (F8): rebuild the floor as just the next room prefab, to try it out.
+    public void DebugNextTestRoom()
+    {
+        if (Current != State.Playing) return;
+        var rooms = RoomLibrary.Current != null ? RoomLibrary.Current.rooms : null;
+        if (rooms == null || rooms.Count == 0) { Hud.ShowMessage("No room prefabs in Assets/Rooms"); return; }
+        collapse.Stop();
+        testRoomIndex = (testRoomIndex + 1) % rooms.Count;
+        BuildFloor(rooms[testRoomIndex]);
+        TeleportPlayer(level.playerStart, level.playerStartYaw);
+        waves.BeginFloor(level.spawnPoints);
+        Hud.ShowMessage($"TEST ROOM {testRoomIndex + 1}/{rooms.Count}: {level.roomNames[0]}");
     }
 
     // Debug: skip straight to the next floor.

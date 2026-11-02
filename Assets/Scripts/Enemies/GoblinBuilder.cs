@@ -40,6 +40,8 @@ public static class GoblinBuilder
         audio.spread = 0f;       // sharp left/right panning
         audio.dopplerLevel = 0f; // no pitch smear when you turn
 
+        root.AddComponent<GoblinTraversal>();
+        root.AddComponent<GoblinAirborne>();
         var goblin = root.AddComponent<GoblinEnemy>();
         root.AddComponent<GoblinSprite>();
         return goblin;

@@ -157,6 +157,7 @@ MonoBehaviour:
   goblinDeadSprite: {fileID: 2800000, guid: 9104ddaf4dd8341798ea04566ab5be35, type: 3}
   fxMaterial: {fileID: 2100000, guid: df3d900ffb1d346329eac074347ba3db, type: 2}
   controls: {fileID: -944628639613478452, guid: cf9df8409bf30465c8c54d29436e2d57, type: 3}
+  roomLibrary: {fileID: 11400000, guid: 2e2abba1a08ba452c91feb05f54b4450, type: 2}
   handLeft: {fileID: 2800000, guid: 1b9c5aea12c6a44db94d4bdfb56479dd, type: 3}
   handLeftCast: {fileID: 2800000, guid: 84eaa57d4a9d04c8bb19ab8fc367374f, type: 3}
   handRight: {fileID: 2800000, guid: e01ba4a9a5bbe4de68c3360f3fa7222e, type: 3}

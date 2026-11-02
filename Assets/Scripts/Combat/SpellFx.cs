@@ -14,9 +14,13 @@ public class SpellFx : MonoBehaviour
 
     // A burst that grows from startSize to endSize metres and fades out, with a light flash.
     public static void Impact(Vector3 position, float startSize, float endSize, float duration, float lightIntensity, float lightRange)
+        => Impact(position, startSize, endSize, duration, lightIntensity, lightRange, Color.white, Palette.ArcaneLight);
+
+    // Same, tinted (e.g. orange for a barrel explosion).
+    public static void Impact(Vector3 position, float startSize, float endSize, float duration, float lightIntensity, float lightRange, Color tint, Color lightColor)
     {
         if (instance == null) return;
-        instance.pool.Get(position).Begin(instance.pool, startSize, endSize, duration, lightIntensity, lightRange);
+        instance.pool.Get(position).Begin(instance.pool, startSize, endSize, duration, lightIntensity, lightRange, tint, lightColor);
     }
 
     public static void MissileImpact(Vector3 position)
@@ -45,9 +49,12 @@ public class SpellFx : MonoBehaviour
         public Light flash;
         SimplePool<ImpactFx> pool;
         float age, duration, startSize, endSize, lightIntensity, roll;
+        Color tint;
 
-        public void Begin(SimplePool<ImpactFx> owner, float fromSize, float toSize, float seconds, float intensity, float range)
+        public void Begin(SimplePool<ImpactFx> owner, float fromSize, float toSize, float seconds, float intensity, float range, Color spriteTint, Color lightColor)
         {
+            tint = spriteTint;
+            flash.color = lightColor;
             pool = owner;
             age = 0f;
             duration = Mathf.Max(0.01f, seconds);
@@ -68,7 +75,7 @@ public class SpellFx : MonoBehaviour
             float ease = 1f - (1f - k) * (1f - k); // fast start, soft end
             sprite.transform.localScale = Vector3.one * Mathf.Lerp(startSize, endSize, ease);
             Art.FaceCameraFully(sprite.transform, roll);
-            Art.SetFxColor(sprite, Color.white, Game.Tuning.spellSpriteBrightness, 1f - k * k);
+            Art.SetFxColor(sprite, tint, Game.Tuning.spellSpriteBrightness, 1f - k * k);
             flash.intensity = lightIntensity * (1f - k);
         }
     }

@@ -98,6 +98,20 @@ public class WaveSpawner : MonoBehaviour
         pool.Get(point).Spawn(pool);
     }
 
+    // Ranged goblins sent after a player camping out of reach (see CampingWatcher).
+    public void SpawnSprayers(int count)
+    {
+        if (spawnPoints == null || spawnPoints.Count == 0) return;
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 point = PickHiddenSpawnPoint();
+            if (NavMesh.SamplePosition(point, out NavMeshHit hit, 2f, NavMesh.AllAreas)) point = hit.position;
+            var g = pool.Get(point);
+            g.Spawn(pool);
+            g.MakeRanged();
+        }
+    }
+
     // A random spawn point that is off-screen and not too close. If none qualifies, the farthest one.
     Vector3 PickHiddenSpawnPoint()
     {

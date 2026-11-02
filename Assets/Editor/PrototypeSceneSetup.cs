@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Menu: Grand Descent > Create Prototype Scene.
-// Makes the TuningConfig asset and materials (if missing), and a scene with just the GameBootstrap object.
+// Makes the TuningConfig asset and materials (if missing), the starter rooms (if missing),
+// and a scene with just the GameBootstrap object.
 // Safe to run again: it reuses the existing scene and only refreshes the bootstrap's references.
 public static class PrototypeSceneSetup
 {
@@ -64,6 +65,9 @@ public static class PrototypeSceneSetup
             AssetDatabase.CreateAsset(fx, FxMaterialPath);
         }
 
+        if (!StarterRooms.Exist()) StarterRooms.BuildAll();
+        var roomLibrary = RoomLibraryUpdater.Refresh();
+
         var goblinSprite = LoadArt(GoblinSpritePath);
         if (goblinSprite == null) Debug.LogWarning("Goblin sprite not found at " + GoblinSpritePath);
 
@@ -81,6 +85,7 @@ public static class PrototypeSceneSetup
         bootstrap.goblinDeadSprite = LoadArt(GoblinDeadPath);
         bootstrap.fxMaterial = fx;
         bootstrap.controls = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ControlsPath);
+        bootstrap.roomLibrary = roomLibrary;
         bootstrap.handLeft = LoadArt(HandLeftPath);
         bootstrap.handLeftCast = LoadArt(HandLeftCastPath);
         bootstrap.handRight = LoadArt(HandRightPath);

@@ -6,12 +6,13 @@ using UnityEngine;
 // Appends one line per run to run_log.csv in Application.persistentDataPath.
 public static class RunLog
 {
-    const string Header = "date_time,outcome,floor_reached,duration_seconds,kills,gold_carried,gold_banked,level_reached,upgrades_taken,seconds_above_70_buzz,transcendences,vortex_casts,max_charges_reached,arcane_upgrades_taken";
+    const string Header = "date_time,outcome,floor_reached,duration_seconds,kills,gold_carried,gold_banked,level_reached,upgrades_taken,seconds_above_70_buzz,transcendences,vortex_casts,max_charges_reached,arcane_upgrades_taken,ring_out_kills,barrel_kills,jumps";
 
     public static string FilePath => Path.Combine(Application.persistentDataPath, "run_log.csv");
 
     public static void Append(string outcome, int floor, float duration, int kills, int goldCarried, int goldBanked, int level, string upgrades,
-        float secondsHighBuzz, int transcendences, int vortexCasts, int maxChargesReached, string arcaneUpgrades)
+        float secondsHighBuzz, int transcendences, int vortexCasts, int maxChargesReached, string arcaneUpgrades,
+        int ringOutKills, int barrelKills, int jumps)
     {
         var inv = CultureInfo.InvariantCulture;
         string line = string.Join(",",
@@ -28,7 +29,10 @@ public static class RunLog
             transcendences.ToString(inv),
             vortexCasts.ToString(inv),
             maxChargesReached.ToString(inv),
-            "\"" + arcaneUpgrades + "\"");
+            "\"" + arcaneUpgrades + "\"",
+            ringOutKills.ToString(inv),
+            barrelKills.ToString(inv),
+            jumps.ToString(inv));
         try
         {
             KeepOldLogIfColumnsChanged();
