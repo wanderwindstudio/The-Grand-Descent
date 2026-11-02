@@ -28,6 +28,9 @@ public static class Palette
     public static readonly Color Poison = new Color(0.65f, 0.9f, 0.1f);
     public static readonly Color Buzz = new Color(0.75f, 0.3f, 1f);
     public static readonly Color BuzzBar = new Color(0.65f, 0.25f, 0.95f);
+    public static readonly Color TabBar = new Color(0.32f, 0.02f, 0.04f);       // the Tab on the health bar
+    public static readonly Color TabBarPulse = new Color(0.42f, 0.04f, 0.06f);
+    public static readonly Color Phantom = new Color(0.75f, 0.3f, 1f);           // the puff a phantom vanishes in
     public static readonly Color Shrine = new Color(0.7f, 0.2f, 1f);
     public static readonly Color TranscendenceBar = new Color(1f, 0.8f, 0.25f);
     public static readonly Color TranscendenceTint = new Color(1f, 0.92f, 0.75f);

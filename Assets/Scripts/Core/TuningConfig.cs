@@ -545,6 +545,48 @@ public class TuningConfig : ScriptableObject
     public float crashDuration = 6f;
     public float crashMoveSpeedMultiplier = 0.5f;
 
+    [Header("Buzz - mode (F1 panel)")]
+    [Tooltip("Classic: the original Buzz (wobble, linear damage bonus, Crash slows you). Hangover: numb while buzzed, damage goes on a Tab you pay when Buzz runs out, and hallucinated goblins above 70%.")]
+    public BuzzMode buzzMode = BuzzMode.Hangover;
+
+    [Header("Hangover - damage curve")]
+    [Tooltip("Damage multiplier at 100% Buzz. Multiplier = 1 + (max - 1) x (Buzz/100)^exponent.")]
+    public float hangoverMaxDamageMultiplier = 4f;
+    [Tooltip("2 = slow start, steep finish (1.75x at 50%). 1 = straight line.")]
+    public float hangoverDamageExponent = 2f;
+    [Tooltip("Missile sway at full Buzz in metres (Classic uses the wobble settings). 0 = none.")]
+    public float hangoverWobble = 0.05f;
+
+    [Header("Hangover - the Tab")]
+    [Tooltip("Fraction of the Tab forgiven per second (0.02 = 2% of what's stored).")]
+    public float tabDrainPerSecond = 0.02f;
+    [Tooltip("If the Tab grows past this many times your max health, it's paid at once.")]
+    public float tabMaxFractionOfHealth = 1.5f;
+    [Tooltip("Gold lost per point of Tab left when you extract (the Hangover bill).")]
+    public float tabGoldPerPoint = 1f;
+    public float hangoverShake = 0.25f;
+    public float hangoverShakeTime = 0.8f;
+    [Tooltip("Strength of the red flash when the Tab is paid (0 to 1).")]
+    public float hangoverFlashAlpha = 0.6f;
+    public float hangoverFlashTime = 0.9f;
+
+    [Header("Hangover - Transcendence")]
+    public float hangoverTranscendenceDuration = 10f;
+    public float hangoverTranscendenceDamageMultiplier = 6f;
+
+    [Header("Hangover - hallucinations (phantom goblins)")]
+    [Tooltip("Phantoms appear above this fraction of Buzz.")]
+    [Range(0f, 1f)] public float phantomBuzzThreshold = 0.7f;
+    [Tooltip("Seconds between phantoms right at the threshold.")]
+    public float phantomIntervalAtThreshold = 4f;
+    [Tooltip("Seconds between phantoms at 100% Buzz.")]
+    public float phantomIntervalAtMax = 1f;
+    public int phantomMaxAlive = 6;
+    [Tooltip("0 = phantoms sound exactly like goblins. 1 = phantoms make no footstep sound (a tell).")]
+    [Range(0f, 1f)] public float phantomFootstepTell = 0f;
+    [Tooltip("Volume of goblin footsteps (needed for the phantom tell). 0 = silent goblins, as before.")]
+    public float goblinFootstepVolume = 0.25f;
+
     [Header("Buzz - screen effects")]
     [Range(0f, 1f)] public float buzzMaxChromaticAberration = 1f;
     [Tooltip("Lens warp at full Buzz (0 to 1).")]

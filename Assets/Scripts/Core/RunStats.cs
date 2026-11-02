@@ -9,6 +9,9 @@ public static class RunStats
     public static int Jumps;
     public static int RingOutKills;
     public static int BarrelKills;
+    // Hangover mode
+    public static float MaxTab, TabPaid, TabForgiven;
+    public static int HangoverDeaths, PhantomsKilled, PhantomChargeResets, HangoverBillGold;
 
     public static void Reset()
     {
@@ -17,6 +20,8 @@ public static class RunStats
         Jumps = 0;
         RingOutKills = 0;
         BarrelKills = 0;
+        MaxTab = TabPaid = TabForgiven = 0f;
+        HangoverDeaths = PhantomsKilled = PhantomChargeResets = HangoverBillGold = 0;
         Kills = 0;
         SecondsAboveBuzzThreshold = 0f;
         Transcendences = 0;

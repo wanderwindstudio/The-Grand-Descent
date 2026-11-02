@@ -12,6 +12,7 @@ public class Hud : MonoBehaviour
     Texture2D arrow;
     GUIStyle bigText, smallText, leftText, rightText, topRightText;
     float flashTimeLeft;
+    float bigFlashLeft, bigFlashTime, bigFlashAlpha;
     string message;
     float messageTimeLeft;
     PlayerMotor motor;
@@ -28,6 +29,14 @@ public class Hud : MonoBehaviour
         if (instance == null) return;
         instance.message = text;
         instance.messageTimeLeft = MessageDuration;
+    }
+
+    // A strong red flash (the Hangover hitting).
+    public static void Flash(float alpha, float duration)
+    {
+        if (instance == null) return;
+        instance.bigFlashAlpha = alpha;
+        instance.bigFlashTime = instance.bigFlashLeft = Mathf.Max(0.01f, duration);
     }
 
     void Awake()
@@ -57,6 +66,7 @@ public class Hud : MonoBehaviour
     {
         float dt = Time.unscaledDeltaTime;
         flashTimeLeft -= dt;
+        bigFlashLeft -= dt;
         messageTimeLeft -= dt;
         for (int i = hitMarkers.Count - 1; i >= 0; i--)
         {
@@ -78,6 +88,7 @@ public class Hud : MonoBehaviour
             float a = t.damageFlashMaxAlpha * (flashTimeLeft / t.damageFlashDuration);
             Fill(new Rect(0, 0, w, h), new Color(1f, 0f, 0f, a));
         }
+        if (bigFlashLeft > 0f) Fill(new Rect(0, 0, w, h), new Color(0.8f, 0f, 0f, bigFlashAlpha * bigFlashLeft / bigFlashTime));
 
         DrawCollapse(w, h);
         DrawOffscreenWarnings(w, h);
@@ -89,7 +100,7 @@ public class Hud : MonoBehaviour
 
         // Health and dash bars, bottom left
         var hp = Game.PlayerHealth;
-        Bar(new Rect(20, h - 50, 300, 22), hp.Current / hp.Max, Palette.HealthBar, $"HP {Mathf.CeilToInt(hp.Current)} / {Mathf.CeilToInt(hp.Max)}");
+        DrawHealthBar(new Rect(20, h - 50, 300, 22), hp);
         if (motor != null) Bar(new Rect(20, h - 22, 300, 8), motor.DashReady01, Palette.DashBar, null);
         DrawBuzzBar(new Rect(20, h - 82, 300, 22));
         DrawSpellSwapWarning(w, h);
@@ -178,6 +189,23 @@ public class Hud : MonoBehaviour
         GUI.color = Color.white;
     }
 
+    // Health, with the Tab as a dark red stretch eating in from the right: what's left after the bill.
+    void DrawHealthBar(Rect r, PlayerHealth hp)
+    {
+        float tab = Game.Tab != null ? Game.Tab.Amount : 0f;
+        float now = Mathf.Clamp01(hp.Current / hp.Max), after = Mathf.Clamp01((hp.Current - tab) / hp.Max);
+        Fill(r, Palette.BarBackground);
+        Fill(new Rect(r.x, r.y, r.width * now, r.height), Palette.HealthBar);
+        if (tab > 0f)
+        {
+            bool pulse = Game.Tab.Frozen || Mathf.Repeat(Time.unscaledTime, 1f) < 0.5f;
+            Fill(new Rect(r.x + r.width * after, r.y, r.width * (now - after), r.height), pulse ? Palette.TabBar : Palette.TabBarPulse);
+        }
+        string label = $"HP {Mathf.CeilToInt(hp.Current)} / {Mathf.CeilToInt(hp.Max)}";
+        if (tab > 0f) label += Game.Tab.Frozen ? $"   TAB {Mathf.CeilToInt(tab)} (frozen)" : $"   TAB {Mathf.CeilToInt(tab)}";
+        GUI.Label(new Rect(r.x + 6, r.y, r.width, r.height), label);
+    }
+
     void DrawBuzzBar(Rect r)
     {
         var t = Game.Tuning;
@@ -185,13 +213,20 @@ public class Hud : MonoBehaviour
         switch (buzz.Current)
         {
             case BuzzMeter.Phase.Transcendent:
-                Bar(r, buzz.PhaseTimeLeft / t.transcendenceDuration, Palette.TranscendenceBar, $"TRANSCENDENCE {buzz.PhaseTimeLeft:0.0}s   DMG x{buzz.DamageMultiplier:0.0}");
+                Bar(r, buzz.PhaseTimeLeft / buzz.TranscendenceDuration, Palette.TranscendenceBar, $"TRANSCENDENCE {buzz.PhaseTimeLeft:0.0}s   DMG x{buzz.DamageMultiplier:0.0}");
                 break;
             case BuzzMeter.Phase.Crash:
                 Bar(r, buzz.PhaseTimeLeft / t.crashDuration, Palette.CrashBar, $"CRASH {buzz.PhaseTimeLeft:0.0}s");
                 break;
             default:
-                Bar(r, buzz.Normalized, Palette.BuzzBar, $"BUZZ {buzz.Normalized * 100f:0}%   DMG x{buzz.DamageMultiplier:0.00}");
+                if (BuzzMeter.Hangover)
+                {
+                    Bar(r, buzz.Normalized, Palette.BuzzBar, $"BUZZ {buzz.Normalized * 100f:0}%");
+                    GUI.Label(new Rect(r.xMax + 8, r.y, 80, r.height), $"×{buzz.DamageMultiplier:0.0}", leftText);
+                    // Tick mark where hallucinations start.
+                    Fill(new Rect(r.x + r.width * t.phantomBuzzThreshold - 1, r.y - 3, 2, r.height + 6), Palette.Buzz);
+                }
+                else Bar(r, buzz.Normalized, Palette.BuzzBar, $"BUZZ {buzz.Normalized * 100f:0}%   DMG x{buzz.DamageMultiplier:0.00}");
                 // Tick mark where spell swaps start.
                 Fill(new Rect(r.x + r.width * t.buzzHighThreshold - 1, r.y - 3, 2, r.height + 6), Color.white);
                 break;

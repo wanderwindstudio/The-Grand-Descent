@@ -17,6 +17,9 @@ public class GoblinSprite : MonoBehaviour
     Material material;
     Texture2D shownFrame;
     float bobPhase;
+    int lastStep;
+    AudioSource audioSource;
+    static AudioClip step;
     float walkBlend;
     float hitPoseUntil;
     bool wasFlashing;
@@ -32,6 +35,8 @@ public class GoblinSprite : MonoBehaviour
         if (!Art.HasGoblinSprite) { enabled = false; return; }
         pivot = Art.CreateBillboard("Sprite", transform, Art.GoblinIdle, out spriteRenderer);
         material = spriteRenderer.sharedMaterial;
+        audioSource = GetComponent<AudioSource>();
+        if (step == null) step = ToneGenerator.Thud("Goblin Step", 150f, 0.05f);
         MakeRim();
         bobPhase = Random.Range(0f, Mathf.PI * 2f); // goblins don't hop in sync
     }
@@ -62,6 +67,7 @@ public class GoblinSprite : MonoBehaviour
         bobPhase += dt * t.spriteBobSpeed * Mathf.PI;
         float hop = Mathf.Abs(Mathf.Sin(bobPhase)) * t.spriteBobHeight * walkBlend;
         float sway = Mathf.Sin(bobPhase) * t.spriteSwayDegrees * walkBlend;
+        Footstep(t);
 
         // Wind-up: stretch tall and thin, then lunge toward the player right before the hit.
         float k = goblin.WindUp01;
@@ -82,6 +88,18 @@ public class GoblinSprite : MonoBehaviour
         material.SetColor("_EmissionColor", glow);
         material.SetColor("_BaseColor", goblin.IsHeld ? Palette.HeldTint : goblin.SpriteTint);
         UpdateRim(t);
+    }
+
+    // A soft step each time a walking goblin lands from its hop. Phantoms can be made quieter (the F1 "tell").
+    void Footstep(TuningConfig t)
+    {
+        int stepIndex = Mathf.FloorToInt(bobPhase / Mathf.PI);
+        if (stepIndex == lastStep) return;
+        lastStep = stepIndex;
+        if (walkBlend < 0.5f || audioSource == null || t.goblinFootstepVolume <= 0f) return;
+        float near = Mathf.Clamp01(1f - Vector3.Distance(transform.position, Game.Player.position) / 18f); // only nearby steps
+        float volume = t.goblinFootstepVolume * GameSettings.Sfx * near * near * (goblin.IsPhantom ? 1f - t.phantomFootstepTell : 1f);
+        if (volume > 0.001f) audioSource.PlayOneShot(step, volume);
     }
 
     // A black copy of the quad whose glow is the rim colour: an outline once it peeks out behind the sprite.

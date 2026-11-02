@@ -96,6 +96,7 @@ public class GameBootstrap : MonoBehaviour
         gameObject.AddComponent<LootDropper>();
         gameObject.AddComponent<GoblinCorpses>();
         var waves = gameObject.AddComponent<WaveSpawner>();
+        gameObject.AddComponent<PhantomSpawner>();
         gameObject.AddComponent<CampingWatcher>();
         gameObject.AddComponent<WorldPopup>();
         gameObject.AddComponent<ScorchMarks>();

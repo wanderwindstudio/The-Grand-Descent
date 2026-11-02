@@ -45,7 +45,7 @@ public class PlayerShooter : MonoBehaviour
             speed = t.missileSpeed,
             hitRadius = t.missileRadius,
             length = t.arcaneMissileLength,
-            wobble = Game.Buzz.Normalized * t.wobbleMaxAmplitude,
+            wobble = Game.Buzz.Normalized * (BuzzMeter.Hangover ? t.hangoverWobble : t.wobbleMaxAmplitude),
             tint = Color.white,
             countsHits = true,
             countsMisses = true,

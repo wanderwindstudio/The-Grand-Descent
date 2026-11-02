@@ -6,12 +6,26 @@ using UnityEngine.AI;
 // A vortex can hold it: pulled to the centre, unable to move or attack, and immune to knockback.
 // Traversal (wall hops, ledge drops, ladders) and flying (knockback, pit drops) live in GoblinTraversal and GoblinAirborne.
 // A "sprayer" is the ranged variant: it keeps its distance and lobs slow projectiles.
+// A "phantom" is a hallucination (Hangover mode, high Buzz): it looks and fights exactly like a goblin,
+// but has 1 HP, doesn't count for the wave, gives nothing, and vanishes in purple smoke.
 [RequireComponent(typeof(NavMeshAgent))]
 public class GoblinEnemy : MonoBehaviour
 {
     public static readonly List<GoblinEnemy> Active = new List<GoblinEnemy>();
     // (where it died). Used to drop loot.
     public static event System.Action<Vector3> Killed;
+
+    // Real goblins only: what the wave waits for.
+    public static int RealCount
+    {
+        get
+        {
+            int n = 0;
+            foreach (var g in Active) if (!g.IsPhantom) n++;
+            return n;
+        }
+    }
+    public static int PhantomCount => Active.Count - RealCount;
 
     // What dealt the damage, for the run log.
     public enum Cause { Spell, Barrel, RingOut }
@@ -20,6 +34,7 @@ public class GoblinEnemy : MonoBehaviour
 
     public bool IsDead { get; private set; }
     public bool IsRanged { get; private set; }
+    public bool IsPhantom { get; private set; }
     public bool IsWindingUp => state == State.WindUp;
     public bool IsHitFlashing => hitFlashTimer > 0f;
     // Renewed every frame by a vortex; wears off a moment after the vortex ends.
@@ -72,6 +87,7 @@ public class GoblinEnemy : MonoBehaviour
         health = t.goblinHealth * FloorScaling.EnemyHealth;
         IsDead = false;
         IsRanged = false;
+        IsPhantom = false;
         state = State.Chase;
         repathTimer = 0f;
         hitFlashTimer = 0f;
@@ -92,6 +108,13 @@ public class GoblinEnemy : MonoBehaviour
         IsRanged = true;
         health = Game.Tuning.sprayerHealth * FloorScaling.EnemyHealth;
         ResetLook();
+    }
+
+    // Turns a freshly spawned goblin into a hallucination.
+    public void MakePhantom()
+    {
+        IsPhantom = true;
+        health = 1f;
     }
 
     public void Stun(float seconds) => stunnedUntil = Mathf.Max(stunnedUntil, Time.time + seconds);
@@ -297,10 +320,22 @@ public class GoblinEnemy : MonoBehaviour
     public void RingOut()
     {
         if (IsDead) return;
+        if (IsPhantom) { Vanish(); return; }
         lastCause = Cause.RingOut;
         WorldPopup.Show(transform.position + Vector3.up * 1.5f, "RING OUT!", Palette.Gold);
         Game.Player.GetComponent<PlayerLevel>().AddXp(Game.Tuning.ringOutXpBonus);
         Die();
+    }
+
+    // A phantom killed or dispelled: a puff of purple smoke, no corpse, no loot.
+    public void Vanish(bool killed = true)
+    {
+        if (IsDead) return;
+        IsDead = true;
+        Active.Remove(this);
+        if (killed) RunStats.PhantomsKilled++;
+        SpellFx.Impact(transform.position + Vector3.up * 0.7f, 0.6f, 2.2f, 0.5f, 1.5f, 4f, Palette.Phantom, Palette.Phantom);
+        pool.Release(this);
     }
 
     // Gone without counting as a kill (used when leaving a floor).
@@ -315,6 +350,7 @@ public class GoblinEnemy : MonoBehaviour
     public void Die()
     {
         if (IsDead) return;
+        if (IsPhantom) { Vanish(); return; }
         IsDead = true;
         Active.Remove(this);
         RunStats.Kills++;

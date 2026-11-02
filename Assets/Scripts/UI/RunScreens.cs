@@ -35,7 +35,8 @@ public class RunScreens : MonoBehaviour
             $"Time: {minutes}:{seconds:00}\n" +
             $"Kills: {RunStats.Kills}\n" +
             $"Level reached: {run.LevelReached}\n" +
-            $"Gold carried: {run.CarriedGold}\n" +
+            $"Gold carried: {run.CarriedGold + run.HangoverBill}\n" +
+            (run.HangoverBill > 0 ? $"Hangover bill: -{run.HangoverBill} gold\n" : "") +
             $"Gold banked: {run.GoldBankedThisRun}  ({bankNote})\n" +
             $"Time above {Game.Tuning.buzzHighThreshold * 100f:0}% Buzz: {RunStats.SecondsAboveBuzzThreshold:0}s\n" +
             $"Transcendences: {RunStats.Transcendences}\n\n" +
