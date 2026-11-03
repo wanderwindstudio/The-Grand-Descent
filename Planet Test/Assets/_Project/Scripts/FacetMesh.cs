@@ -12,9 +12,10 @@ namespace TestPlanet
         readonly List<int> indices = new List<int>();
         public void Triangle(Vector3 a, Vector3 b, Vector3 c, Color colour)
         {
+            // Vertex colours bypass Unity's material colour conversion. Convert artist-friendly sRGB to linear for URP.
             int start = vertices.Count;
             vertices.Add(a); vertices.Add(b); vertices.Add(c);
-            for (int i = 0; i < 3; i++) { indices.Add(start + i); colours.Add(colour); }
+            for (int i = 0; i < 3; i++) { indices.Add(start + i); colours.Add(colour.linear); }
         }
         public void Quad(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Color colour)
         { Triangle(a, b, c, colour); Triangle(a, c, d, colour); }

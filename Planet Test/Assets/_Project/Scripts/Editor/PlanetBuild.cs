@@ -79,6 +79,25 @@ namespace TestPlanet.Editor
                 AssetDatabase.CreateAsset(mat, Root + "Materials/" + feature.GetType().Name + ".mat");
                 prop.objectReferenceValue = mat; so.ApplyModifiedProperties();
             }
+            var atmosphere = world.GetComponent<PlanetAtmosphere>();
+            if (atmosphere != null)
+            {
+                var so = new SerializedObject(atmosphere);
+                if (stage == 3)
+                {
+                    so.FindProperty("giantPosition").vector3Value = new Vector3(1000,1150,3300);
+                    so.FindProperty("moonPosition").vector3Value = new Vector3(3500,1600,400);
+                    so.FindProperty("ringTilt").vector3Value = new Vector3(-8,0,-20);
+                    so.ApplyModifiedProperties();
+                }
+                var prop = so.FindProperty("celestialMaterial");
+                if (prop.objectReferenceValue == null)
+                {
+                    var mat = new Material(Shader.Find("Planet/Celestial"));
+                    AssetDatabase.CreateAsset(mat, Root + "Materials/Celestial.mat");
+                    prop.objectReferenceValue = mat; so.ApplyModifiedProperties();
+                }
+            }
             EditorSceneManager.MarkSceneDirty(world.gameObject.scene);
             EditorSceneManager.SaveOpenScenes(); AssetDatabase.SaveAssets();
             StartReview(stage);

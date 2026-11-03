@@ -2,6 +2,7 @@ using System.Collections;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace TestPlanet.Editor
 {
@@ -29,10 +30,10 @@ namespace TestPlanet.Editor
             var terrain = FindFirstObjectByType<PlanetTerrain>();
             camera.enabled = false;
             var fresh = new GameObject("Shore review camera").AddComponent<Camera>(); fresh.CopyFrom(camera);
-            camera = fresh; camera.enabled = true;
-            camera.transform.position = new Vector3(190, terrain.Height(190, -40) + 1.8f, -40);
-            if (Physics.Raycast(new Vector3(190, 250, -40), Vector3.down, out RaycastHit shore, 400)) camera.transform.position = shore.point + Vector3.up * 1.8f;
-            camera.transform.LookAt(new Vector3(65, 90, 52));
+            camera = fresh; camera.enabled = true; camera.GetUniversalAdditionalCameraData().renderPostProcessing = true;
+            camera.transform.position = new Vector3(-135, terrain.Height(-135, -105) + 1.8f, -105);
+            if (Physics.Raycast(new Vector3(-135, 250, -105), Vector3.down, out RaycastHit shore, 400)) camera.transform.position = shore.point + Vector3.up * 1.8f;
+            camera.transform.LookAt(new Vector3(65, 65, 52));
             Debug.Log($"REVIEW CAMERA {camera.transform.position} forward={camera.transform.forward} summit={terrain.Height(65,52)}");
             yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_shoreline");
             Debug.Log($"PLANET_REVIEW_PASS stage={stage} triangles={terrain.TriangleCount} colliders={FindObjectsByType<MeshCollider>(FindObjectsSortMode.None).Length}");

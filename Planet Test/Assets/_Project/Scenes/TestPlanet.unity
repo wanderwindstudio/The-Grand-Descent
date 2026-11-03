@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 92553460}
   - component: {fileID: 92553459}
   - component: {fileID: 92553462}
+  - component: {fileID: 92553463}
   m_Layer: 0
   m_Name: "PELAGIC \xB7 procedural ocean world"
   m_TagString: Untagged
@@ -180,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341c6a52e3262423c95892a726b843da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetWorld
-  stage: 2
+  stage: 3
   terrain: {fileID: 92553459}
 --- !u!4 &92553461
 Transform:
@@ -219,6 +220,35 @@ MonoBehaviour:
   waveFrequency: 0.075
   deepWater: {r: 0.035, g: 0.29, b: 0.29, a: 0.96}
   shallowWater: {r: 0.3, g: 0.63, b: 0.53, a: 0.96}
+--- !u!114 &92553463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92553458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0255bffe79f9e41dfb1ec5a840c8f93a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetAtmosphere
+  surfaceMaterial: {fileID: 2100000, guid: 9759f8366073244e1a78a11c22a2ed83, type: 2}
+  celestialMaterial: {fileID: 2100000, guid: bf41b231b2bfd4f3fa537551525a0276, type: 2}
+  horizon: {r: 0.57, g: 0.51, b: 0.64, a: 1}
+  zenith: {r: 0.09, g: 0.2, b: 0.34, a: 1}
+  sunColour: {r: 1, g: 0.65, b: 0.28, a: 1}
+  fogDensity: 0.0013
+  giantPosition: {x: 1000, y: 1150, z: 3300}
+  giantRadius: 670
+  ringTilt: {x: -8, y: 0, z: -20}
+  ringExtent: 1.85
+  moonPosition: {x: 3500, y: 1600, z: 400}
+  moonRadius: 125
+  bloom: 0.18
+  vignette: 0.12
+  exposure: 0.1
+  sunRotation: {x: 22, y: -38, z: 0}
+  sunIntensity: 2.1
 --- !u!1 &165574729
 GameObject:
   m_ObjectHideFlags: 0
