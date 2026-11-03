@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 92553461}
   - component: {fileID: 92553460}
   - component: {fileID: 92553459}
+  - component: {fileID: 92553462}
   m_Layer: 0
   m_Name: "PELAGIC \xB7 procedural ocean world"
   m_TagString: Untagged
@@ -179,7 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341c6a52e3262423c95892a726b843da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetWorld
-  stage: 1
+  stage: 2
   terrain: {fileID: 92553459}
 --- !u!4 &92553461
 Transform:
@@ -196,6 +197,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &92553462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92553458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cac83cdd35f174ff0a2e0bb6d86f3bd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetOcean
+  surfaceMaterial: {fileID: 2100000, guid: 6e4b525a4b80e4ce99bc785c2a39883a, type: 2}
+  seaLevel: 0
+  width: 1800
+  cells: 140
+  horizonDistance: 10000
+  waveHeight: 0.24
+  waveSpeed: 0.65
+  waveFrequency: 0.075
+  deepWater: {r: 0.035, g: 0.29, b: 0.29, a: 0.96}
+  shallowWater: {r: 0.3, g: 0.63, b: 0.53, a: 0.96}
 --- !u!1 &165574729
 GameObject:
   m_ObjectHideFlags: 0

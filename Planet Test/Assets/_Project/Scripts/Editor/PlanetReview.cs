@@ -25,6 +25,7 @@ namespace TestPlanet.Editor
             var camera = Camera.main;
             camera.transform.position = new Vector3(-430, 340, -430); camera.transform.LookAt(new Vector3(0, 18, 0));
             yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_aerial");
+            if (stage >= 2) { yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_ocean_motion"); }
             var terrain = FindFirstObjectByType<PlanetTerrain>();
             camera.enabled = false;
             var fresh = new GameObject("Shore review camera").AddComponent<Camera>(); fresh.CopyFrom(camera);

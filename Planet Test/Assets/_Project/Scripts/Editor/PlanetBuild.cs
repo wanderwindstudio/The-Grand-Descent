@@ -54,6 +54,9 @@ namespace TestPlanet.Editor
         }
         public static void Advance(int stage)
         {
+            foreach (string file in new[] { "DefaultVolumeProfile.asset", "UniversalRenderPipelineGlobalSettings.asset" })
+                if (AssetDatabase.LoadMainAssetAtPath("Assets/" + file) != null)
+                    AssetDatabase.MoveAsset("Assets/" + file, Root + "Materials/" + file);
             var world = Object.FindFirstObjectByType<PlanetWorld>();
             world.Stage = stage;
             string[] types = { "PlanetOcean", "PlanetAtmosphere", "PlanetPlayer", "PlanetProps", "PlanetTide" };
