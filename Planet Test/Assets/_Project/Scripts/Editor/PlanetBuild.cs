@@ -2,6 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using TMPro;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
@@ -57,6 +58,15 @@ namespace TestPlanet.Editor
             foreach (string file in new[] { "DefaultVolumeProfile.asset", "UniversalRenderPipelineGlobalSettings.asset" })
                 if (AssetDatabase.LoadMainAssetAtPath("Assets/" + file) != null)
                     AssetDatabase.MoveAsset("Assets/" + file, Root + "Materials/" + file);
+            if (Directory.Exists("Assets/TextMesh Pro"))
+            {
+                AssetDatabase.DeleteAsset(Root + "Shaders/TextMeshPro");
+                AssetDatabase.DeleteAsset(Root + "Materials/Fonts");
+                AssetDatabase.DeleteAsset("Assets/TextMesh Pro/Examples & Extras");
+                AssetDatabase.DeleteAsset("Assets/TextMesh Pro/Documentation");
+                AssetDatabase.MoveAsset("Assets/TextMesh Pro/Shaders", Root + "Shaders/TextMeshPro");
+                AssetDatabase.MoveAsset("Assets/TextMesh Pro", Root + "Materials/TMP Essentials");
+            }
             var world = Object.FindFirstObjectByType<PlanetWorld>();
             world.Stage = stage;
             string[] types = { "PlanetOcean", "PlanetAtmosphere", "PlanetPlayer", "PlanetProps", "PlanetTide" };
@@ -64,6 +74,26 @@ namespace TestPlanet.Editor
             {
                 var type = typeof(PlanetWorld).Assembly.GetType("TestPlanet." + types[i]);
                 if (type != null && world.GetComponent(type) == null) world.gameObject.AddComponent(type);
+            }
+            if(stage >= 6 && world.GetComponent<PlanetHud>() == null) world.gameObject.AddComponent<PlanetHud>();
+            if(stage >= 6)
+            {
+                var hud = world.GetComponent<PlanetHud>();
+                var so = new SerializedObject(hud);var prop = so.FindProperty("font");
+                if(prop.objectReferenceValue == null)
+                {
+                    // Use the prebuilt font from Unity's official TMP essentials; built-in runtime fonts lack source face data.
+                    var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(Root + "Materials/TMP Essentials/Resources/Fonts & Materials/LiberationSans SDF.asset");
+                    if (font == null) throw new System.InvalidOperationException("Unity TMP Essentials font is missing.");
+                    font.material.shader = Shader.Find("TextMeshPro/Distance Field");
+                    prop.objectReferenceValue=font;so.ApplyModifiedProperties();EditorUtility.SetDirty(font.material);
+                }
+            }
+            if(stage >= 6)
+            {
+                var font = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(Root + "Materials/TMP Essentials/Resources/Fonts & Materials/LiberationSans SDF.asset");
+                font.material.shader = AssetDatabase.LoadAssetAtPath<Shader>(Root + "Shaders/TextMeshPro/TMP_SDF.shader");
+                EditorUtility.SetDirty(font.material);
             }
             // Keep shader references in material assets, so a future player build does not strip them.
             foreach (var feature in world.GetComponents<MonoBehaviour>())

@@ -134,6 +134,8 @@ GameObject:
   - component: {fileID: 92553463}
   - component: {fileID: 92553464}
   - component: {fileID: 92553465}
+  - component: {fileID: 92553467}
+  - component: {fileID: 92553466}
   m_Layer: 0
   m_Name: "PELAGIC \xB7 procedural ocean world"
   m_TagString: Untagged
@@ -183,7 +185,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341c6a52e3262423c95892a726b843da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetWorld
-  stage: 5
+  stage: 6
   terrain: {fileID: 92553459}
 --- !u!4 &92553461
 Transform:
@@ -300,6 +302,53 @@ MonoBehaviour:
   organicSizes: {x: 0.65, y: 1.6}
   crystalEmission: {r: 0.12, g: 0.55, b: 0.49, a: 1}
   crystalMaterial: {fileID: 2100000, guid: ca969828430724d1887dc97c26269020, type: 2}
+--- !u!114 &92553466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92553458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee5c2fa17caca42b3baec24b719852eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetHud
+  font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  textColour: {r: 0.87, g: 0.93, b: 0.88, a: 1}
+  warningColour: {r: 1, g: 0.66, b: 0.32, a: 1}
+  readoutSize: 26
+  warningSize: 46
+  margin: 48
+  reticleSize: 3
+  refreshInterval: 0.1
+--- !u!114 &92553467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92553458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00d43bedc711443b09e1d5625ae714ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetTide
+  waveInterval: 90
+  warningDuration: 15
+  crestHeight: 60
+  drawdownDepth: 8
+  travelSpeed: 38
+  direction: {x: 1, y: 0.18}
+  offshoreMargin: 180
+  waveWidth: 1100
+  waveSegments: 72
+  recoveryDuration: 6
+  fadeInDuration: 0.65
+  sweepDuration: 1.6
+  pushSpeed: 32
+  shakeAmount: 0.28
+  surfaceMaterial: {fileID: 2100000, guid: f0e91e5f4269441678ea2e93bf9906d8, type: 2}
 --- !u!1 &165574729
 GameObject:
   m_ObjectHideFlags: 0

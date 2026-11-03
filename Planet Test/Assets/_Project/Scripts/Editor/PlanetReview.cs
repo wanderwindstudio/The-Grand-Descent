@@ -46,9 +46,39 @@ namespace TestPlanet.Editor
                 camera.transform.LookAt(new Vector3(-80,35,-140));
                 yield return Capture(camera, $"stage{stage}_summit");
             }
+            if(stage >= 6) yield return TideReview(camera, player, terrain);
             Debug.Log($"PLANET_REVIEW_PASS stage={stage} triangles={terrain.TriangleCount} colliders={FindObjectsByType<MeshCollider>(FindObjectsSortMode.None).Length}");
             SessionState.SetInt("PlanetReviewStage", 0);
             EditorApplication.ExitPlaymode();
+        }
+        static IEnumerator TideReview(Camera camera,PlanetPlayer player,PlanetTerrain terrain)
+        {
+            var tide=FindFirstObjectByType<PlanetTide>();var ocean=FindFirstObjectByType<PlanetOcean>();
+            Vector3 summit=player.Position;int before=player.Respawns;player.Respawn();before=player.Respawns;
+            Time.timeScale=4;
+            float timeout=Time.time+240;
+            while(tide.Phase!=PlanetTide.TidePhase.Drawdown && Time.time<timeout) yield return null;
+            while(tide.Countdown>2 && Time.time<timeout) yield return null;
+            camera.transform.position=new Vector3(0,18,-215);camera.transform.LookAt(new Vector3(120,8,-120));
+            yield return Capture(camera,"stage6_drawdown");
+            bool lowered=ocean.Level<ocean.RestLevel-5;
+            while((tide.Phase!=PlanetTide.TidePhase.Wave || tide.WaveCoordinate<0) && Time.time<timeout)yield return null;
+            camera.transform.position=new Vector3(-350,300,-350);camera.transform.LookAt(new Vector3(30,28,20));
+            yield return Capture(camera,"stage6_mid_wave");
+            while(tide.Phase!=PlanetTide.TidePhase.Calm && Time.time<timeout)yield return null;
+            bool swept=tide.Sweeps==1 && player.Respawns==before+1;
+            bool restored=Mathf.Abs(ocean.Level-ocean.RestLevel)<.01f;
+            player.Teleport(summit);int summitRespawns=player.Respawns;
+            int firstWave=tide.WavesLaunched;
+            while(tide.WavesLaunched==firstWave && Time.time<timeout)yield return null;
+            while(tide.Phase!=PlanetTide.TidePhase.Calm && Time.time<timeout)yield return null;
+            bool survived=player.Respawns==summitRespawns && player.Position.y>tide.Crest && tide.WavesLaunched==firstWave+1;
+            Time.timeScale=1;
+            camera.transform.position=summit+Vector3.up*1.8f;camera.transform.LookAt(new Vector3(-100,10,-130));
+            yield return Capture(camera,"stage6_safe_summit");
+            Debug.Log($"TIDE_REVIEW drawdown={lowered} sweptRespawn={swept} seaRestored={restored} summitSurvived={survived} launches={tide.WavesLaunched}");
+            File.WriteAllText("Assets/_Project/Screenshots/tide_review.txt",$"Drawdown: {lowered}\nLowland sweep and respawn: {swept}\nSea restored: {restored}\nSummit survival: {survived}\nWaves observed: {tide.WavesLaunched}\nDefault interval: 90s. Review ran at 4x game time after the climb.\n");
+            if(!lowered || !swept || !restored || !survived)Debug.LogError("TIDE_REVIEW_FAIL");
         }
         static IEnumerator WalkReview(PlanetPlayer player, PlanetTerrain terrain)
         {
@@ -76,6 +106,7 @@ namespace TestPlanet.Editor
         public static IEnumerator Capture(Camera camera, string name)
         {
             // Render explicitly at 1080p; the editor's docked Game view size does not change the evidence.
+            var hud=Object.FindFirstObjectByType<PlanetHud>();if(hud!=null)hud.SetReviewCamera(camera);
             var target = new RenderTexture(1920, 1080, 24);
             var previous = camera.targetTexture; camera.targetTexture = target; camera.aspect = 1920f / 1080f;
             camera.ResetWorldToCameraMatrix(); camera.ResetProjectionMatrix();
