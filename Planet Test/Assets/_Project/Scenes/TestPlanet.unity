@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 92553459}
   - component: {fileID: 92553462}
   - component: {fileID: 92553463}
+  - component: {fileID: 92553464}
   m_Layer: 0
   m_Name: "PELAGIC \xB7 procedural ocean world"
   m_TagString: Untagged
@@ -181,7 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341c6a52e3262423c95892a726b843da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetWorld
-  stage: 3
+  stage: 4
   terrain: {fileID: 92553459}
 --- !u!4 &92553461
 Transform:
@@ -249,6 +250,30 @@ MonoBehaviour:
   exposure: 0.1
   sunRotation: {x: 22, y: -38, z: 0}
   sunIntensity: 2.1
+--- !u!114 &92553464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 92553458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75aed5265c73d4be0bdf037479652554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetPlayer
+  spawnXZ: {x: -135, y: -105}
+  walkSpeed: 7
+  sprintSpeed: 12
+  jumpHeight: 1.5
+  gravity: 22
+  sensitivity: 0.11
+  eyeHeight: 1.75
+  bodyHeight: 1.9
+  bodyRadius: 0.35
+  slopeLimit: 58
+  stepHeight: 0.45
+  rescueDepth: -25
 --- !u!1 &165574729
 GameObject:
   m_ObjectHideFlags: 0

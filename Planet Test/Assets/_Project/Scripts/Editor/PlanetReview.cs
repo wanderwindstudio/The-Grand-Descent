@@ -24,6 +24,8 @@ namespace TestPlanet.Editor
             int stage = SessionState.GetInt("PlanetReviewStage", 1);
             yield return new WaitForSeconds(4);
             var camera = Camera.main;
+            var player = FindFirstObjectByType<PlanetPlayer>();
+            if (player != null) { player.ReviewControl = true; camera.transform.SetParent(null); PlanetPlayer.LockCursor(false); }
             camera.transform.position = new Vector3(-430, 340, -430); camera.transform.LookAt(new Vector3(0, 18, 0));
             yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_aerial");
             if (stage >= 2) { yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_ocean_motion"); }
@@ -36,9 +38,39 @@ namespace TestPlanet.Editor
             camera.transform.LookAt(new Vector3(65, 65, 52));
             Debug.Log($"REVIEW CAMERA {camera.transform.position} forward={camera.transform.forward} summit={terrain.Height(65,52)}");
             yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_shoreline");
+            if (stage >= 4)
+            {
+                yield return WalkReview(player, terrain);
+                camera.transform.position = player.Position + Vector3.up * 1.8f;
+                camera.transform.LookAt(new Vector3(-80,35,-140));
+                yield return Capture(camera, $"stage{stage}_summit");
+            }
             Debug.Log($"PLANET_REVIEW_PASS stage={stage} triangles={terrain.TriangleCount} colliders={FindObjectsByType<MeshCollider>(FindObjectsSortMode.None).Length}");
             SessionState.SetInt("PlanetReviewStage", 0);
             EditorApplication.ExitPlaymode();
+        }
+        static IEnumerator WalkReview(PlanetPlayer player, PlanetTerrain terrain)
+        {
+            player.Respawn();
+            for(int i=0;i<20;i++) { player.Move(Vector3.zero,false,false,.02f); yield return null; }
+            float startY=player.Position.y; bool jumped=false;
+            for(int i=0;i<35;i++)
+            {
+                player.Move(Vector3.zero,false,i==0,.02f);
+                if(player.Position.y>startY+.5f) jumped=true;
+                yield return null;
+            }
+            Vector3 target=new Vector3(terrain.VolcanoCentre.x-24,0,terrain.VolcanoCentre.y-12);
+            float elapsed=0; int rescues=player.Respawns;
+            while(elapsed<65)
+            {
+                Vector3 delta=target-player.Position;delta.y=0;
+                if(delta.magnitude<4) break;
+                player.Move(delta.normalized,true,false,.02f);elapsed+=.02f;yield return null;
+            }
+            bool climbed=player.Position.y>100 && player.Respawns==rescues;
+            Debug.Log($"PLAYER_REVIEW jump={jumped} craterReached={climbed} position={player.Position} simulatedSeconds={elapsed:F1}");
+            if(!jumped || !climbed) Debug.LogError("PLAYER_REVIEW_FAIL: jump or shore-to-crater climb");
         }
         public static IEnumerator Capture(Camera camera, string name)
         {
