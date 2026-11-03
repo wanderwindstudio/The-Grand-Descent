@@ -160,6 +160,7 @@ MonoBehaviour:
   chunks: 4
   cellsPerChunk: 40
   seaLevel: 0
+  seabedSlope: 0.65
   volcanoCentre: {x: 65, y: 52}
   volcanoHeight: 120
   volcanoRadius: 185
@@ -185,7 +186,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 341c6a52e3262423c95892a726b843da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetWorld
-  stage: 6
+  stage: 7
+  targetFrameRate: 60
   terrain: {fileID: 92553459}
 --- !u!4 &92553461
 Transform:
@@ -253,6 +255,9 @@ MonoBehaviour:
   exposure: 0.1
   sunRotation: {x: 22, y: -38, z: 0}
   sunIntensity: 2.1
+  lightColour: {r: 1, g: 0.81, b: 0.61, a: 1}
+  saturation: -7
+  contrast: 7
 --- !u!114 &92553464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,7 +270,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75aed5265c73d4be0bdf037479652554, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestPlanet.PlanetPlayer
-  spawnXZ: {x: -135, y: -105}
+  spawnXZ: {x: -155, y: -130}
   walkSpeed: 7
   sprintSpeed: 12
   jumpHeight: 1.5
@@ -302,6 +307,11 @@ MonoBehaviour:
   organicSizes: {x: 0.65, y: 1.6}
   crystalEmission: {r: 0.12, g: 0.55, b: 0.49, a: 1}
   crystalMaterial: {fileID: 2100000, guid: ca969828430724d1887dc97c26269020, type: 2}
+  rockDark: {r: 0.21, g: 0.27, b: 0.33, a: 1}
+  rockLight: {r: 0.42, g: 0.44, b: 0.47, a: 1}
+  stalkColour: {r: 0.3, g: 0.35, b: 0.38, a: 1}
+  fanTeal: {r: 0.36, g: 0.58, b: 0.51, a: 1}
+  fanMauve: {r: 0.58, g: 0.39, b: 0.51, a: 1}
 --- !u!114 &92553466
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -349,6 +359,16 @@ MonoBehaviour:
   pushSpeed: 32
   shakeAmount: 0.28
   surfaceMaterial: {fileID: 2100000, guid: f0e91e5f4269441678ea2e93bf9906d8, type: 2}
+  profile:
+  - {x: -100, y: -8}
+  - {x: -80, y: 12}
+  - {x: -45, y: 40}
+  - {x: -15, y: 60}
+  - {x: 3, y: 59}
+  - {x: 17, y: 51}
+  - {x: 19, y: 36}
+  - {x: 13, y: 13}
+  - {x: 18, y: -8}
 --- !u!1 &165574729
 GameObject:
   m_ObjectHideFlags: 0
@@ -359,7 +379,6 @@ GameObject:
   m_Component:
   - component: {fileID: 165574733}
   - component: {fileID: 165574732}
-  - component: {fileID: 165574731}
   - component: {fileID: 165574730}
   m_Layer: 0
   m_Name: Player Camera
@@ -412,14 +431,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &165574731
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 165574729}
-  m_Enabled: 1
 --- !u!20 &165574732
 Camera:
   m_ObjectHideFlags: 0
