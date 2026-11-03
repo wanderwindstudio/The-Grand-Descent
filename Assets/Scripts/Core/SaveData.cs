@@ -40,6 +40,7 @@ public class RunSave
     public List<string> spells = new List<string>();
     public int carriedGold;
     public float buzz;
+    public float tab; // Hangover mode: damage still owed
     public int kills;
     public float runSeconds;
 }

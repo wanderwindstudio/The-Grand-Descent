@@ -130,6 +130,19 @@ public class Missile : MonoBehaviour
             }
 
             if (goblin.IsDead || alreadyHit.Contains(goblin)) continue;
+            if (goblin.IsPhantom)
+            {
+                // A hallucination: it pops, but the shot counts as a miss (charges reset).
+                goblin.TakeDamage(shot.damage);
+                SpellFx.MissileImpact(point);
+                if (shot.countsMisses)
+                {
+                    if (Game.Charges.Charges > 0) RunStats.PhantomChargeResets++;
+                    Game.Charges.RegisterMiss();
+                }
+                End(missed: false);
+                return true;
+            }
             alreadyHit.Add(goblin);
             goblin.TakeDamage(shot.damage);
             SpellFx.MissileImpact(point);

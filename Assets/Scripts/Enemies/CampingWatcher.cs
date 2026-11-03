@@ -24,7 +24,7 @@ public class CampingWatcher : MonoBehaviour
         var t = Game.Tuning;
         float dt = Time.deltaTime;
         cooldownLeft -= dt;
-        if (RunManager.Instance.Current != RunManager.State.Playing || GoblinEnemy.Active.Count == 0 || dt <= 0f)
+        if (RunManager.Instance.Current != RunManager.State.Playing || GoblinEnemy.RealCount == 0 || dt <= 0f)
         {
             campTimer = 0f;
             return;

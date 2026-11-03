@@ -42,6 +42,13 @@ public class PlayerHealth : MonoBehaviour
     {
         if (IsDead || Game.GodMode || Time.time < invulnerableUntil) return false;
 
+        if (Game.Tab != null && Game.Tab.Absorbing)
+        {
+            // Hangover mode: numb. It goes on the Tab (or is ignored while the Tab is frozen).
+            Game.Tab.Add(amount);
+            Damaged?.Invoke(sourcePosition, amount);
+            return true;
+        }
         Current = Mathf.Max(0f, Current - amount);
         Damaged?.Invoke(sourcePosition, amount);
         if (Current <= 0f) Die();
@@ -52,9 +59,24 @@ public class PlayerHealth : MonoBehaviour
     public void LoseHealth(float amount)
     {
         if (IsDead || Game.GodMode) return;
+        if (Game.Tab != null && Game.Tab.Absorbing) { Game.Tab.Add(amount); return; }
         Current = Mathf.Max(0f, Current - amount);
         if (Current <= 0f) Die();
     }
+
+    // The Tab being paid. Returns true if it killed you.
+    public bool LoseHealthFromHangover(float amount)
+    {
+        if (IsDead || Game.GodMode) return false;
+        Current = Mathf.Max(0f, Current - amount);
+        if (Current > 0f) return false;
+        DiedToHangover = true;
+        RunStats.HangoverDeaths++; // before Die(), which writes the run log
+        Die();
+        return true;
+    }
+
+    public bool DiedToHangover { get; private set; }
 
     // Instant death regardless of health (the collapse).
     public void Kill()

@@ -1,6 +1,8 @@
 using UnityEngine;
 
 // The Buzz value, its slow drain, and the Transcendence -> Crash cycle at 100%.
+// Classic and Hangover modes differ in the damage curve, Transcendence and the Crash slowdown;
+// the Tab (Hangover only) lives in HangoverTab.
 public class BuzzMeter : MonoBehaviour
 {
     public enum Phase { Normal, Transcendent, Crash }
@@ -12,11 +14,26 @@ public class BuzzMeter : MonoBehaviour
     public float Normalized => Value / Game.Tuning.buzzMax;
     public bool IsHigh => Normalized >= Game.Tuning.buzzHighThreshold;
 
-    public float DamageMultiplier => Current == Phase.Transcendent
-        ? Game.Tuning.transcendenceDamageMultiplier
-        : 1f + Normalized * Game.Tuning.buzzMaxDamageBonus;
+    public static bool Hangover => Game.Tuning.buzzMode == BuzzMode.Hangover;
+
+    public float DamageMultiplier
+    {
+        get
+        {
+            var t = Game.Tuning;
+            if (!Hangover)
+                return Current == Phase.Transcendent ? t.transcendenceDamageMultiplier : 1f + Normalized * t.buzzMaxDamageBonus;
+            if (Current == Phase.Transcendent) return t.hangoverTranscendenceDamageMultiplier;
+            return 1f + (t.hangoverMaxDamageMultiplier - 1f) * Mathf.Pow(Mathf.Clamp01(Normalized), t.hangoverDamageExponent);
+        }
+    }
     public float FireRateMultiplier => Current == Phase.Transcendent ? Game.Tuning.transcendenceFireRateMultiplier : 1f;
-    public float MoveSpeedMultiplier => Current == Phase.Crash ? Game.Tuning.crashMoveSpeedMultiplier : 1f;
+    // Hangover mode never slows you down.
+    public float MoveSpeedMultiplier => Current == Phase.Crash && !Hangover ? Game.Tuning.crashMoveSpeedMultiplier : 1f;
+    public float TranscendenceDuration => Hangover ? Game.Tuning.hangoverTranscendenceDuration : Game.Tuning.transcendenceDuration;
+
+    // The Crash just started (the Tab is paid then).
+    public event System.Action CrashStarted;
 
     // Shrines and pickups. Ignored while transcendent or crashing.
     public void Add(float amount)
@@ -60,6 +77,7 @@ public class BuzzMeter : MonoBehaviour
                     PhaseTimeLeft = t.crashDuration;
                     Value = 0f;
                     Hud.ShowMessage("CRASH");
+                    CrashStarted?.Invoke();
                 }
                 break;
 
@@ -74,7 +92,7 @@ public class BuzzMeter : MonoBehaviour
     void StartTranscendence()
     {
         Current = Phase.Transcendent;
-        PhaseTimeLeft = Game.Tuning.transcendenceDuration;
+        PhaseTimeLeft = TranscendenceDuration;
         RunStats.Transcendences++;
         Hud.ShowMessage("TRANSCENDENCE");
     }

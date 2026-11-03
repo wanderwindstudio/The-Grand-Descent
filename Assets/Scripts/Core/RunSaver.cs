@@ -19,6 +19,7 @@ public static class RunSaver
             maxHealth = Game.PlayerHealth.Max,
             carriedGold = RunManager.Instance.CarriedGold,
             buzz = Game.Buzz.Value,
+            tab = Game.Tab != null ? Game.Tab.Amount : 0f,
             kills = RunStats.Kills,
             runSeconds = runSeconds,
         };
@@ -40,6 +41,7 @@ public static class RunSaver
         if (run.maxHealth > 0f) Game.PlayerHealth.Restore(run.health, run.maxHealth);
         RunManager.Instance.AddGold(run.carriedGold);
         Game.Buzz.SetValue(run.buzz);
+        if (Game.Tab != null) Game.Tab.Restore(run.tab);
         RunStats.Kills = run.kills;
     }
 }

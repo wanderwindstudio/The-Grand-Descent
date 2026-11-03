@@ -6,7 +6,7 @@ using UnityEngine;
 // Appends one line per run to run_log.csv in Application.persistentDataPath.
 public static class RunLog
 {
-    const string Header = "date_time,outcome,floor_reached,duration_seconds,kills,gold_carried,gold_banked,level_reached,upgrades_taken,seconds_above_70_buzz,transcendences,vortex_casts,max_charges_reached,arcane_upgrades_taken,ring_out_kills,barrel_kills,jumps";
+    const string Header = "date_time,outcome,floor_reached,duration_seconds,kills,gold_carried,gold_banked,level_reached,upgrades_taken,seconds_above_70_buzz,transcendences,vortex_casts,max_charges_reached,arcane_upgrades_taken,ring_out_kills,barrel_kills,jumps,buzz_mode,max_tab,tab_paid,tab_forgiven,hangover_deaths,hangover_bill_gold,phantoms_killed,phantom_charge_resets";
 
     public static string FilePath => Path.Combine(Application.persistentDataPath, "run_log.csv");
 
@@ -32,7 +32,15 @@ public static class RunLog
             "\"" + arcaneUpgrades + "\"",
             ringOutKills.ToString(inv),
             barrelKills.ToString(inv),
-            jumps.ToString(inv));
+            jumps.ToString(inv),
+            Game.Tuning.buzzMode.ToString(),
+            RunStats.MaxTab.ToString("0.0", inv),
+            RunStats.TabPaid.ToString("0.0", inv),
+            RunStats.TabForgiven.ToString("0.0", inv),
+            RunStats.HangoverDeaths.ToString(inv),
+            RunStats.HangoverBillGold.ToString(inv),
+            RunStats.PhantomsKilled.ToString(inv),
+            RunStats.PhantomChargeResets.ToString(inv));
         try
         {
             KeepOldLogIfColumnsChanged();

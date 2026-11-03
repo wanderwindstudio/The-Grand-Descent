@@ -23,6 +23,7 @@ public class RunManager : MonoBehaviour
     public bool Extracted { get; private set; }
     public bool DiedToCollapse { get; private set; }
     public int GoldBankedThisRun { get; private set; }
+    public int HangoverBill { get; private set; } // gold lost to the Tab on extraction
     public float RunDuration { get; private set; }
     public int LevelReached { get; private set; }
 
@@ -197,11 +198,19 @@ public class RunManager : MonoBehaviour
         Current = State.Summary;
         Extracted = extracted;
         RunDuration = RunSeconds;
+        if (extracted && Game.Tab != null && Game.Tab.Amount > 0f)
+        {
+            // Walking out with a Tab: it's paid in gold instead.
+            HangoverBill = Mathf.Min(CarriedGold, Game.Tab.SettleInGold());
+            CarriedGold -= HangoverBill;
+            RunStats.HangoverBillGold = HangoverBill;
+        }
         LevelReached = Game.Player.GetComponent<PlayerLevel>().Level;
         GoldBankedThisRun = extracted ? CarriedGold : Mathf.FloorToInt(CarriedGold * t.deathBankFraction);
 
         MetaProgress.RecordRun(GoldBankedThisRun, Game.Floor);
-        RunLog.Append(extracted ? "extracted" : DiedToCollapse ? "collapsed" : "died", Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
+        string outcome = extracted ? "extracted" : DiedToCollapse ? "collapsed" : Game.PlayerHealth.DiedToHangover ? "hangover" : "died";
+        RunLog.Append(outcome, Game.Floor, RunDuration, RunStats.Kills, CarriedGold, GoldBankedThisRun,
             LevelReached, UpgradeList(arcaneOnly: false), RunStats.SecondsAboveBuzzThreshold, RunStats.Transcendences,
             RunStats.VortexCasts, RunStats.MaxChargesReached, UpgradeList(arcaneOnly: true),
             RunStats.RingOutKills, RunStats.BarrelKills, RunStats.Jumps);

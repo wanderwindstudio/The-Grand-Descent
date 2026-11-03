@@ -12,7 +12,8 @@ public class WaveSpawner : MonoBehaviour
 
     public int WaveNumber { get; private set; }    // 1-based; 0 before the first wave
     public int WaveCount => Game.Tuning.waveEnemyCounts.Length;
-    public int EnemiesRemaining => GoblinEnemy.Active.Count + toSpawn;
+    public int EnemiesRemaining => GoblinEnemy.RealCount + toSpawn; // phantoms don't count
+    public bool WaveInProgress => state == State.Spawning || state == State.Fighting;
 
     List<Vector3> spawnPoints;
     SimplePool<GoblinEnemy> pool;
@@ -61,7 +62,8 @@ public class WaveSpawner : MonoBehaviour
                 break;
 
             case State.Fighting:
-                if (GoblinEnemy.Active.Count > 0) break;
+                if (GoblinEnemy.RealCount > 0) break;
+                PhantomSpawner.DispelAll(); // the wave is over: the hallucinations go too
                 if (WaveNumber >= WaveCount)
                 {
                     state = State.Idle;
@@ -96,6 +98,17 @@ public class WaveSpawner : MonoBehaviour
         if (NavMesh.SamplePosition(point, out NavMeshHit hit, t.spawnScatter * 2f, NavMesh.AllAreas))
             point = hit.position;
         pool.Get(point).Spawn(pool);
+    }
+
+    // A hallucinated goblin from a normal spawn point (see PhantomSpawner).
+    public void SpawnPhantom()
+    {
+        if (spawnPoints == null || spawnPoints.Count == 0) return;
+        Vector3 point = PickHiddenSpawnPoint();
+        if (NavMesh.SamplePosition(point, out NavMeshHit hit, 2f, NavMesh.AllAreas)) point = hit.position;
+        var g = pool.Get(point);
+        g.Spawn(pool);
+        g.MakePhantom();
     }
 
     // Ranged goblins sent after a player camping out of reach (see CampingWatcher).

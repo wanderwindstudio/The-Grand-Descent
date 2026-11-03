@@ -34,6 +34,7 @@ public static class PlayerBuilder
         Game.Charges = root.AddComponent<ArcaneCharges>();
         root.AddComponent<PlayerLevel>();
         Game.Buzz = root.AddComponent<BuzzMeter>();
+        Game.Tab = root.AddComponent<HangoverTab>();
         root.AddComponent<SpellSwap>();
         root.AddComponent<PlayerMotor>();
         root.AddComponent<LandingFeedback>();

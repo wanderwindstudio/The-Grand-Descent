@@ -6,9 +6,10 @@ using UnityEngine;
 public class CameraOffsets : MonoBehaviour
 {
     public static Vector3 Shake;
+    public static Vector3 Jolt; // the Hangover hitting
     public static Vector3 Dip;
 
-    void Awake() => Shake = Dip = Vector3.zero;
+    void Awake() => Shake = Jolt = Dip = Vector3.zero;
 
-    void LateUpdate() => transform.localPosition = Vector3.up * Game.Tuning.eyeHeight + Shake * GameSettings.Shake + Dip * GameSettings.Bob;
+    void LateUpdate() => transform.localPosition = Vector3.up * Game.Tuning.eyeHeight + (Shake + Jolt) * GameSettings.Shake + Dip * GameSettings.Bob;
 }
