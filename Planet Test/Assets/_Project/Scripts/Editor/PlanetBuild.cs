@@ -79,10 +79,24 @@ namespace TestPlanet.Editor
                 AssetDatabase.CreateAsset(mat, Root + "Materials/" + feature.GetType().Name + ".mat");
                 prop.objectReferenceValue = mat; so.ApplyModifiedProperties();
             }
+            var props = world.GetComponent<PlanetProps>();
+            if (props != null)
+            {
+                var so = new SerializedObject(props); var prop = so.FindProperty("crystalMaterial");
+                if (prop.objectReferenceValue == null)
+                {
+                    var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    mat.SetColor("_BaseColor", new Color(.10f,.45f,.40f)); mat.SetFloat("_Smoothness",.32f);
+                    mat.EnableKeyword("_EMISSION"); mat.SetColor("_EmissionColor",new Color(.2f,.8f,.7f));
+                    AssetDatabase.CreateAsset(mat, Root + "Materials/Crystal.mat");
+                    prop.objectReferenceValue = mat; so.ApplyModifiedProperties();
+                }
+            }
             var atmosphere = world.GetComponent<PlanetAtmosphere>();
             if (atmosphere != null)
             {
                 var so = new SerializedObject(atmosphere);
+                if (stage == 5) { so.FindProperty("fogDensity").floatValue = .00065f; so.ApplyModifiedProperties(); }
                 if (stage == 3)
                 {
                     so.FindProperty("giantPosition").vector3Value = new Vector3(1000,1150,3300);

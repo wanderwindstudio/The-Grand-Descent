@@ -11,7 +11,7 @@ namespace TestPlanet
         [SerializeField, Tooltip("Horizon and distance fog share this colour.")] Color horizon = new Color(.57f, .51f, .64f);
         [SerializeField, Tooltip("Deep overhead blue.")] Color zenith = new Color(.09f, .20f, .34f);
         [SerializeField, Tooltip("Warm amber sky glow.")] Color sunColour = new Color(1, .65f, .28f);
-        [SerializeField, Tooltip("Fog density. Keep low enough to see the volcano across the island.")] float fogDensity = .0013f;
+        [SerializeField, Tooltip("Fog density. Keep low enough to see the volcano across the island.")] float fogDensity = .00065f;
         [SerializeField, Tooltip("Gas giant fixed world position. Thousands of metres away makes walking parallax tiny.")] Vector3 giantPosition = new Vector3(1000, 1150, 3300);
         [SerializeField, Tooltip("Gas giant radius in metres.")] float giantRadius = 670;
         [SerializeField, Tooltip("Rotation of the gas giant and its rings.")] Vector3 ringTilt = new Vector3(-8, 0, -20);

@@ -23,6 +23,7 @@ namespace TestPlanet
         [SerializeField, Tooltip("Slate exposed on steep slopes.")] Color rock = new Color(.29f, .34f, .40f);
         [SerializeField, Tooltip("Dark basalt above the volcano's shoulder.")] Color basalt = new Color(.075f, .085f, .10f);
         [SerializeField, Tooltip("URP Lit Shader Graph driven by Vertex Color → Base Color.")] Material terrainMaterial;
+        public Material Surface => terrainMaterial;
         public Vector2 VolcanoCentre => volcanoCentre;
         public float Size => islandSize;
         public float SeaLevel => seaLevel;

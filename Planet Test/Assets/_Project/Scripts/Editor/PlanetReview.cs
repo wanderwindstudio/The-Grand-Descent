@@ -26,7 +26,7 @@ namespace TestPlanet.Editor
             var camera = Camera.main;
             var player = FindFirstObjectByType<PlanetPlayer>();
             if (player != null) { player.ReviewControl = true; camera.transform.SetParent(null); PlanetPlayer.LockCursor(false); }
-            camera.transform.position = new Vector3(-430, 340, -430); camera.transform.LookAt(new Vector3(0, 18, 0));
+            camera.transform.position = new Vector3(-350, 450, -350); camera.transform.LookAt(Vector3.zero);
             yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_aerial");
             if (stage >= 2) { yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_ocean_motion"); }
             var terrain = FindFirstObjectByType<PlanetTerrain>();
@@ -38,6 +38,7 @@ namespace TestPlanet.Editor
             camera.transform.LookAt(new Vector3(65, 65, 52));
             Debug.Log($"REVIEW CAMERA {camera.transform.position} forward={camera.transform.forward} summit={terrain.Height(65,52)}");
             yield return new WaitForSeconds(1); yield return Capture(camera, $"stage{stage}_shoreline");
+            if (stage >= 5) Debug.Log("PROP_VALIDATION " + FindFirstObjectByType<PlanetProps>().ValidatePlacements(terrain));
             if (stage >= 4)
             {
                 yield return WalkReview(player, terrain);
